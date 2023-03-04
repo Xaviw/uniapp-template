@@ -1,0 +1,15 @@
+{
+  "name": "uniapp-template",
+  "packageManager": "pnpm@7.27.1",
+  "description": "uniapp移动端APP混合开发模板",
+  "version": "1.0.0",
+  "main": "main.js",
+  "dependencies": {
+    "js-base64": "^3.7.5",
+    "js-md5": "^0.7.3",
+    "json-bigint": "^1.0.0",
+    "lodash-es": "^4.17.21",
+    "protobufjs": "^7.2.2",
+    "tki-qrcode": "^0.1.6"
+  }
+}

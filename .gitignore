@@ -1,0 +1,6 @@
+.yarn/*
+node_modules/
+unpackage/cache
+unpackage/dist
+.DS_Store
+.hbuilderx/
