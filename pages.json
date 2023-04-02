@@ -1,16 +1,65 @@
 {
-	"pages": [{
-		"path": "pages/index/index",
-		"style": {
-			"navigationBarTitleText": ""
-		}
-	}],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "",
-		"app-plus": {
-			"bounce": "none",
-			"scrollIndicator": "none"
-		}
-	}
+  // 用于模拟直达页面，仅开发期间生效
+  // "condition": {
+  //   "current": 0, // 当前激活的模式(list的索引项)
+  //   "list": [{
+  //     "name": "test", // 模式名称
+  //     "path": "pages/test", // 启动页面，必选
+  //     "query": "" // 启动参数，在页面的onLoad函数里面得到
+  //   }]
+  // },
+  "pages": [
+  {
+    "path": "pages/index/index",
+    "style": {
+      "navigationBarTitleText": ""
+    }
+  },
+  {
+    "path": "pages/common/webView/webView"
+  },
+  {
+    "path": "pages/common/noNetwork/noNetwork",
+    "style": {
+      "navigationStyle": "custom",
+      "app-plus": {
+        "popGesture": "none",
+        "animationType": "fade-in"
+      }
+    }
+  }],
+  // APP端修改后需要重新运行才有效果
+  "globalStyle": {
+    "navigationBarTitleText": "默认标题",
+    "navigationBarBackgroundColor": "#f3f4f6", // 导航栏颜色
+    "navigationBarTextStyle": "black", // 页面标题颜色
+    "backgroundColorTop": "#ffffff", // ios回弹区域背景色
+    "backgroundColorBottom": "#ffffff", // ios底部回弹区域背景色
+    "backgroundColor": "#ffffff", // 微信小程序下拉背景颜色
+    "backgroundTextStyle": "light", // 微信小程序下拉三个圆点样式
+    // "titleImage": "", // 图片作为页面标题，测试仅h5生效
+    // "transparentTitle": "none", // APP、H5生效，等同于无导航栏
+    // "titlePenetrate": "NO", // 导航栏点击穿透，支付宝小程序、H5
+    // "pageOrientation": "portrait", // 设置APP端屏幕方向，auto、landscape均会导致微信小程序横屏
+    "app-plus": {
+      "background": "#f3f4f6", // 页面底色，vue页面需要设置page背景色透明，此处设置应和App.vue page样式背景色统一
+      "bounce": "none", // 回弹效果，安卓测试无效
+      "popGesture": "close", // ios侧滑返回
+      // "animationType": "auto",
+      // "animationDuration": 300,
+      // "titleNView": {},
+      // "subNVues": [],
+      // "softinputNavBar": "auto", // none时关闭ios软键盘工具栏显示
+      // "softinputmode": "adjustPan", // 软键盘弹出模式
+      // "scrollIndicator": "none", // none时不显示滚动条
+      "pullToRefresh": {
+        // "support": false,
+        // "color": "#19be6b", // circle样式颜色
+        // "offset": "0px", // 动画出现的偏移量
+        // "range": "", // 可拖到的范围
+        "height": "100px", // 触发刷新需要拖动的范围
+        "style": "circle" // 安卓default无效
+      }
+    }
+  }
 }

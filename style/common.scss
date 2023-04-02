@@ -6,9 +6,10 @@
 .h-full {
   height: 100%;
 }
-// nvue默认flex
+// nvue默认元素为flex，添加flex类后变为统一的横向便于组件公用
 .flex {
   display: flex;
+  flex-direction: row;
 }
 // 浮动
 .float-right {
@@ -51,6 +52,9 @@
 // nvue默认
 .border-box {
   box-sizing: border-box;
+}
+.text-nowrap {
+  white-space: nowrap;
 }
 /* #endif */
 
@@ -131,12 +135,15 @@
 .sticky {
   position: sticky;
 }
-// 颜色bacground-color 、color
+// 颜色background-color 、color
 .text-black {
   color: #000;
 }
 .text-white {
   color: #fff;
+}
+.text-link {
+  color: #2979ff;
 }
 .bg {
   background-color: $u-bg-color;
@@ -160,38 +167,16 @@
 .text-bold {
   font-weight: 700;
 }
-.text-main {
-  color: $u-main-color;
-}
-.text-content {
-  color: $u-content-color;
-}
-.text-tips {
-  color: $u-tips-color;
-}
-.text-light {
-  color: $u-light-color;
-}
-// 边框扩展颜色
-.border-main {
-  border-color: $u-main-color;
-}
-.border-content {
-  border-color: $u-content-color;
-}
-.border-tips {
-  border-color: $u-tips-color;
-}
-.border-light {
-  border-color: $u-light-color;
-}
-.border-base {
-  border-color: $u-border-color;
-}
 // 其他
 .box-shadow {
   box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.1);
 }
 .rounded {
   border-radius: 50%;
+}
+.ellipsis {
+  text-overflow: ellipsis;
+}
+.overflow-hidden {
+  overflow: hidden;
 }

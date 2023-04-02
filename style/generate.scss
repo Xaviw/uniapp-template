@@ -1,14 +1,14 @@
 $num: 0; //循环计数器
-$sum: 30; //循环次数，用于控制生成calss的数量
+$sum: 30; //循环次数，用于控制生成class的数量
 $step: 2; //步长，由于设计稿2rpx=1px，故此处步长为2
-$pixis: 'rpx'; //单位
+$unit: 'rpx'; //单位
 
 $primary_list: $u-primary, $u-success, $u-warning, $u-error, $u-info;
 $dark_list: $u-primary-dark, $u-success-dark, $u-warning-dark, $u-error-dark, $u-info-dark;
 $disabled_list: $u-primary-disabled, $u-success-disabled, $u-warning-disabled, $u-error-disabled, $u-info-disabled;
 $light_list: $u-primary-light, $u-success-light, $u-warning-light, $u-error-light, $u-info-light;
 $color_list: $primary_list, $dark_list, $disabled_list, $light_list;
-$color_level: 'paimary', 'dark', 'disabled', 'light';
+$color_level: 'primary', 'dark', 'disabled', 'light';
 $color_type: 'primary', 'success', 'warning', 'error', 'info';
 
 @while $num < ($sum + 1) {
@@ -21,115 +21,115 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 
   // 宽高
   .w-#{$num} {
-    width: #{$num * $step}#{$pixis};
+    width: #{$num * $step}#{$unit};
   }
   .w-#{$num + $sum} {
-    width: #{$num + $sum}#{$pixis};
+    width: #{$num + $sum}#{$unit};
   }
   .h-#{$num } {
-    height: #{$num * $step}#{$pixis};
+    height: #{$num * $step}#{$unit};
   }
   .h-#{$num + $sum} {
-    height: #{$num + $sum}#{$pixis};
+    height: #{$num + $sum}#{$unit};
   }
   //padding
   .p-#{$num} {
-    padding: #{$num * $step}#{$pixis};
+    padding: #{$num * $step}#{$unit};
   }
   .px-#{$num} {
-    padding-left: #{$num * $step}#{$pixis};
-    padding-right: #{$num * $step}#{$pixis};
+    padding-left: #{$num * $step}#{$unit};
+    padding-right: #{$num * $step}#{$unit};
   }
   .py-#{$num} {
-    padding-top: #{$num * $step}#{$pixis};
-    padding-bottom: #{$num * $step}#{$pixis};
+    padding-top: #{$num * $step}#{$unit};
+    padding-bottom: #{$num * $step}#{$unit};
   }
   .pt-#{$num} {
-    padding-top: #{$num * $step}#{$pixis};
+    padding-top: #{$num * $step}#{$unit};
   }
   .pr-#{$num} {
-    padding-right: #{$num * $step}#{$pixis};
+    padding-right: #{$num * $step}#{$unit};
   }
   .pb-#{$num} {
-    padding-bottom: #{$num * $step}#{$pixis};
+    padding-bottom: #{$num * $step}#{$unit};
   }
   .pl-#{$num} {
-    padding-left: #{$num * $step}#{$pixis};
+    padding-left: #{$num * $step}#{$unit};
   }
   //margin
   .m-#{$num} {
-    margin: #{$num * $step}#{$pixis};
+    margin: #{$num * $step}#{$unit};
   }
   .mx-#{$num} {
-    margin-left: #{$num * $step}#{$pixis};
-    margin-right: #{$num * $step}#{$pixis};
+    margin-left: #{$num * $step}#{$unit};
+    margin-right: #{$num * $step}#{$unit};
   }
   .my-#{$num} {
-    margin-top: #{$num * $step}#{$pixis};
-    margin-bottom: #{$num * $step}#{$pixis};
+    margin-top: #{$num * $step}#{$unit};
+    margin-bottom: #{$num * $step}#{$unit};
   }
   .mt-#{$num} {
-    margin-top: #{$num * $step}#{$pixis};
+    margin-top: #{$num * $step}#{$unit};
   }
   .mr-#{$num} {
-    margin-right: #{$num * $step}#{$pixis};
+    margin-right: #{$num * $step}#{$unit};
   }
   .mb-#{$num} {
-    margin-bottom: #{$num * $step}#{$pixis};
+    margin-bottom: #{$num * $step}#{$unit};
   }
   .ml-#{$num} {
-    margin-left: #{$num * $step}#{$pixis};
+    margin-left: #{$num * $step}#{$unit};
   }
   // border
   .border-#{$num} {
-    border-width: #{$num * $step}#{$pixis};
+    border-width: #{$num * $step}#{$unit};
   }
   .border-t-#{$num} {
-    border-top-width: #{$num * $step}#{$pixis};
+    border-top-width: #{$num * $step}#{$unit};
   }
   .border-r-#{$num} {
-    border-right-width: #{$num * $step}#{$pixis};
+    border-right-width: #{$num * $step}#{$unit};
   }
   .border-b-#{$num} {
-    border-bottom-width: #{$num * $step}#{$pixis};
+    border-bottom-width: #{$num * $step}#{$unit};
   }
   .border-l-#{$num} {
-    border-left-width: #{$num * $step}#{$pixis};
+    border-left-width: #{$num * $step}#{$unit};
   }
   .rounded-#{$num} {
-    border-radius: #{$num * $step}#{$pixis};
+    border-radius: #{$num * $step}#{$unit};
   }
   // line-height
   .leading-#{$num} {
-    line-height: #{$num * $step}#{$pixis};
+    line-height: #{$num * $step}#{$unit};
   }
   //定位相关
   .t-#{$num} {
-    top: #{$num * $step}#{$pixis};
+    top: #{$num * $step}#{$unit};
   }
   .r-#{$num} {
-    right: #{$num * $step}#{$pixis};
+    right: #{$num * $step}#{$unit};
   }
   .b-#{$num} {
-    bottom: #{$num * $step}#{$pixis};
+    bottom: #{$num * $step}#{$unit};
   }
   .l-#{$num} {
-    left: #{$num * $step}#{$pixis};
+    left: #{$num * $step}#{$unit};
   }
   // 字号
   .text-#{$num} {
-    font-size: #{$num * $step}#{$pixis};
+    font-size: #{$num * $step}#{$unit};
   }
   $num: $num + 1;
 }
 /* #ifndef APP-NVUE */
 //百分比 高度、宽度拓展
-@for $precentage from 1 through 10 {
-  .w-p-#{$precentage * 10} {
-    width: #{$precentage * 10}#{'%'};
+@for $percent from 1 through 10 {
+  .w-p-#{$percent * 10} {
+    width: #{$percent * 10}#{'%'};
   }
-  .h-p-#{$precentage * 10} {
-    height: #{$precentage * 10}#{'%'};
+  .h-p-#{$percent * 10} {
+    height: #{$percent * 10}#{'%'};
   }
 }
 /* #endif */

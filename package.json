@@ -1,10 +1,21 @@
 {
   "name": "uniapp-template",
-  "packageManager": "pnpm@7.27.1",
-  "description": "uniapp移动端APP混合开发模板",
   "version": "1.0.0",
+  "description": "uniapp混合开发模板",
+  "keywords": [
+    "uniapp",
+    "uniapp模板"
+  ],
+  "repository": "https://github.com/Xaviw/uniapp-template",
+  "license": "MIT",
+  "author": {
+    "name": "xavi",
+    "email": "xaviw@foxmail.com",
+    "url": "https://xaviw.github.io/XaviDocs/"
+  },
   "main": "main.js",
   "dependencies": {
+    "@limm/uni-pushy-client": "^0.6.0",
     "js-base64": "^3.7.5",
     "js-md5": "^0.7.3",
     "json-bigint": "^1.0.0",

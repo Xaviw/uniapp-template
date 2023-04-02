@@ -1,6 +1,5 @@
 export default function audioPlay(content) {
-  if (uni.getSystemInfoSync()
-    .platform === 'ios')
+  if (uni.getSystemInfoSync().platform === 'ios')
     iosPlay(content)
   else
     androidPlay(content)
