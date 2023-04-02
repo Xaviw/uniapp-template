@@ -9,8 +9,6 @@
 
   通过插件市场导入uni_modules，相比于npm安装多了代码提示，使用前先右击**uni_modules/uview-ui->从插件市场更新**
 
-- [luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)(uview 中已集成的请求库)
-
 ## 项目配置
 
 根目录下`config.js`文件中已书写了模板用到的公共配置项，可以搜索配置项查看用途后按需填写，以及自由添加其他配置项
@@ -216,6 +214,10 @@ const strategies = [
   },
 ]
 ```
+
+## 自动更新
+
+项目内采用[upushy](https://ext.dcloud.net.cn/plugin?id=4200)提供的更新策略，upushy后台配置好应用后，填写`config.js`中相关配置即可使用
 
 ## npm库
 
