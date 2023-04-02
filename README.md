@@ -1,5 +1,7 @@
 # uniapp混合开发模板
 
+该项目为HBuilderX下使用的模板，可以参考另一个仓库[HBuilderX-Settings](https://github.com/Xaviw/HBuilderX-Settings)统一HBuilderX设置
+
 ## 技术栈
 
 - uni-app
@@ -11,19 +13,19 @@
 
 ## 项目配置
 
-根目录下`config.js`文件中已书写了模板用到的公共配置项，可以搜索配置项查看用途后按需填写，以及自由添加其他配置项
+根目录下`config.js`文件中已书写了模板用到的公共配置项，可以搜索配置项查看用途后按需填写，可以自由添加其他配置项
 
 > 部分方法中可能需要修改的部分已用`FIX`注释标注，可以全局搜索并查看是否需要修改
 
 ## 样式
 
 1. 定义了类似Tailwind的常用css类，查看`style/common.scss`、`style/generate.scss`，`generate`默认生成范围为`0-30`，可以自行修改文件顶部的配置项
-2. 可以在`style/uview.theme.scss`中替换uview主题颜色，uview组件并不是直接使用的主题色变量，所以需要按下一条单独设置
+2. 按需在`style/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
 3. 按需在`style/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
 
 ### CSS类列表
 
-基础样式查看`style/common.scss`文件，同时uview也提供了部分css类，可以查看`uview-ui/libs/css/`下的文件，`common.scss`中未定义且较为实用的有：
+基础样式查看`style/common.scss`文件，同时uview也提供了部分css类，可以查看`uview-ui/libs/css/`下的文件，较为实用的有：
 
 |        名称         |         对应样式         | 范围  |
 | :-----------------: | :----------------------: | :---: |
@@ -55,7 +57,7 @@ $unit: 'rpx'; //单位
 
 使用时`bg-primary`对应`background-color: $u-primary`，`text-primary-dark`对应`color: $u-primary-dark`
 
-**后续使用`x`代替类名中的`num`，使用`y`代替生成的值，不在重复书写**
+**后续使用`x`代替类名中的`num`，使用`y`代替生成的值，不再重复书写**
 
 |              名称              |        对应样式        |          范围          | 兼容性 |
 | :----------------------------: | :--------------------: | :--------------------: | :----: |
@@ -109,15 +111,13 @@ page {
 }
 ```
 
-NVUE页面不支持标签样式，需要单独定义，`pages.json -> globalStyle -> app-plus -> background`属性与这里的背景色设置一致，便能保证所有页面背景色统一
+NVUE页面不支持标签样式，需要单独定义。`pages.json -> globalStyle -> app-plus -> background`属性与这里的背景色设置一致，便能保证所有页面背景色统一
 
 另外`pages.json`文件中对其他样式属性做了说明，可以按需求进行修改
 
 ## 请求
 
-使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`network/request.js`中。api定义在根目录api文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`network/request.js`文件，重新定义一个实例即可
-
-内部响应验证以及默认请求头等可以自定义，关键信息已用`FIX`注释标注
+使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`network/request.js`中。请求接口定义在根目录api文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`network/request.js`文件，重新定义一个实例即可
 
 同时还扩展了几个自定义属性：
 
@@ -163,7 +163,7 @@ fetchData()
     // 比如fetchData返回500，默认会显示提示信息"服务器错误，请稍后再试！"
     // 直接调用后则不展示提示信息
     response.cancelOrResetToast()
-    // 也可以手动设置提示信息
+    // 也可以覆盖提示信息
     response.cancelOrResetToast('服务器挂了')
   })
 ```
@@ -197,17 +197,17 @@ uni.$socket.disconnect()
 
 socket消息处理定义在`utils/socketUtil.js`中，用策略模式分别处理对应的消息类型
 
-如果用到了protobuf序列化，在`utils/protobufUtil.js`中定义了`decode`、`encode`、`deserialize`方法:
+如果用到了protobuf序列化，需要替换`libs/proto.js`文件。在`utils/protobufUtil.js`中定义了`decode`、`encode`、`deserialize`方法:
 
 ```js
 import { encode, decode, deserialize } from '@/utils/protobufUtil.js'
 
 const strategies = [
   {
-    type, // commandId
+    type, // commandId，因为protobuf中commandId是唯一的，不需要连同serviceId一起判断
     parser, // protobuf解析方法
     handler: msg => {
-      // 这里的msg就是decode后的
+      // 这里的msg已经是decode后的数据
       // 可以使用deserialize解析其中的json数据
       const data = deserialize(msg.data)
     },
@@ -274,7 +274,7 @@ parse(data)
 import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js'
 ```
 
-此外utils目录下定义部分常用工具函数:
+此外utils目录下定义了部分常用工具函数:
 
 ```js
 // 手机号、银行卡号脱敏
