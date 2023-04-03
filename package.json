@@ -2,10 +2,6 @@
   "name": "uniapp-template",
   "version": "1.0.0",
   "description": "uniapp混合开发模板",
-  "keywords": [
-    "uniapp",
-    "uniapp模板"
-  ],
   "repository": "https://github.com/Xaviw/uniapp-template",
   "license": "MIT",
   "author": {
