@@ -19,6 +19,6 @@ export const LOGIN_PATH = ''
 // 首页地址
 export const HOME_PATH = ''
 // 更新检测地址
-export const UPDATE_SERVER = 'http://218.203.235.55:13789/prod_api/api/basic/update'
+export const UPDATE_SERVER = ''
 // 更新检测ID
 export const UPDATE_ID = ''

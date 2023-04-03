@@ -1,13 +1,13 @@
 <script>
 import { watchMiniPaymentState, navToFirstPage, watchNetworkState } from '@/utils/helper.js'
 import { watchSocketMessage } from '@/utils/socketUtil.js'
-import pushy from '@/utils/update.js'
+import checkUpdate from '@/utils/update.js'
 
 export default {
   onLaunch() {
     // #ifdef APP-PLUS
     navToFirstPage()
-    pushy.getUpdate()
+    checkUpdate()
     // #endif
     watchNetworkState()
     watchSocketMessage()
