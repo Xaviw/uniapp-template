@@ -119,6 +119,10 @@ NVUE页面不支持标签样式，需要单独定义。`pages.json -> globalStyl
 
 另外`pages.json`文件中对其他样式属性做了说明，可以按需求进行修改
 
+### 扩展图标
+
+如果有扩展图标的需求，请在[iconfont](https://www.iconfont.cn/)中将图标保存至一个项目后，按uview官方指南-[CustomIcon 扩展自定义图标库](https://www.uviewui.com/guide/customIcon.html)进行操作
+
 ## 请求
 
 使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`network/request.js`中。请求接口定义在根目录api文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`network/request.js`文件，重新定义一个实例即可
