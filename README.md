@@ -1,6 +1,10 @@
 # uniapp混合开发模板
 
-该项目为HBuilderX下使用的模板，可以参考另一个仓库[HBuilderX-Settings](https://github.com/Xaviw/HBuilderX-Settings)统一HBuilderX设置
+当前`1.0`版本仅是根据自身业务需求搭建的一套跨端应用开发框架，本人经验有限，功能与开发体验并没有特别完善，例如没有权限控制功能，没有做全端的兼容性处理等...
+
+开发这个仓库的初衷是让自身业务开发中框架更为易用，以及提升自己逻辑抽离、封装能力。如果业务需求不复杂，可以尝试直接使用本框架。或者同样处在学习阶段的朋友，可以尝试阅读仓库源码可能能够得到部分业务框架搭建灵感
+
+> 该项目为HBuilderX下使用的模板，可以参考另一个仓库[HBuilderX-Settings](https://github.com/Xaviw/HBuilderX-Settings)设置HBuilderX编辑器代码格式化等相关功能
 
 ## 技术栈
 
