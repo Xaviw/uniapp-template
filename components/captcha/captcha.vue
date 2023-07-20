@@ -1,5 +1,12 @@
 <template>
-  <view><canvas :style="{ width: width + 'px', height: height + 'px' }" canvas-id="imgcanvas" @error="canvasIdErrorCallback"></canvas></view>
+  <view>
+    <canvas
+      :style="{ width: width + 'px', height: height + 'px' }"
+      canvas-id="imgcanvas"
+      @error="canvasIdErrorCallback"
+    >
+    </canvas>
+  </view>
 </template>
 
 <script>
@@ -8,45 +15,45 @@ export default {
   props: {
     width: {
       type: Number,
-      default: 70
+      default: 70,
     },
     height: {
       type: Number,
-      default: 30
+      default: 30,
     },
     code: {
       type: String,
-      default: ''
+      default: '',
     },
     codeLength: {
       type: Number,
-      default: 4
+      default: 4,
     },
     isRandom: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   watch: {
     code: {
       handler(newCode) {
         if (newCode || this.isRandom) {
-          this.render();
+          this.render()
         }
       },
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   methods: {
-    render: function() {
+    render() {
       var context = uni.createCanvasContext('imgcanvas', this),
         w = this.width,
-        h = this.height;
-      var fontSize = 18;
-      var padding = (w - fontSize * this.codeLength) / (this.codeLength + 1);
-      context.setFillStyle('white');
-      context.setLineWidth(5);
-      context.fillRect(0, 0, w, h);
+        h = this.height
+      var fontSize = 18
+      var padding = (w - fontSize * this.codeLength) / (this.codeLength + 1)
+      context.setFillStyle('white')
+      context.setLineWidth(5)
+      context.fillRect(0, 0, w, h)
       var pool = [
           'A',
           'B',
@@ -84,47 +91,47 @@ export default {
           '7',
           '8',
           '9',
-          '0'
+          '0',
         ],
-        str = '';
+        str = ''
       for (var i = 0; i < this.codeLength; i++) {
-        var c = this.isRandom ? pool[this.rn(0, pool.length - 1)] : this.code[i];
-        var deg = this.rn(-30, 30);
-        context.setFontSize(fontSize);
-        context.setTextBaseline('top');
-        context.setFillStyle(this.rc(80, 150));
-        context.save();
-        context.translate(fontSize * i + padding, parseInt(h / 1.5));
-        context.rotate((deg * Math.PI) / 180);
-        context.fillText(c, 0, -15);
-        context.restore();
-        str += c;
+        var c = this.isRandom ? pool[this.rn(0, pool.length - 1)] : this.code[i]
+        var deg = this.rn(-30, 30)
+        context.setFontSize(fontSize)
+        context.setTextBaseline('top')
+        context.setFillStyle(this.rc(80, 150))
+        context.save()
+        context.translate(fontSize * i + padding, parseInt(h / 1.5))
+        context.rotate((deg * Math.PI) / 180)
+        context.fillText(c, 0, -15)
+        context.restore()
+        str += c
       }
       uni.setStorage({
         key: 'imgcode',
-        data: str
-      });
+        data: str,
+      })
       for (var i = 0; i < this.codeLength * 10; i++) {
-        context.beginPath();
-        context.arc(this.rn(0, w), this.rn(0, h), 1, 0, 2 * Math.PI);
-        context.closePath();
-        context.setFillStyle(this.rc(150, 200));
-        context.fill();
+        context.beginPath()
+        context.arc(this.rn(0, w), this.rn(0, h), 1, 0, 2 * Math.PI)
+        context.closePath()
+        context.setFillStyle(this.rc(150, 200))
+        context.fill()
       }
-      context.draw();
+      context.draw()
     },
     rc: function(min, max) {
-      var r = this.rn(min, max);
-      var g = this.rn(min, max);
-      var b = this.rn(min, max);
-      return 'rgb(' + r + ',' + g + ',' + b + ')';
+      var r = this.rn(min, max)
+      var g = this.rn(min, max)
+      var b = this.rn(min, max)
+      return 'rgb(' + r + ',' + g + ',' + b + ')'
     },
     rn: function(max, min) {
-      return parseInt(Math.random() * (max - min)) + min;
+      return parseInt(Math.random() * (max - min)) + min
     },
     canvasIdErrorCallback: function(e) {
-      console.error(e.detail.errMsg);
-    }
-  }
-};
+      console.error(e.detail.errMsg)
+    },
+  },
+}
 </script>

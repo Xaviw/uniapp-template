@@ -1,6 +1,10 @@
-.yarn/*
-node_modules/
-unpackage/cache
-unpackage/dist
 .DS_Store
-.hbuilderx/
+/.idea/*
+/.hbuilderx/
+/.vscode/
+/node_modules/*
+/unpackage/dist/build/*
+/unpackage/dist/dev/*
+/unpackage/cache/*
+/unpackage/release/*
+!/unpackage/dist/build/h5

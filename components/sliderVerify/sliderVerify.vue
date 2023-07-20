@@ -6,7 +6,16 @@
       <text :style="{ color: isSuccess ? '#fff' : '' }">{{ text }}</text>
     </view>
     <movable-area ref="area" id="area" :style="{ height: '88rpx', flex: 1 }">
-      <movable-view ref="slider" id="slider" class="slider" direction="horizontal" :disabled="isSuccess || disabled" :x="x" @change="onChange" @touchend="onEnd">
+      <movable-view
+        ref="slider"
+        id="slider"
+        class="slider"
+        direction="horizontal"
+        :disabled="isSuccess || disabled"
+        :x="x"
+        @change="onChange"
+        @touchend="onEnd"
+      >
         <u-icon size="20" :name="getIcon" color="#fff"></u-icon>
       </movable-view>
     </movable-area>
@@ -15,59 +24,59 @@
 
 <script>
 export default {
-  name: 'slider-verify',
+  name: 'sliderVerify',
   emits: ['success'],
   props: {
     text: { type: String, default: '' },
-    disabled: { type: Boolean, default: false }
+    disabled: { type: Boolean, default: false },
   },
   data() {
     return {
       x: 0, // 滑块x偏移量
       maskWidth: 0, // 滑动遮罩宽度
-      isSuccess: false // 滑动验证完成
-    };
+      isSuccess: false, // 滑动验证完成
+    }
   },
   computed: {
     getIcon() {
-      if (this.isSuccess) return 'checkmark-circle';
-      if (this.disabled) return 'close-circle';
-      return 'arrow-right-double';
-    }
+      if (this.isSuccess) return 'checkmark-circle'
+      if (this.disabled) return 'close-circle'
+      return 'arrow-right-double'
+    },
   },
   methods: {
     onChange(e) {
-      this.maskWidth = e.detail.x;
+      this.maskWidth = e.detail.x
     },
     async onEnd(e) {
-      if (this.isSuccess) return;
-      const area = await this.getSize('area');
-      const slider = await this.getSize('slider');
-      let end = area.left + area.width;
-      let pos = slider.left + slider.width;
+      if (this.isSuccess) return
+      const area = await this.getSize('area')
+      const slider = await this.getSize('slider')
+      let end = area.left + area.width
+      let pos = slider.left + slider.width
       if (pos >= end) {
-        this.isSuccess = true;
-        this.$emit('success');
+        this.isSuccess = true
+        this.$emit('success')
       } else {
-        this.reset();
+        this.reset()
       }
     },
 
     reset() {
-      this.isSuccess = false;
-      this.x = 1;
+      this.isSuccess = false
+      this.x = 1
       setTimeout(() => {
-        this.x = 0;
-      }, 50);
+        this.x = 0
+      }, 50)
     },
 
     getSize(name) {
       return new Promise((resolve, reject) => {
         // #ifdef APP-NVUE
-        const dom = weex.requireModule('dom');
+        const dom = weex.requireModule('dom')
         dom.getComponentRect(this.$refs[name], option => {
-          resolve(option.size);
-        });
+          resolve(option.size)
+        })
         // #endif
 
         // #ifndef APP-NVUE
@@ -76,14 +85,14 @@ export default {
           .in(this)
           .select(`#${name}`)
           .boundingClientRect(data => {
-            resolve(data);
+            resolve(data)
           })
-          .exec();
+          .exec()
         // #endif
-      });
-    }
-  }
-};
+      })
+    },
+  },
+}
 </script>
 
 <style scoped lang="scss">
