@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { amap_mini_key } from '@/config.js'
-import amap from '@/libs/amap-wx.js'
-
-export const amapFunc = new amap.AMapWX({ key: amap_mini_key, })
-=======
 import { AMAP_MINI_KEY } from '@/config.js'
 import amap from '@/libs/amap-wx.js'
 
@@ -32,4 +26,3 @@ export function isSameLocation(a, b) {
   if (!lon1 || !lon2 || !lat1 || !lat2) return false
   return Math.abs(lon1 - lon2) < 0.00001 && Math.abs(lat1 - lat2) < 0.00001
 }
->>>>>>> ec2f89ac0053a50731e91f31c47f633c6eaa23b0

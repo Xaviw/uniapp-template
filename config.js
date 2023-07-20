@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-export default {
-  // api基础地址
-  baseUrl: '',
-  // 应用名
-  name: 'UniApp模板',
-  // 应用版本
-  version: '1.0.0',
-  // 苹果商店应用id，用于跳转苹果商店更新
-  ios_app_id: '',
-  // 高德小程序key
-  amap_mini_key: '',
-}
-=======
 // 开发环境API地址
 // export const API_URL = ''
 // 生产环境API地址
@@ -36,4 +22,3 @@ export const HOME_PATH = ''
 export const UPDATE_SERVER = ''
 // 更新检测ID
 export const UPDATE_ID = ''
->>>>>>> ec2f89ac0053a50731e91f31c47f633c6eaa23b0

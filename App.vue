@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-<script>
-export default {
-  onLaunch: function() {},
-  onShow: function() {},
-  onHide: function() {},
-  onError: function() {},
-}
-</script>
-
-<style lang="scss">
-@import '@/style/colorui.css';
-@import '@/style/icon.css';
-@import '@/uni_modules/uview-ui/index.scss';
-=======
 <script>
 import { watchMiniPaymentState, navToFirstPage, watchNetworkState } from '@/utils/helper.js'
 import { watchSocketMessage } from '@/utils/socketUtil.js'
@@ -51,5 +36,4 @@ page {
   background-color: $u-bg-color;
 }
 /* #endif */
->>>>>>> ec2f89ac0053a50731e91f31c47f633c6eaa23b0
 </style>
