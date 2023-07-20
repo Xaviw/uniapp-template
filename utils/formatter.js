@@ -1,22 +1,22 @@
 import { checkBankCard } from '@/utils/test.js'
 
-export const hideMobile = (val) => {
+export const hideMobile = val => {
   if (!uni.$u.test.code(val, 11))
     return ''
   return `${val.substr(0, 3)}****${val.substr(7)}`
 }
 
-export const hideBankCard = (val) => {
+export const hideBankCard = val => {
   if (!checkBankCard(val))
     return ''
   return '*'.repeat(val.length - 4) + val.substr(-4)
 }
 
 // 米转换为格式化距离
-export const m2distance = m => m < 1000 ? `${m}米` : `${(m / 1000).toFixed(2)}公里`
+export const distanceFormatter = m => m < 1000 ? `${m}米` : `${(m / 1000).toFixed(2)}公里`
 
 // 秒转换为格式化时长
-export const s2duration = (s) => {
+export const durationFormatter = s => {
   if (s < 60) {
     return `${s}秒`
   }
