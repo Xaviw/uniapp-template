@@ -1,12 +1,13 @@
 import Vue from 'vue'
-import store from '@/store'
 import uView from '@/uni_modules/uview-ui'
 import App from './App'
-import setUViewConfig from '@/style/setUViewConfig.js'
-import '@/utils/routerGuard.js'
-import permission from '@/utils/permission.js'
+import store from '@/store'
+import request from '@/utils/http.js'
+import setUViewConfig from '@/utils/setUViewConfig.js'
 import modal from '@/utils/modal.js'
-import request from '@/network'
+// TODO: 按需开启
+// import permission from '@/utils/permission.js'
+// import '@/utils/routerGuard.js'
 
 function isPromise(obj) {
   return (
@@ -37,8 +38,8 @@ Vue.config.productionTip = false
 App.mpType = 'app'
 
 Vue.prototype.$store = store
-Vue.prototype.$permi = permission
 Vue.prototype.$modal = modal
+// Vue.prototype.$permi = permission
 Vue.use(uView)
 
 const app = new Vue({

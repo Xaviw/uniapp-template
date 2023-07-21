@@ -1,6 +1,7 @@
 import { Login, BaseDefine, Other } from '@/libs/proto.js';
-import { encode, decode } from '@/utils/protobufUtil.js'
+import { encode, decode } from './protobuf.js'
 import { LOGIN_PATH } from '@/config.js'
+import store from '@/store'
 
 const strategies = [
   // 登录响应
@@ -24,7 +25,7 @@ const strategies = [
     type: BaseDefine.LoginCmdID.CID_LOGIN_KICK_USER,
     parser: Login.IMKickUser,
     handler: () => {
-      this.$store.dispatch('logout')
+      store.dispatch('logout')
       uni.showModal({
         title: '您的账号在另一设备登录',
         content: '如果这不是您本人的操作，建议您修改密码',

@@ -1,13 +1,16 @@
 <template>
-  <view></view>
+  <view class="text-center">
+    <text class="text-24 text-bold text-primary">HELLO</text>
+  </view>
 </template>
 
 <script>
-export default {
-  data() {
-    return {}
-  },
-}
+  export default {
+    data() {
+      return {}
+    },
+  }
+
 </script>
 
 <style lang="scss" scoped></style>

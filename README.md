@@ -1,8 +1,6 @@
 # uniapp混合开发模板
 
-当前`1.0`版本仅是根据自身业务需求搭建的一套跨端应用开发框架，本人经验有限，功能与开发体验并没有特别完善，例如没有权限控制功能，没有做全端的兼容性处理等...
-
-开发这个仓库的初衷是让自身业务开发中框架更为易用，以及提升自己逻辑抽离、封装能力。如果业务需求不复杂，可以尝试直接使用本框架。或者同样处在学习阶段的朋友，可以尝试阅读仓库源码可能能够得到部分业务框架搭建灵感
+个人uniapp-vue2开发模板，仍在不断完善中...
 
 > 该项目为HBuilderX下使用的模板，可以参考另一个仓库[HBuilderX-Settings](https://github.com/Xaviw/HBuilderX-Settings)设置HBuilderX编辑器代码格式化等相关功能
 
@@ -19,13 +17,15 @@
 
 根目录下`config.js`文件中已书写了模板用到的公共配置项，可以搜索配置项查看用途后按需填写，可以自由添加其他配置项
 
-> 部分方法中可能需要修改的部分已用`FIX`注释标注，可以全局搜索并查看是否需要修改
+> 部分方法中可能需要修改的部分已用`TODO`注释标注，可以全局搜索并查看是否需要修改
+
+`utils/permission.js`提供了权限验证方法，需要配合`vuex`中定义相关数据；`utils/routerGuard.js`中定义了路由拦截方法；这两个文件可以按需在main.js中开启导入
 
 ## 样式
 
-1. 定义了类似Tailwind的常用css类，查看`style/common.scss`、`style/generate.scss`，`generate`默认生成范围为`0-30`，可以自行修改文件顶部的配置项
-2. 按需在`style/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
-3. 按需在`style/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
+1. 定义了类似Tailwind的常用css类，查看`styles/common.scss`、`styles/generate.scss`，`generate`默认生成范围为`0-30`，可以自行修改文件顶部的配置项
+2. 按需在`styles/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
+3. 按需在`utils/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
 
 ### CSS类列表
 
@@ -109,7 +109,6 @@ App.vue中设置了全局的根样式
 // APP NVUE页面默认字号18px，其他默认字号16px
 // 除H5外，page标签样式只能写在非scope style中
 page {
-  // font-size: 28rpx;
   color: $u-content-color;
   background-color: $u-bg-color;
 }
@@ -125,22 +124,22 @@ NVUE页面不支持标签样式，需要单独定义。`pages.json -> globalStyl
 
 ## 请求
 
-使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`network/request.js`中。请求接口定义在根目录api文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`network/request.js`文件，重新定义一个实例即可
+使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`utils/http.js`中。请求接口定义在根目录apis文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`utils/http.js`文件，重新定义一个实例即可
 
 同时还扩展了几个自定义属性：
 
 ```js
 {
-  // 是否返回原始响应数据 比如：需要获取响应头时使用该属性
-  isReturnNativeResponse: false,
-  // 请求是否加入时间戳
+  // 是否加入时间戳，避免从缓存中取数据
   joinTime: false,
-  // GET请求失败重试
-  retryRequest: {
-    isOpenRetry: true,
-    count: 2,
-    waitTime: 1000,
-  },
+  // 是否携带token
+  withToken: true,
+  // 是否转换响应，转换为返回响应中的data，不转换为返回完整响应
+  isTransformResponse: true,
+  // 是否返回原生响应 比如：需要获取响应头时使用该属性
+  isReturnNativeResponse: false,
+  // 消息提示类型message | modal，其他值可以取消错误消息提示
+  errorMessageMode: 'message'
 };
 ```
 
@@ -151,59 +150,44 @@ NVUE页面不支持标签样式，需要单独定义。`pages.json -> globalStyl
 export default fetchData = data => uni.$u.http.post('/data', data, {
   custom: { isReturnNativeResponse: true }
 })
-
-export default fetchData = params => uni.$u.http.get('/data', {
-  params,
-  custom: { joinTime: true }
-})
-```
-
-另外在响应对象中扩展了`cancelOrResetToast`属性，作用为取消或手动设置`request.js`中触发的提示信息：
-
-``` js
-import {fetchData} from '@/api/xxx.js'
-
-fetchData()
-  .then(
-    // ...
-  )
-  .catch(response => {
-    // 比如fetchData返回500，默认会显示提示信息"服务器错误，请稍后再试！"
-    // 直接调用后则不展示提示信息
-    response.cancelOrResetToast()
-    // 也可以覆盖提示信息
-    response.cancelOrResetToast('服务器挂了')
-  })
 ```
 
 ## WebSocket
 
-`network/socket.js`中定义了通用webSocket类，使用方式：
+`network/socket.js`中定义了通用useSocket方法，并提供了完整的类型定义：
 
 ```js
-import Socket from '@/network/socket.js'
-
 /**
- * @param {string} url - websocket地址
- * @param {number} [reconnectInterval=5*1000] - 重连间隔时长（毫秒）
- * @param {boolean} [useHeartbeat=false] - 是否开启心跳机制
- * @param {number} [heartbeatInterval=30*1000] - 心跳间隔时长（毫秒）
- * @param {string|function} [heartbeatData='heartbeat'] - 心跳发送内容或返回内容的函数
- * @param {function} [onOpen] - onOpen时触发的钩子函数，例如socket登录
- * @param {function} [onClose] - onClose时触发的钩子函数
+ * 连接webSocket方法
+ * @param {string} url - 连接地址
+ * @param {Object} options - 连接选项对象
+ * @param {function(Socket):void} options.onConnected - 连接成功回调
+ * @param {function(Socket, event):void} options.onClosed - 连接失败回调
+ * @param {function(Socket, event):void} options.onError - socket错误回调
+ * @param {function(Socket, Event):void} options.onMessage - 收到消息回调
+ * @param {boolean} [options.heartbeat=false] - 是否启用心跳，布尔值或对象
+ * @param {string} [options.heartbeat.message='ping'] - 心跳发送消息
+ * @param {number} [options.heartbeat.interval=1000] - 心跳发送间隔
+ * @param {number} [options.heartbeat.pongTimeout=1000] - 未收到心跳回应时，停止心跳的超时时间
+ * @param {boolean} [options.autoReconnect=false] - 是否自动连接，布尔值或对象
+ * @param {number} [options.autoReconnect.retries=-1] - 最大重试次数，默认-1表示无限制
+ * @param {number} [options.autoReconnect.delay=1000] - 重试间隔时间
+ * @param {function} options.autoReconnect.onFailed - 超过最大重试次数后回调
+ * @param {boolean} [options.immediate=true] - 调用函数后是否立即连接
+ * @param {Array} options.protocols - 子协议数组
+ * @param {Object} options.header - HTTP Header , header 中不能设置 Referer
+ * @param {boolean} [options.multiple=false] - 是否多实例。传入 true 时，将返回一个包含 SocketTask 实例
+ * @return {Object} socket - 返回对象
+ * @return {string} socket.status - 连接状态：CLOSED|CONNECTING|OPEN
+ * @return {function} socket.open - 连接方法
+ * @return {function({code=1000, reason}):void} socket.close - 关闭方法
+ * @return {function(data, useBuffer: boolean):boolean} socket.send - 发送消息方法
+ * @return {Object} socket.task - socket连接实例
  */
-uni.$socket = new Socket({
-  // ...
-})
-
-uni.$on('socketMessage', (msg) => {
-  // ...
-})
-
-uni.$socket.disconnect()
+export function useSocket(url, options = {}) {...}
 ```
 
-socket消息处理定义在`utils/socketUtil.js`中，用策略模式分别处理对应的消息类型
+socket消息处理定义在`utils/socketHandler.js`中，用策略模式分别处理对应的消息类型
 
 如果用到了protobuf序列化，需要替换`libs/proto.js`文件。在`utils/protobufUtil.js`中定义了`decode`、`encode`、`deserialize`方法:
 

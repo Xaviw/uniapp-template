@@ -1,11 +1,11 @@
 import { getToken } from '@/utils/auth'
+import { LOGIN_PATH } from '@/config.js'
 
-// 登录页面
-const loginPage = "/pages/login"
+// TODO：需要定义相关数据，并在main.js中开启引用
 
 // 页面白名单
 const whiteList = [
-  '/pages/login', '/pages/common/webview/index',
+  LOGIN_PATH, '/pages/common/webview/index',
 ]
 
 // 检查地址白名单
@@ -15,7 +15,7 @@ function checkWhite(url) {
 }
 
 // 页面跳转验证拦截器
-let list = ["navigateTo", "redirectTo", "reLaunch", "switchTab",]
+let list = ["navigateTo", "redirectTo", "reLaunch", "switchTab", ]
 list.forEach(item => {
   uni.addInterceptor(item, {
     invoke(to) {

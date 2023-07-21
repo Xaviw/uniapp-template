@@ -1,7 +1,7 @@
-import { fetchSocketServer, fetchPaymentStatus } from '@/api/system.js'
-import { useSocket } from '@/network/socket.js'
+import { fetchSocketServer, fetchPaymentStatus } from '@/apis/index.js'
+import { useSocket } from './socket.js'
 import { MINI_ORIGINAL_ID, MINI_PAYMENT_PATH, HOME_PATH } from '@/config.js'
-import { socketLogin } from '@/utils/socketUtil.js'
+import { socketLogin } from './socketHandler.js'
 import { getToken } from './auth.js'
 import {
   divide as uviewDivide,
@@ -9,36 +9,7 @@ import {
   plus as uviewPlus,
   times as uviewTimes,
 } from '@/uni_modules/uview-ui/libs/function/digit.js'
-
-/**
- * @desc 统一Vue2 Promise化API返回格式
- */
-export function promiseify() {
-  function isPromise(obj) {
-    return (
-      !!obj &&
-      (typeof obj === "object" || typeof obj === "function") &&
-      typeof obj.then === "function"
-    )
-  }
-
-  uni.addInterceptor({
-    returnValue(res) {
-      if (!isPromise(res)) {
-        return res
-      }
-      return new Promise((resolve, reject) => {
-        res.then(res => {
-          if (res[0]) {
-            reject(res[0])
-          } else {
-            resolve(res[1])
-          }
-        })
-      })
-    },
-  })
-}
+import store from '@/store'
 
 /**
  * @desc socket连接
@@ -77,7 +48,7 @@ export function wxPayment(params = {}, type = 0) {
         }
         wx.launchMiniProgram(launchOption, () => {
           // 存储支付订单id供返回APP时检查支付状态
-          this.$store.commit('setPaymentId', params.id)
+          store.commit('setPaymentId', params.id)
           // 监听检查支付状态的结果
           uni.$once('paymentResult', (id, state) => {
             if (id !== params.id) return
@@ -102,7 +73,7 @@ export function wxPayment(params = {}, type = 0) {
  * @desc App.vue onShow方法中监听跳转小程序支付状态
  */
 export function watchMiniPaymentState() {
-  const paymentId = this.$store.state.user.paymentId
+  const paymentId = store.state.user.paymentId
   if (paymentId) {
     uni.showLoading({ title: '获取支付状态中' })
     // 调用检查支付状态的api
@@ -118,7 +89,7 @@ export function watchMiniPaymentState() {
       })
       .finally(() => {
         // 检查完毕清空存储的支付Id
-        this.$store.commit('setPaymentId', null)
+        store.commit('setPaymentId', null)
         uni.hideLoading()
       })
   }
@@ -158,16 +129,6 @@ export function watchNetworkState() {
 }
 
 /**
- * 计算方法参数标准化，将无法识别的参数看作0
- * @private
- * @param {...*} nums 计算参数
- * @return {...number}
- */
-function calcNormalize(...nums) {
-  return nums.map(item => parseFloat(item) || 0)
-}
-
-/**
  * 高精度加法，无法识别为数字的参数会看作0
  * plus函数名与H5+ API plus冲突，不应该使用plus作为函数名
  * @param {...*} nums 计算参数
@@ -202,4 +163,44 @@ export function multiply(...nums) {
  */
 export function divide(...nums) {
   return uviewDivide(calcNormalize(nums))
+}
+
+/**
+ * 计算方法参数标准化，将无法识别的参数看作0
+ * @private
+ * @param {...*} nums 计算参数
+ * @return {...number}
+ */
+function calcNormalize(...nums) {
+  return nums.map(item => parseFloat(item) || 0)
+}
+
+/**
+ * @desc 统一Vue2 Promise化API返回格式
+ */
+export function promiseify() {
+  function isPromise(obj) {
+    return (
+      !!obj &&
+      (typeof obj === "object" || typeof obj === "function") &&
+      typeof obj.then === "function"
+    )
+  }
+
+  uni.addInterceptor({
+    returnValue(res) {
+      if (!isPromise(res)) {
+        return res
+      }
+      return new Promise((resolve, reject) => {
+        res.then(res => {
+          if (res[0]) {
+            reject(res[0])
+          } else {
+            resolve(res[1])
+          }
+        })
+      })
+    },
+  })
 }

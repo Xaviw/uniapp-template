@@ -1,5 +1,5 @@
 import store from '@/store'
-
+// TODO: 需要配合VUEX中的数据permissions、roles
 function authPermission(permission) {
   const all_permission = "*:*:*"
   const permissions = store.getters.permissions

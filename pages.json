@@ -10,13 +10,13 @@
   // },
   "pages": [
   {
-    "path": "pages/index/index",
-    "style": {
-      "navigationBarTitleText": ""
-    }
+    "path": "pages/index/index"
   },
   {
-    "path": "pages/common/webView/webView"
+    "path": "pages/login"
+  },
+  {
+    "path": "pages/common/webview/webview"
   },
   {
     "path": "pages/common/noNetwork/noNetwork",
@@ -30,7 +30,7 @@
   }],
   // APP端修改后需要重新运行才有效果
   "globalStyle": {
-    "navigationBarTitleText": "默认标题",
+    "navigationBarTitleText": "uni-app模板",
     "navigationBarBackgroundColor": "#f3f4f6", // 导航栏颜色
     "navigationBarTextStyle": "black", // 页面标题颜色
     "backgroundColorTop": "#ffffff", // ios回弹区域背景色
