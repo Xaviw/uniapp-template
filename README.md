@@ -29,7 +29,7 @@
 
 ### CSS类列表
 
-基础样式查看`style/common.scss`文件，同时uview也提供了部分css类，可以查看`uview-ui/libs/css/`下的文件，较为实用的有：
+基础样式查看`styles/common.scss`文件，同时uview也提供了部分css类，可以查看`uview-ui/libs/css/`下的文件，较为实用的有：
 
 |        名称         |         对应样式         | 范围  |
 | :-----------------: | :----------------------: | :---: |
@@ -154,7 +154,7 @@ export default fetchData = data => uni.$u.http.post('/data', data, {
 
 ## WebSocket
 
-`network/socket.js`中定义了通用useSocket方法，并提供了完整的类型定义：
+`utils/socket.js`中定义了通用useSocket方法，并提供了完整的类型定义：
 
 ```js
 /**
@@ -189,10 +189,10 @@ export function useSocket(url, options = {}) {...}
 
 socket消息处理定义在`utils/socketHandler.js`中，用策略模式分别处理对应的消息类型
 
-如果用到了protobuf序列化，需要替换`libs/proto.js`文件。在`utils/protobufUtil.js`中定义了`decode`、`encode`、`deserialize`方法:
+如果用到了protobuf序列化，需要替换`libs/proto.js`文件。在`utils/protobuf.js`中定义了`decode`、`encode`、`deserialize`方法:
 
 ```js
-import { encode, decode, deserialize } from '@/utils/protobufUtil.js'
+import { encode, decode, deserialize } from '@/utils/protobuf.js'
 
 const strategies = [
   {
@@ -209,7 +209,7 @@ const strategies = [
 
 ## 自动更新
 
-项目内采用[upushy](https://ext.dcloud.net.cn/plugin?id=4200)提供的更新策略，upushy后台配置好应用后，填写`config.js`中相关配置即可使用
+项目内采用[upushy](https://github.com/SunSeekerX2/uni-pushy-client)提供的更新策略，upushy后台配置好应用后，填写`config.js`中相关配置即可使用
 
 ## npm库
 
@@ -272,11 +272,9 @@ import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js'
 // 手机号、银行卡号脱敏
 import { hideMobile, hideBankCard } from '@/utils/formatter.js'
 // 高精度计算
-import { add, minus, multiply, divide } from '@/utils/helper.js'
+import { add, minus, multiply, divide } from '@/utils/index.js'
 // uni定位方法promise化
-import { getLocation, isSameLocation } from '@/utils/mapUtil.js'
-// 系统原生语音播放，仅APP
-import audioPlay from '@/utils/speechSynthesis.js'
+import { getLocation, isSameLocation } from '@/utils/map.js'
 // 密码校验、银行卡号校验
 import { checkPwd, checkBankCard } from '@/utils/test.js'
 ```
