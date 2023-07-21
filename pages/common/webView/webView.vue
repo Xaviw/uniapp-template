@@ -1,24 +1,37 @@
 <template>
-  <view><web-view :src="src" :update-title="false"></web-view></view>
+  <view v-if="params.url">
+    <web-view :webview-styles="webviewStyles" :src="`${params.url}`" :updateTitle="updateTitle"></web-view>
+  </view>
 </template>
 
 <script>
-import { API_URL } from '@/config.js'
-
 export default {
-  /**
-   * @param {string} src - 地址
-   * @param {string} [title] - 页面标题
-   */
-  onLoad({ src, title }) {
-    this.src = src
-    if (title) {
-      uni.setNavigationBarTitle({ title })
-    }
-  },
   data() {
     return {
-      src: '',
+      params: {},
+      webviewStyles: {
+        progress: {
+          color: uni.$u.color.primary,
+        },
+      },
+    }
+  },
+  props: {
+    src: {
+      type: [String],
+      default: null,
+    },
+    updateTitle: {
+      type: [Boolean],
+      default: false,
+    },
+  },
+  onLoad(event) {
+    this.params = event
+    if (event.title) {
+      uni.setNavigationBarTitle({
+        title: event.title,
+      })
     }
   },
 }

@@ -1,148 +1,194 @@
-const SOCKET_READY_STATE = {
-  CONNECTING: 0, // 正在连接中
-  OPEN: 1, // 已经连接并且可以通讯
-  CLOSING: 2, // 连接正在关闭
-  CLOSED: 3, // 连接已关闭或者没有连接成功
-};
+const DEFAULT_PING_MESSAGE = 'ping';
 
-export default class Socket {
-  url; // websocket地址
-  task; // socket任务
+/**
+ * 连接webSocket方法
+ * @param {string} url - 连接地址
+ * @param {Object} options - 连接选项对象
+ * @param {function(Socket):void} options.onConnected - 连接成功回调
+ * @param {function(Socket, event):void} options.onClosed - 连接失败回调
+ * @param {function(Socket, event):void} options.onError - socket错误回调
+ * @param {function(Socket, Event):void} options.onMessage - 收到消息回调
+ * @param {boolean} [options.heartbeat=false] - 是否启用心跳，布尔值或对象
+ * @param {string} [options.heartbeat.message='ping'] - 心跳发送消息
+ * @param {number} [options.heartbeat.interval=1000] - 心跳发送间隔
+ * @param {number} [options.heartbeat.pongTimeout=1000] - 未收到心跳回应时，停止心跳的超时时间
+ * @param {boolean} [options.autoReconnect=false] - 是否自动连接，布尔值或对象
+ * @param {number} [options.autoReconnect.retries=-1] - 最大重试次数，默认-1表示无限制
+ * @param {number} [options.autoReconnect.delay=1000] - 重试间隔时间
+ * @param {function} options.autoReconnect.onFailed - 超过最大重试次数后回调
+ * @param {boolean} [options.immediate=true] - 调用函数后是否立即连接
+ * @param {Array} options.protocols - 子协议数组
+ * @param {Object} options.header - HTTP Header , header 中不能设置 Referer
+ * @param {boolean} [options.multiple=false] - 是否多实例。传入 true 时，将返回一个包含 SocketTask 实例
+ * @return {Object} socket - 返回对象
+ * @return {string} socket.status - 连接状态：CLOSED|CONNECTING|OPEN
+ * @return {function} socket.open - 连接方法
+ * @return {function({code=1000, reason}):void} socket.close - 关闭方法
+ * @return {function(data, useBuffer: boolean):boolean} socket.send - 发送消息方法
+ * @return {Object} socket.task - socket连接实例
+ */
+export function useSocket(url, options = {}) {
+  const {
+    onConnected,
+    onClosed,
+    onError,
+    onMessage,
+    heartbeat = false,
+    autoReconnect = false,
+    immediate = true,
+    multiple = false,
+    header,
+    method = 'GET',
+    protocols = [],
+  } = options;
 
-  requireReconnect = true; // 是否需要重连（非手动关闭需要重连）
-  reconnectInterval; // 重连尝试间隔
-  reconnectTimer; // 重连定时器
+  let status = 'CLOSED';
+  let task
 
-  useHeartbeat; // 是否定时发送心跳
-  heartbeatTimer; // 发送心跳定时器
-  heartbeatInterval; // 发送心跳间隔
-  heartbeatData; // 心跳内容
+  let heartbeatPause;
+  let heartbeatResume;
 
-  onOpen; // 传入的onOpen时执行的函数
-  onCLose; // 传入的onClose时执行的函数
+  let explicitlyClosed = false;
+  let retried = 0;
 
-  constructor({
-    url,
-    reconnectInterval = 1000 * 5,
-    useHeartbeat = true,
-    heartbeatInterval = 1000 * 30,
-    heartbeatData = "heartbeat",
-    onOpen = () => {},
-    onClose = () => {},
-  } = {}) {
-    this.url = url;
-    this.reconnectInterval = reconnectInterval;
-    this.useHeartbeat = useHeartbeat;
-    this.heartbeatInterval = heartbeatInterval;
-    this.heartbeatData = heartbeatData;
-    this.onOpen = onOpen;
-    this.onClose = onClose;
-  }
+  let bufferedData = [];
 
-  connect() {
-    // 已连接且未关闭，忽略
-    if (
-      this.task &&
-      ![WebSocket.CLOSING, WebSocket.CLOSED].includes(this.task.readyState)
-    ) {
-      return;
+  let pongTimeoutWait;
+
+  // 1000 表示正常关闭
+  // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+  // https://uniapp.dcloud.net.cn/api/request/socket-task.html#sockettask-close
+  const close = ({ code = 1000, reason } = {}) => {
+    if (!task) return;
+    explicitlyClosed = true;
+    heartbeatPause?.();
+    task.close({ code, reason });
+  };
+
+  const _sendBuffer = () => {
+    if (bufferedData.length > 0 && task && status === 'OPEN') {
+      for (const buffer of bufferedData) task.send({ data: buffer });
+      bufferedData = [];
     }
+  };
 
-    // 连接时标记断开需要重连
-    this.requireReconnect = true;
+  const resetHeartbeat = () => {
+    clearTimeout(pongTimeoutWait);
+    pongTimeoutWait = undefined;
+  };
 
-    this.task = uni.connectSocket({
-      url: this.url,
-      success: () => {
-        console.log("连接socket调用成功");
-      },
-      fail: (err) => {
-        console.log("连接socket调用失败", err);
-        this.reconnect();
+  const send = (data, useBuffer = true) => {
+    if (!task || status !== 'OPEN') {
+      if (useBuffer) bufferedData.push(data);
+      return false;
+    }
+    _sendBuffer();
+    task.send({ data });
+    return true;
+  };
+
+  const _init = () => {
+    if (explicitlyClosed || urlRef === undefined) return;
+
+    task = uni.connectSocket({
+      url,
+      multiple,
+      header,
+      method,
+      protocols,
+      complete: () => {
+        // just for correct types
       },
     });
+    status = 'CONNECTING';
 
-    // 连接成功时，执行onOpen钩子函数，并判断是否开启心跳机制
-    this.task.onOpen(async () => {
-      console.log("socket连接成功");
-      await this.onOpen();
-      if (this.useHeartbeat) {
-        this.sendHeartbeat();
+    task.onOpen((result) => {
+      status = 'OPEN';
+      onConnected?.(task, result);
+      heartbeatResume?.();
+      _sendBuffer();
+    });
+
+    task.onClose((result) => {
+      status = 'CLOSED';
+      task = undefined;
+      onClosed?.(task, result);
+      if (!explicitlyClosed && autoReconnect) {
+        const { retries = -1, delay = 1000, onFailed } = resolveNestedOptions(autoReconnect);
+        retried += 1;
+        if (typeof retries === 'number' && (retries < 0 || retried < retries))
+          setTimeout(_init, delay);
+        else if (typeof retries === 'function' && retries()) setTimeout(_init, delay);
+        else onFailed?.();
       }
     });
 
-    // 广播socket消息
-    this.task.onMessage((res) => {
-      uni.$emit("socketMessage", res);
+    task.onError((error) => {
+      onError?.(task, error);
     });
 
-    // 出错时尝试重连
-    this.task.onError((e) => {
-      console.log("socket错误", e);
-      this.reconnect();
+    task.onMessage((result) => {
+      if (heartbeat) {
+        resetHeartbeat();
+        const { message = DEFAULT_PING_MESSAGE } = resolveNestedOptions(heartbeat);
+        if (result.data === message) return;
+      }
+      onMessage?.(task, result);
     });
+  };
 
-    // 关闭时执行onClose钩子函数并尝试重连
-    this.task.onClose(async (e) => {
-      console.log("socket关闭", e);
-      await this.onClose();
-      this.reconnect();
-    });
-  }
+  if (heartbeat) {
+    const {
+      message = DEFAULT_PING_MESSAGE,
+        interval = 1000,
+        pongTimeout = 1000,
+    } = resolveNestedOptions(heartbeat);
 
-  sendHeartbeat() {
-    let msg = this.heartbeatData?.() || this.heartbeatData;
-    this.heartbeatTimer = setInterval(() => {
-      this.send(msg);
-    }, this.heartbeatInterval);
-  }
+    let timer = null
 
-  // 主动断开，标记不需要重连，取消心跳
-  disconnect() {
-    this.task?.close({
-      success: () => {
-        console.log("关闭socket调用成功");
-      },
-      fail: (err) => {
-        console.log("关闭socket调用失败", err);
-      },
-      complete: () => {
-        this.heartbeatInterval && clearInterval(this.heartbeatInterval);
-        this.task = null;
-        this.requireReconnect = false;
-      },
-    });
-  }
-
-  // 重连
-  reconnect() {
-    // 已有等待中的重连，不再重复连接
-    if (this.reconnectTimer) return;
-    // 需要重连，则等待reconnectInterval后重连
-    if (this.requireReconnect) {
-      // 关闭上次连接中的心跳循环
-      this.heartbeatInterval && clearInterval(this.heartbeatInterval);
-      this.task = null;
-      this.reconnectTimer = setTimeout(
-        this.connect.bind(this),
-        this.reconnectInterval
-      );
+    function clean() {
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
     }
+
+    function resume() {
+      if (interval <= 0) return
+      clean()
+      timer = setInterval(() => {
+        send(message, false);
+        if (pongTimeoutWait != null) return;
+        pongTimeoutWait = setTimeout(() => {
+          // 明确关闭连接以避免重试
+          close({});
+        }, pongTimeout);
+      }, interval)
+    }
+
+    heartbeatPause = clean;
+    heartbeatResume = resume;
   }
 
-  // 发送消息
-  send(data) {
-    if (!this.task) {
-      this.reconnect();
-    } else {
-      this.task.send({
-        data,
-        fail: (err) => {
-          console.log("socket发送错误", err);
-          this.reconnect();
-        },
-      });
-    }
-  }
+  const open = () => {
+    close({});
+    explicitlyClosed = false;
+    retried = 0;
+    _init();
+  };
+
+  if (immediate) open();
+
+  return {
+    status,
+    open,
+    close,
+    send,
+    task,
+  };
 }
 
+function resolveNestedOptions(options) {
+  if (options === true) return {};
+  return options;
+}

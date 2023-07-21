@@ -1,68 +1,40 @@
-import { merge } from 'lodash-es'
-import { alert } from '@/utils/modal.js'
+export function checkStatus(status, message) {
+  let errorMessage
 
-export function getBasicsHeader(header) {
-  const defaultHeader = {}
-  return merge(defaultHeader, header)
-}
-
-export function checkStatusCode(response, vm) {
-  let errMsg = response.data.msg || response.data.errorMsg
-
-  if (response.errMsg.startsWith("request:fail")) {
-    errMsg = "请检查网络是否正常"
-  }
-
-  if (response.statusCode) {
-    switch (response.statusCode) {
+  switch (status) {
+    case 400:
+      errorMessage = `${message}`
+      break
     case 401:
-      alert('您的登录信息已过期，请重新登录').then(() => {
-        vm.$store.dispatch('LogOut').then(() => {
-          uni.reLaunch({ url: '/pages/login' })
-        })
-      })
+      errorMessage = '登录信息已过期！'
+      break
+    case 403:
+      errorMessage = '当前没有权限访问！'
+      break
+    case 404:
+      errorMessage = '网络请求错误，没有找到该资源！'
+      break
+    case 405:
+      errorMessage = '网络请求错误，请求方法未允许！'
+      break
+    case 408:
+      errorMessage = '网络请求超时！'
       break
     case 500:
+    case 501:
     case 503:
-      errMsg = "服务器错误，请稍后再试！"
+      errorMessage = '服务器错误，请稍后再试！'
       break
     case 502:
-    case 504:
-      errMsg = "网络错误，请检查您的网络！"
+      errorMessage = '网络错误，请检查您的网络！'
       break
-    }
-  }
-  // 扩展cancelOrResetToast属性，能在请求catch中取消默认或重设toast内容
-  let timer
-  new Promise(resolve => {
-    response.cancelOrResetToast = resolve
-    timer = setTimeout(() => {
-      uni.$u.toast(errMsg)
-    }, 100)
-  })
-    .then(newToastMsg => {
-      clearTimeout(timer)
-      newToastMsg && uni.$u.toast(newToastMsg)
-    })
-
-  return response
-}
-
-export class RequestRetry {
-  retry(instance, error) {
-    const { config } = error
-    const { waitTime, count } = config?.custom?.retryRequest || {}
-    config.custom.retryRequest.__retryCount = config.custom.retryRequest
-      .__retryCount || 0
-    if (config.custom.retryRequest.__retryCount >= count) {
-      return Promise.reject(error)
-    }
-    config.custom.retryRequest.__retryCount += 1
-    return this.delay(waitTime)
-      .then(() => instance(config))
+    case 504:
+      errorMessage = '网络超时！'
+      break
+    case 505:
+      errorMessage = 'http版本不支持该请求！'
+      break
   }
 
-  delay(waitTime) {
-    return new Promise(resolve => setTimeout(resolve, waitTime))
-  }
+  return errorMessage
 }

@@ -1,7 +1,5 @@
-/*
-const http = uni.$u.http
+export const fetchSocketServer = params => uni.$u.http.get('', { params })
 
-export const getX = params => http.get('', { params, })
+export const login = data => uni.$u.http.post('', data)
 
-export const postX = data => http.post('', data)
-*/
+export const fetchPaymentStatus = data => uni.$u.http.post('', data)

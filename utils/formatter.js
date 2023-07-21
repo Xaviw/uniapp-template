@@ -1,15 +1,13 @@
 import { checkBankCard } from '@/utils/test.js'
 
-export const hideMobile = val => {
-  if (!uni.$u.test.code(val, 11))
-    return ''
-  return `${val.substr(0, 3)}****${val.substr(7)}`
+export const hideMobile = phone => {
+  if (!uni.$u.test.code(phone, 11)) { return phone }
+  return `${phone.slice(0, 3)}****${phone.slice(7)}`
 }
 
-export const hideBankCard = val => {
-  if (!checkBankCard(val))
-    return ''
-  return '*'.repeat(val.length - 4) + val.substr(-4)
+export const hideBankCard = card => {
+  if (!checkBankCard(card)) { return card }
+  return '*'.repeat(card.length - 4) + card.slice(-4)
 }
 
 // 米转换为格式化距离

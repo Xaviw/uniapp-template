@@ -51,7 +51,7 @@ export default {
     })
   },
   // 提示信息
-  showToast(option) {
+  toast(option) {
     if (typeof option === "object") {
       uni.showToast(option)
     } else {

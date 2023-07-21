@@ -2,8 +2,8 @@
 // export const API_URL = ''
 // 生产环境API地址
 export const API_URL = ''
-// API公共前缀
-export const API_PREFIX = '/api'
+// Token Key
+export const TOKEN_KEY = 'Authorization'
 // 应用名称
 export const APP_NAME = ''
 // 高德小程序key
@@ -15,9 +15,9 @@ export const MINI_ORIGINAL_ID = ''
 // 跳转小程序支付页面地址
 export const MINI_PAYMENT_PATH = ''
 // 登录页地址
-export const LOGIN_PATH = ''
+export const LOGIN_PATH = '/pages/login'
 // 首页地址
-export const HOME_PATH = ''
+export const HOME_PATH = '/pages/index'
 // 更新检测地址
 export const UPDATE_SERVER = ''
 // 更新检测ID

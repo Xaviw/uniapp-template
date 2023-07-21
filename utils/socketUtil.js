@@ -1,5 +1,5 @@
 import { Login, BaseDefine, Other } from '@/libs/proto.js';
-import { encode, decode, deserialize } from '@/utils/protobufUtil.js'
+import { encode, decode } from '@/utils/protobufUtil.js'
 import { LOGIN_PATH } from '@/config.js'
 
 const strategies = [

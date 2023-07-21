@@ -6,6 +6,7 @@ import setUViewConfig from '@/style/setUViewConfig.js'
 import '@/utils/routerGuard.js'
 import permission from '@/utils/permission.js'
 import modal from '@/utils/modal.js'
+import request from '@/network'
 
 function isPromise(obj) {
   return (
@@ -46,4 +47,4 @@ const app = new Vue({
 app.$mount()
 
 setUViewConfig()
-request(app)
+request()

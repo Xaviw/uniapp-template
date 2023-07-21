@@ -1,7 +1,8 @@
 import { fetchSocketServer, fetchPaymentStatus } from '@/api/system.js'
-import { Socket } from '@/network/socket.js'
+import { useSocket } from '@/network/socket.js'
 import { MINI_ORIGINAL_ID, MINI_PAYMENT_PATH, HOME_PATH } from '@/config.js'
 import { socketLogin } from '@/utils/socketUtil.js'
+import { getToken } from './auth.js'
 import {
   divide as uviewDivide,
   minus as uviewMinus,
@@ -43,15 +44,18 @@ export function promiseify() {
  * @desc socket连接
  */
 export function connectSocket() {
-  // FIX:获取socket地址
+  // TODO:获取socket地址
   return fetchSocketServer().then(res => {
     const url = `wss://${res.domain}:${res.sslPort}`
-    uni.$socket = new Socket({
-      url,
-      onOpen: socketLogin,
-      onClose: () => {
+    uni.$socket = useSocket(url, {
+      autoReconnect: true,
+      onConnected: socketLogin,
+      onClosed: () => {
         uni.$socket = null
       },
+      onMessage: (_, message) => {
+        uni.$emit("socketMessage", message)
+      }
     })
   })
 }
@@ -102,7 +106,7 @@ export function watchMiniPaymentState() {
   if (paymentId) {
     uni.showLoading({ title: '获取支付状态中' })
     // 调用检查支付状态的api
-    // FIX:需要替换此处的fetchPaymentStatus
+    // TODO: 检查支付状态
     fetchPaymentStatus({ id: paymentId })
       .then(state => {
         // 发射支付检查结果
@@ -124,8 +128,8 @@ export function watchMiniPaymentState() {
  * @desc 检查登录状态跳转并关闭启动图
  */
 export function navToFirstPage() {
-  const token = uni.getStorageSync('token')
-  if (token && token !== 'Bearer test') {
+  const token = getToken()
+  if (token) {
     uni.reLaunch({
       url: HOME_PATH,
       success: () => {

@@ -1,32 +1,40 @@
-import { API_URL } from "@/config";
-import { checkStatusCode, getBasicHeader, RequestRetry } from "./helpers";
+import { API_URL, TOKEN_KEY, LOGIN_PATH } from "@/config";
+import { getToken } from '../utils/auth.js'
+import { checkStatusCode } from "./helpers";
+import { alert, msgError } from '@/utils/modal.js'
+import store from '../store'
 
-export default function request(vm) {
+export default function request() {
   uni.$u.http.setConfig(config => {
     config.baseURL = API_URL;
     config.custom = {
-      // 是否返回原生响应头 比如：需要获取响应头时使用该属性
-      isReturnNativeResponse: false,
-      // 是否加入时间戳
+      // 是否加入时间戳，避免从缓存中取数据
       joinTime: false,
-      // 失败重试
-      retryRequest: {
-        isOpenRetry: true,
-        count: 2,
-        waitTime: 1000,
-      },
+      // 是否携带token
+      withToken: true,
+      // 是否转换响应，转换为返回响应中的data，不转换为返回完整响应
+      isTransformResponse: true,
+      // 是否返回原生响应 比如：需要获取响应头时使用该属性
+      isReturnNativeResponse: false,
+      // 消息提示类型message | modal，其他值可以取消错误消息提示
+      errorMessageMode: 'message'
     };
     return config;
   });
 
   uni.$u.http.interceptors.request.use(config => {
     config.data = config.data || {};
-    config.header = {
-      ...getBasicHeader(vm.$store.state.auth),
-      ...config.header,
-    };
-    // 加入时间戳，避免从缓存中取数据
-    if (config.custom.joinTime) {
+
+    const { joinTime, withToken } = config.custom
+
+    // 添加token
+    const token = getToken()
+    if (token && withToken) {
+      config.header = { ...config.header, [TOKEN_KEY]: token }
+    }
+
+    // 加入时间戳
+    if (joinTime) {
       config.params = { _t: Date.now(), ...(config.params || {}) };
     }
     return config;
@@ -34,36 +42,48 @@ export default function request(vm) {
 
   uni.$u.http.interceptors.response.use(
     response => {
+      const { isReturnNativeResponse, errorMessageMode, isTransformResponse } = response.config.custom
+
       const data = response.data;
 
-      if (data.code != 0) {
+      // TODO: 根据需求判断code与错误msg
+      if (data.code != 0 && data.code != 200) {
         const errMsg = data.msg || data.errMsg
-        errMsg && uni.showToast({
-          title: errMsg,
-          icon: "error",
-        })
+        if (errMsg && errorMessageMode == 'message') {
+          msgError(errMsg)
+        } else if (errMsg && errorMessageMode == 'modal') {
+          alert(errMsg)
+        }
         return Promise.reject(data)
       }
 
-      // 自定义参数，默认返回response.data.data，定义后返回原始响应
-      if (response.config.custom.isReturnNativeResponse) {
+      // 定义后返回原始响应
+      if (isReturnNativeResponse) {
         return response;
       }
+      // 定义后仅返回data
+      if (isTransformResponse) {
+        return data.data === undefined ? {} : data.data;
+      }
+      // 未定义返回完整响应
+      return data
 
-      return data.data === undefined ? {} : data.data;
     },
     errorResponse => {
-      checkStatusCode(errorResponse, vm);
-
-      // 添加自动重试机制 保险起见 只针对GET请求
-      const retryRequest = new RequestRetry();
-      const isOpenRetry =
-        errorResponse.config.custom?.retryRequest?.isOpenRetry;
-
-      errorResponse.config.method?.toUpperCase() === "GET" &&
-        isOpenRetry &&
-        retryRequest.retry(uni.$u.http, errorResponse);
-
+      // TODO: 根据需求判断错误msg
+      const { errMsg, msg } = errorResponse.data || {}
+      const message = checkStatusCode(errorResponse.statusCode, msg || errMsg);
+      if (message && errorMessageMode == 'message') {
+        msgError(message)
+      } else if (message && errorMessageMode == 'modal') {
+        alert(message)
+      }
+      if (errorResponse.statusCode === 401) {
+        store.dispatch('logout')
+        uni.reLaunch({
+          url: LOGIN_PATH
+        })
+      }
       return Promise.reject(errorResponse);
     },
   );
