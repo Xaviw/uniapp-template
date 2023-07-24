@@ -23,7 +23,6 @@
 
 <style lang="scss">
   @import '@/uni_modules/uview-ui/index.scss';
-  @import '@/styles/generate.scss';
   @import '@/styles/common.scss';
 
   /* #ifndef APP-NVUE */

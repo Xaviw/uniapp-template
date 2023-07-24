@@ -1,6 +1,6 @@
 <template>
   <view class="text-center">
-    <text class="text-24 text-bold text-primary">HELLO</text>
+    <text class="text-24 font-bold text-primary">HELLO</text>
   </view>
 </template>
 
@@ -8,7 +8,7 @@
   export default {
     data() {
       return {}
-    },
+    }
   }
 
 </script>

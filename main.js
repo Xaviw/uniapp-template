@@ -2,37 +2,16 @@ import Vue from 'vue'
 import uView from '@/uni_modules/uview-ui'
 import App from './App'
 import store from '@/store'
-import request from '@/utils/http.js'
+import http from '@/utils/http.js'
 import setUViewConfig from '@/utils/setUViewConfig.js'
 import modal from '@/utils/modal.js'
+import { promiseify } from './utils'
 // TODO: 按需开启
 // import permission from '@/utils/permission.js'
 // import '@/utils/routerGuard.js'
 
-function isPromise(obj) {
-  return (
-    !!obj &&
-    (typeof obj === "object" || typeof obj === "function") &&
-    typeof obj.then === "function"
-  );
-}
-
-uni.addInterceptor({
-  returnValue(res) {
-    if (!isPromise(res)) {
-      return res;
-    }
-    return new Promise((resolve, reject) => {
-      res.then(res => {
-        if (res[0]) {
-          reject(res[0]);
-        } else {
-          resolve(res[1]);
-        }
-      });
-    });
-  },
-});
+// 统一uni api为Vue3项目promise格式
+promiseify()
 
 Vue.config.productionTip = false
 App.mpType = 'app'
@@ -40,12 +19,16 @@ App.mpType = 'app'
 Vue.prototype.$store = store
 Vue.prototype.$modal = modal
 // Vue.prototype.$permi = permission
+
 Vue.use(uView)
+// 配置uview
+setUViewConfig()
 
 const app = new Vue({
   ...App,
 })
-app.$mount()
 
-setUViewConfig()
-request()
+// 配置请求器
+Vue.use(http, app)
+
+app.$mount()

@@ -23,7 +23,7 @@
 
 ## 样式
 
-1. 定义了类似Tailwind的常用css类，查看`styles/common.scss`、`styles/generate.scss`，`generate`默认生成范围为`0-30`，可以自行修改文件顶部的配置项
+1. 定义了[WindiCSS](https://cn.windicss.org/utilities/general/typography.html)中大部分常用原子化css类，具体查看`styles/common.scss`，`font-size`、`width`、`height`等范围值修改为具体值，默认生成范围为`0-30`（`width`、`height`为定义范围乘2），可以自行修改文件顶部的配置项
 2. 按需在`styles/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
 3. 按需在`utils/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
 
@@ -46,7 +46,7 @@
 |   u-border-bottom   |                          |       |
 | u-border-top-bottom |                          |       |
 
-`generate.scss`文件中提供了四个变量：
+`common.scss`文件中提供了四个变量：
 
 ```scss
 $num: 0; // 循环生成初始点
@@ -61,44 +61,13 @@ $unit: 'rpx'; //单位
 
 使用时`bg-primary`对应`background-color: $u-primary`，`text-primary-dark`对应`color: $u-primary-dark`
 
-**后续使用`x`代替类名中的`num`，使用`y`代替生成的值，不再重复书写**
+还有部分样式与`WindiCSS`文档不同：
 
 |              名称              |        对应样式        |          范围          | 兼容性 |
 | :----------------------------: | :--------------------: | :--------------------: | :----: |
-|              w-x               |        width: y        |      0-60(sum*2)       |        |
-|              h-x               |       height: y        |      0-60(sum*2)       |        |
-|              p-x               |       padding: y       |          0-30          |        |
-|              px-x              |      padding: 0 y      |          0-30          |        |
-|              py-x              |      padding: y 0      |          0-30          |        |
-|              pt-x              |    padding: y 0 0 0    |          0-30          |        |
-|              pr-x              |    padding: 0 y 0 0    |          0-30          |        |
-|              pb-x              |    padding: 0 0 y 0    |          0-30          |        |
-|              pl-x              |    padding: 0 0 0 y    |          0-30          |        |
-|              p-x               |       margin: y        |          0-30          |        |
-|              mx-x              |      margin: 0 y       |          0-30          |        |
-|              my-x              |      margin: y 0       |          0-30          |        |
-|              mt-x              |    margin: y 0 0 0     |          0-30          |        |
-|              mr-x              |    margin: 0 y 0 0     |          0-30          |        |
-|              mb-x              |    margin: 0 0 y 0     |          0-30          |        |
-|              ml-x              |    margin: 0 0 0 y     |          0-30          |        |
-|            border-x            |    border-width: y     |          0-30          |        |
-|           border-t-x           |  border-top-width: y   |          0-30          |        |
-|           border-r-x           | border-right-width: y  |          0-30          |        |
-|           border-b-x           | border-bottom-width: y |          0-30          |        |
-|           border-l-x           |  border-left-width: y  |          0-30          |        |
-|           rounded-x            |    border-radius: y    |          0-30          |        |
-|            leding-x            |     line-height: y     |          0-30          |        |
-|              t-x               |         top: y         |          0-30          |        |
-|              r-x               |        right: y        |          0-30          |        |
-|              b-x               |       bottom: y        |          0-30          |        |
-|              l-x               |        left: y         |          0-30          |        |
-|             text-x             |      font-size: y      |          0-30          |        |
-|     bg-type或bg-type-level     |  background-color: y   | 查看上方颜色变量的介绍 |        |
-|   text-type或text-type-level   |        color: y        | 查看上方颜色变量的介绍 |        |
-| border-type或border-type-level |    border-color: y     | 查看上方颜色变量的介绍 |        |
-|              z-x               |       z-index: x       |          0-30          | 非NVUE |
 |             w-p-x              |   width: ${num*10}%    |          1-10          | 非NVUE |
 |             h-p-x              |   height: ${num*10}%   |          1-10          | 非NVUE |
+|           basis-1-2            |   flex-basis: ${1/2}%  |       0-11/1-12        | 非NVUE |
 
 ### 页面样式
 

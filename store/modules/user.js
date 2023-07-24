@@ -1,14 +1,14 @@
 import { login, logout } from '@/apis/index'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
-const user = {
+export default {
   state: {
     userInfo: {}
   },
 
   mutations: {
-    setUserInfo(state, info) {
-      state.userInfo = info
+    setUserInfo(state, payload) {
+      state.userInfo = payload
     }
   },
 
@@ -30,5 +30,3 @@ const user = {
     },
   },
 }
-
-export default user
