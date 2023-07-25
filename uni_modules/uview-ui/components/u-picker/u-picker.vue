@@ -1,55 +1,46 @@
 <template>
-	<u-popup
-		:show="show"
-		@close="closeHandler"
-	>
-		<view class="u-picker">
-			<u-toolbar
-				v-if="showToolbar"
-				:cancelColor="cancelColor"
-				:confirmColor="confirmColor"
-				:cancelText="cancelText"
-				:confirmText="confirmText"
-				:title="title"
-				@cancel="cancel"
-				@confirm="confirm"
-			></u-toolbar>
-			<picker-view
-				class="u-picker__view"
-				:indicatorStyle="`height: ${$u.addUnit(itemHeight)}`"
-				:value="innerIndex"
-				:immediateChange="immediateChange"
-				:style="{
+  <u-popup :show="show" @close="closeHandler">
+    <view class="u-picker">
+      <u-toolbar
+        v-if="showToolbar"
+        :cancelColor="cancelColor"
+        :confirmColor="confirmColor"
+        :cancelText="cancelText"
+        :confirmText="confirmText"
+        :title="title"
+        @cancel="cancel"
+        @confirm="confirm"
+      ></u-toolbar>
+      <picker-view
+        class="u-picker__view"
+        :indicatorStyle="`height: ${$u.addUnit(itemHeight)}`"
+        :value="innerIndex"
+        :immediateChange="immediateChange"
+        :style="{
 					height: `${$u.addUnit(visibleItemCount * itemHeight)}`
 				}"
-				@change="changeHandler"
-			>
-				<picker-view-column
-					v-for="(item, index) in innerColumns"
-					:key="index"
-					class="u-picker__view__column"
-				>
-					<text
-						v-if="$u.test.array(item)"
-						class="u-picker__view__column__item u-line-1"
-						v-for="(item1, index1) in item"
-						:key="index1"
-						:style="{
+        @change="changeHandler"
+      >
+        <picker-view-column v-for="(item, index) in innerColumns" :key="index" class="u-picker__view__column">
+          <text
+            v-if="$u.test.array(item)"
+            class="u-picker__view__column__item u-line-1"
+            v-for="(item1, index1) in item"
+            :key="index1"
+            :style="{
 							height: $u.addUnit(itemHeight),
 							lineHeight: $u.addUnit(itemHeight),
 							fontWeight: index1 === innerIndex[index] ? 'bold' : 'normal'
 						}"
-					>{{ getItemText(item1) }}</text>
-				</picker-view-column>
-			</picker-view>
-			<view
-				v-if="loading"
-				class="u-picker--loading"
-			>
-				<u-loading-icon mode="circle"></u-loading-icon>
-			</view>
-		</view>
-	</u-popup>
+            >{{ getItemText(item1) }}</text
+          >
+        </picker-view-column>
+      </picker-view>
+      <view v-if="loading" class="u-picker--loading">
+        <u-loading-icon mode="circle"></u-loading-icon>
+      </view>
+    </view>
+  </u-popup>
 </template>
 
 <script>
@@ -234,50 +225,50 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-	@import "../../libs/css/components.scss";
+@import "../../libs/css/components.scss";
 
-	.u-picker {
-		position: relative;
+.u-picker {
+	position: relative;
 
-		&__view {
+	&__view {
 
-			&__column {
+		&__column {
+			@include flex;
+			flex: 1;
+			justify-content: center;
+
+			&__item {
 				@include flex;
-				flex: 1;
 				justify-content: center;
+				align-items: center;
+				font-size: 16px;
+				text-align: center;
+				/* #ifndef APP-NVUE */
+				display: block;
+				/* #endif */
+				color: $u-main-color;
 
-				&__item {
-					@include flex;
-					justify-content: center;
-					align-items: center;
-					font-size: 16px;
-					text-align: center;
+				&--disabled {
 					/* #ifndef APP-NVUE */
-					display: block;
+					cursor: not-allowed;
 					/* #endif */
-					color: $u-main-color;
-
-					&--disabled {
-						/* #ifndef APP-NVUE */
-						cursor: not-allowed;
-						/* #endif */
-						opacity: 0.35;
-					}
+					opacity: 0.35;
 				}
 			}
 		}
-
-		&--loading {
-			position: absolute;
-			top: 0;
-			right: 0;
-			left: 0;
-			bottom: 0;
-			@include flex;
-			justify-content: center;
-			align-items: center;
-			background-color: rgba(255, 255, 255, 0.87);
-			z-index: 1000;
-		}
 	}
+
+	&--loading {
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		bottom: 0;
+		@include flex;
+		justify-content: center;
+		align-items: center;
+		background-color: rgba(255, 255, 255, 0.87);
+		z-index: 1000;
+	}
+}
 </style>

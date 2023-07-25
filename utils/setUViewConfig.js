@@ -4,6 +4,10 @@ export default function setConfig() {
     // 修改$u.config对象的属性
     config: {},
     // 修改$u.props对象的属性
-    props: {}
+    props: {
+      formItem: {
+        borderBottom: true,
+      },
+    },
   })
 }
