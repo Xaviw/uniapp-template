@@ -22,9 +22,7 @@ export default function setConfig() {
         Upload: {
           // 默认的上传方法，需要返回图片链接字符串
           api: url => {
-            return Promise.resolve(
-              'https://vkceyugu.cdn.bspapp.com/VKCEYUGU-8f7e1d02-dcb1-46ba-90db-ae32fea44f22/0d0bc2dc-64e3-4ea1-a641-9c23d198e36d.png',
-            )
+            return Promise.resolve('')
           },
         },
         Code: {

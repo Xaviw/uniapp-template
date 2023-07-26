@@ -1,3 +1,4 @@
+// 查看 README.md BasicForm 介绍
 <template>
   <view>
     <!-- 表单配置 -->
@@ -729,7 +730,6 @@
 <script>
 import { cloneDeep, set, get } from "lodash-es";
 import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js";
-import { uploadFile } from "@/apis";
 import props from "./props.js";
 
 // HACK: uview中的deepMerge有问题，无法在setUViewConfig中直接配置空数组
