@@ -7,38 +7,51 @@ export default {
     },
     // Calendar和Picker不能v-model绑定数据,Picker默认会保存values数组,Calendar默认会保存全部日期数据
     // 可以通过再onConfirm方法中手动保存数据,支持保存`${propName}Text`属性用于展示
-    // position为left时rule message会添加labelWidth的margin,如果要去掉这段margin需要设置margin大于0(如0.1),因为源码中使用labelWidth || parent.labelWidth取值
+    // position为left时rule message会添加labelWidth的margin,labelWidth为auto时message会靠右对齐
     // rules未设置trigger时会自动设置为['blur','trigger']
     // rule未设置message时,会自动补充
     /* 表单内容
-     * @param {string} prop - 字段名
-     * @param {string} label - 标签名
-     * @param {boolean} borderBottom - 下边框
-     * @param {string} labelWidth - 标签宽度，覆盖表单同名参数
-     * @param {string} labelPosition - 标签位置，覆盖表单同名参数
-     * @param {string} rightIcon - 右侧图标名（仅支持内置）或图片地址
-     * @param {string} leftIcon - 左侧图标名（仅支持内置）或图片地址
-     * @param {string|Object} leftIconStyle - 左侧自定义字体图标的样式
-     * @param {string|Object} required - 是否显示必填"*"号（仅展示，swiper-item展示需设置根节点margin）
      * @param {string} component - 组件类型：Calendar|Picker|DatetimePicker|Rate|NumberBox|Upload|Code|Input|Textarea|Checkbox|Radio|Switch|Slider
      * @param {Object} componentProps - 组件参数
      * @param {Function} onClick - 单击事件
-     * @param {boolean|Function} show - 组件是否显示
+     * @param {boolean|Function} ifShow - 组件是否显示
      * @param {boolean} disabled - 是否禁用
      * @param {boolean|Function} dynamicDisabled - 动态判断是否禁用
-     * upload组件插槽使用propNameRef
-     * upload组件扩展compress属性,值为quality(压缩质量0-1)和fileType(图片扩展名入png)
+     * 组件插槽使用propNameRef
+     * 组件默认插槽使用propNameDefault
+     * 组件具名插槽使用propNameSlotName
+     * upload组件扩展compress属性,值为quality(压缩质量0-1)和fileType(图片扩展名，如png)
      * checkbox组件componentProps为{...groupProps, options: [{label: '', value: '', labelField: 'label', valueField: 'value', ...boxProps}]}
      * radio组件componentProps为{...groupProps, options: [{label: '', value: '', labelField: 'label', valueField: 'value', ...radioProps}]}
-     * code组件增加type配置，值为button|text以及对应的buttonType、buttonSize、textStyle
+     * code组件增加type配置，值为button|text,默认button,以及对应的buttonType、buttonSize、textStyle
+     * picker keyName 改为labelField控制默认label;columns也支持写为options，支持单层数组
+     * checkbox和radio改为labelField控制label,默认label;valueField控制name,默认value
+     * DatetimePicker增加format属性,表示是存储格式化还是时间戳,默认true
      */
     schemas: {
       type: Array,
       required: true,
       validator: schemas => {
-        return schemas.every(item => ['Calendar', 'Picker', 'DatetimePicker', 'Rate', 'NumberBox', 'Upload', 'Code',
-          'Input', 'Textarea', 'Checkbox', 'Radio', 'Switch', 'Slider',
-        ].includes(item.component))
+        return schemas.every(item => {
+          // 验证组件名
+          const componentCorrect = ['Calendar', 'Picker', 'DatetimePicker', 'Rate', 'NumberBox', 'Upload', 'Code',
+            'Input', 'Textarea', 'Checkbox', 'Radio', 'Switch', 'Slider',
+          ].includes(item.component)
+          // 验证选项组件options
+          let optionsCorrect = true
+          if (['Checkbox', 'radio'].includes(item.component)) {
+            optionsCorrect = !!item.componentProps?.options?.length
+          }
+          if (item.component === 'Picker') {
+            optionsCorrect = !!item.componentProps?.options?.length || !!item.componentProps?.columns?.length
+          }
+          // 验证验证码组件发送验证码方法
+          let codeCorrect = true
+          if (!uni.$u.props.BasicForm.Code.api && item.component === 'Code') {
+            codeCorrect = typeof item.componentProps.api === 'function'
+          }
+          return componentCorrect && optionsCorrect && codeCorrect
+        })
       },
     },
     // 是否整体禁用

@@ -1,7 +1,10 @@
 <template>
-  <view class="text-center px-24 bg-white">
-    <text class="text-24 font-bold text-primary">HELLO</text>
-    <BasicForm :model="model" :schemas="schemas" labelWidth="auto"></BasicForm>
+  <view class="px-24 bg-white">
+    <view class="text-24 font-bold text-primary text-center">HELLO</view>
+    <BasicForm ref="formRef" :model="model" :schemas="schemas" labelWidth="auto" :rules="rules">
+      <view class="border-2 border-dashed border-info text-center p-12" slot="uploadDefault">自定义上传插槽</view>
+    </BasicForm>
+    <u-button type="primary" @click="onConsole">Console Form</u-button>
   </view>
 </template>
 
@@ -10,6 +13,11 @@ export default {
   data() {
     return {
       model: {},
+      rules: {
+        'a.calendar': {
+          required: true
+        }
+      },
       schemas: [
         {
           prop: 'a.calendar',
@@ -21,13 +29,10 @@ export default {
           label: '选择器',
           component: 'Picker',
           componentProps: {
-            options: [[
+            options: [
               {label: 'A', value: 1},
               {label: 'B', value: 2},
-            ], [
-              {label: 'A1', value: 11},
-              {label: 'A2', value: 22},
-            ]]
+            ]
           }
         },
         {
@@ -52,11 +57,19 @@ export default {
           prop: 'upload',
           label: '上传',
           component: 'Upload',
+          componentProps: {
+            uploadText: '自定义上传',
+            maxCount: 1
+          }
         },
         {
           prop: 'code',
           label: '验证码输入框',
-          component: 'Code'
+          component: 'Code',
+          componentProps: {
+            // buttonDisabled: true,
+            type: 'text'
+          }
         },
         {
           prop: 'input',
@@ -74,8 +87,11 @@ export default {
           component: 'Checkbox',
           componentProps: {
             options: [
-              {label: 'A', value: 1},
-              {label: 'B', value: 2},
+              {label: 'A', value: 1, customStyle:'margin-right: 16px'},
+              {label: 'B', value: 2, customStyle:'margin-right: 16px'},
+              {label: 'C', value: 3, customStyle:'margin-right: 16px'},
+              {label: 'D', value: 4, customStyle:'margin-right: 16px'},
+              {label: 'E', value: 5, customStyle:'margin-right: 16px'},
             ]
           }
         },
@@ -87,6 +103,7 @@ export default {
             options: [
               {label: 'A', value: 1},
               {label: 'B', value: 2},
+              {label: 'C', value: 3},
             ]
           }
         },
@@ -103,6 +120,12 @@ export default {
       ]
     }
   },
+  methods: {
+    onConsole(){
+      console.log(this.$refs.formRef);
+      this.$refs.formRef.validate()
+    }
+  }
 }
 </script>
 

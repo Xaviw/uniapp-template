@@ -222,8 +222,89 @@ parse(data)
 
 ## 内置组件
 
-1. `captcha`组件传入字符生成图像验证码`<captcha :code="code" @click.native="fetchCode" />`
-2. `sliderVerify`组件为滑动解锁组件，按需求修改内部实现`<slider-verify :text="text" @success="handleNext" :disabled="disabled" ref="verify">`
+### Captcha
+
+组件传入字符生成图像验证码`<captcha :code="code" @click.native="fetchCode" />`
+
+### SliderVerify
+
+滑动解锁组件，按需求修改内部实现`<slider-verify :text="text" @success="handleNext" :disabled="disabled" ref="verify">`
+
+### BasicForm
+
+通用表单组件，使用方法：
+
+```vue
+<template>
+  // formProps同u-form属性，其余为扩展属性
+  // 组件内u-form的方法已映射到组件方法中，可以直接this.$refs.formRef调用
+  // 表单项组件的ref名为`${prop}Ref`，可以通过this.$refs.formRef.$refs[`${prop}Ref`][0]调用，v-if中的ref会放在数组中，所以需要用[0]获取
+  <BasicForm ref="formRef" v-bind="formProps" :schemas="schemas" :isNVUE="false" :disabled="false" :autoSetPlaceholder="true">
+    // `${prop}`插槽可以覆盖schema中的配置
+    <view slot="compA">自定义comA组件内容</view>
+
+    // `${prop}Default`插槽可以配置组件默认插槽
+    <view clot="compBDefault">自定义Upload</view>
+
+    // `${prop}${slot}`插槽可以配置组件具名插槽
+    <view clot="compCMinus">自定义compC步进器minus插槽</view>
+  </BasicForm>
+</template>
+
+<script>
+export default {
+  data(){
+    return {
+      model: {},
+      schemas: [
+        // 每一个schema项根属性同u-form-item属性
+        {
+          prop: 'compA',
+          label: 'A组件',
+          // component属性配置渲染组件
+          component: 'Input',
+          // componentProps属性配置渲染组件属性
+          // 组件事件使用`on${eventName}`: () => {}方式配置，参数不变
+          componentProps: {}
+        },
+        {
+          prop: 'compB',
+          label: 'B组件',
+          component: 'Upload'
+        },
+        {
+          prop: 'compC',
+          label: 'C组件',
+          component: 'NumberBox'
+        },
+      ]
+    }
+  },
+}
+</script>
+```
+
+除uview组件默认配置项外，还增加以及修改了部分配置：
+
+BasicForm根属性：
+- {Array} schemas：表单项配置
+- {boolean} [isNVUE=false]：因为Input组件的prefix、suffix插槽需要区分NVUE页面判断是否使用u--input
+- {boolean} [disabled=false]：配置全部表单项禁用
+- {boolean} [autoSetPlaceholder=true]：schema中未设置placeholder时自动填充为“请输入${label}”或“请选择${label}”
+
+schema根属性：
+- {string} component：组件名，Calendar|Picker|DatetimePicker|Rate|NumberBox|Upload|Code|Input|Textarea|Checkbox|Radio|Switch|Slider
+- componentProps：组件配置
+- {boolean} [ifShow=true]：是否显示（v-show）
+- {boolean} [disabled=false]：是否禁用
+- {boolean|({schema, schemas, model, prop}) => boolean} [dynamicDisabled=false]：动态禁用，支持配置函数
+
+component新增或修改默认值的属性（可以在utils/setUViewConfig.js中配置props.BasicForm修改）：
+- Picker、Checkbox、Radio组件增加options选项，表示数据数组；增加[labelField='label']、[valueField='value']属性，options必须传递包含labelField、valueField的对象数组
+- Picker组件支持使用options属性代替columns；同时还支持单层数组
+- DatetimePicker组件增加[format=true]属性，表示选择日期后是存储格式化的字符串还是时间戳
+- Upload组件增加api函数属性，为接收文件上传路径，返回文件链接字符串的函数
+- Code组件增加[type='button']属性，表示获取验证码是按钮还是文本（'text'）；增加[buttonType='primary']属性，对应u-button的type；增加[button-size='mini']属性，对应u-button的size；增加textStyle属性，为text的样式对象；增加api函数属性，为接收表单model，返回Promise的函数
 
 ## 内置工具
 
