@@ -198,7 +198,7 @@
               :customStyle="item.componentProps.customStyle"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(null, item.prop, $event),
                   item.componentProps.onChange,
                   $event
                 )
@@ -237,7 +237,7 @@
               @blur="onMethod(null, item.componentProps.onBlur, $event)"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event.value),
+                  setModel.bind(null, item.prop, $event.value),
                   item.componentProps.onChange,
                   $event
                 )
@@ -246,9 +246,15 @@
                 onMethod(null, item.componentProps.onOverlimit, $event)
               "
             >
-              <slot :name="`${getName(item)}Minus`"></slot>
-              <slot :name="`${getName(item)}Input`"></slot>
-              <slot :name="`${getName(item)}Plus`"></slot>
+              <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
+                <slot :name="`${getName(item)}Minus`"></slot>
+              </view>
+              <view slot="input" v-if="$slots[`${getName(item)}Input`]">
+                <slot :name="`${getName(item)}Input`"></slot>
+              </view>
+              <view slot="plus" v-if="$slots[`${getName(item)}Plus`]">
+                <slot :name="`${getName(item)}Plus`"></slot>
+              </view>
             </u-number-box>
           </template>
 
@@ -299,7 +305,7 @@
             <view class="flex items-center basic-form-code">
               <u--input
                 :value="get(model, item.prop)"
-                @input="set.bind(null, model, item.prop, $event)"
+                @change="setModel(item.prop, $event)"
                 border="none"
                 :placeholder="item.componentProps.placeholder"
                 :disabled="isDisabled(item)"
@@ -413,15 +419,19 @@
               @input="onMethod(null, item.componentProps.onInput, $event)"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(null, item.prop, $event),
                   item.componentProps.onChange,
                   $event
                 )
               "
               @clear="onMethod(null, item.componentProps.onClear, $event)"
             >
-              <slot :name="`${getName(item)}Prefix`"></slot>
-              <slot :name="`${getName(item)}suffix`"></slot>
+              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
+                <slot :name="`${getName(item)}Prefix`"></slot>
+              </view>
+              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
+                <slot :name="`${getName(item)}suffix`"></slot>
+              </view>
             </u--input>
           </template>
 
@@ -478,15 +488,19 @@
               @input="onMethod(null, item.componentProps.onInput, $event)"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(model, item.prop, $event),
                   item.componentProps.onChange,
                   $event
                 )
               "
               @clear="onMethod(null, item.componentProps.onClear, $event)"
             >
-              <slot :name="`${getName(item)}Prefix`"></slot>
-              <slot :name="`${getName(item)}suffix`"></slot>
+              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
+                <slot :name="`${getName(item)}Prefix`"></slot>
+              </view>
+              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
+                <slot :name="`${getName(item)}suffix`"></slot>
+              </view>
             </u-input>
           </template>
 
@@ -530,7 +544,7 @@
               "
               @input="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(model, item.prop, $event),
                   item.componentProps.onInput,
                   $event
                 )
@@ -564,7 +578,7 @@
               :customStyle="item.componentProps.customStyle"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(null, item.prop, $event),
                   item.componentProps.onChange,
                   $event
                 )
@@ -616,7 +630,7 @@
               :disabled="isDisabled(item)"
               @change="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(null, item.prop, $event),
                   item.componentProps.onChange,
                   $event
                 )
@@ -662,13 +676,7 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="
-                onMethod(
-                  set.bind(null, model, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
+              @change="onMethod(setModel.bind(null, item.prop, $event), item.componentProps.onChange, $event)"
               @input="onMethod(null, item.componentProps.onInput, $event)"
             />
           </template>
@@ -694,7 +702,7 @@
               @change="onMethod(null, item.componentProps.onChange, $event)"
               @input="
                 onMethod(
-                  set.bind(null, model, item.prop, $event),
+                  setModel.bind(null, item.prop, $event),
                   item.componentProps.onInput,
                   $event
                 )
@@ -883,7 +891,10 @@ export default {
     toJSON() {},
     // 导入的方法template中无法直接使用,这里映射一遍
     get,
-    set,
+    // 兼容小程序template中直接set可能无效问题
+    setModel(prop, value){
+      set(this.model, prop, value)
+    },
     // 实现Form方法,方便直接通过组件ref调用
     validate() {
       this.$refs.formRef.validate();
@@ -951,14 +962,17 @@ export default {
     onMethod(func1, func2, event) {
       func1?.();
       func2?.(event);
+      this.$forceUpdate()
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的打开操作
     showItem(item, func, event) {
       if (this.isDisabled(item)) return;
-      item.show = true;
       func?.(event);
-      uni.hideKeyboard();
-      this.$forceUpdate();
+      if(['Calendar','Picker','DatetimePicker'].includes(item.component)) {
+        item.show = true;
+        uni.hideKeyboard();
+        this.$forceUpdate();
+      }
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的关闭操作
     closeItem(item, func1, func2, event) {

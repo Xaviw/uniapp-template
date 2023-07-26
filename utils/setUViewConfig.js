@@ -22,7 +22,7 @@ export default function setConfig() {
         Upload: {
           // 默认的上传方法，需要返回图片链接字符串
           api: url => {
-            return Promise.resolve('')
+            return Promise.resolve('test')
           },
         },
         Code: {
@@ -34,7 +34,7 @@ export default function setConfig() {
           tips: '获取验证码',
           // 可以配置默认发送验证码方法，参数为表单model
           api: model => {
-            return Promise.resolve()
+            return Promise.resolve('test')
           },
         },
         Checkbox: {

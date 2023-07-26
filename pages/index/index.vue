@@ -3,6 +3,7 @@
     <view class="text-24 font-bold text-primary text-center">HELLO</view>
     <BasicForm ref="formRef" :schemas="schemas" labelWidth="auto" :rules="rules">
       <view class="border-2 border-dashed border-info text-center p-12" slot="uploadDefault">自定义上传插槽</view>
+      <view class="border-2 border-dashed border-info text-center p-12" slot="numberBoxMinus">==</view>
     </BasicForm>
     <u-button type="primary" @click="onConsole">Console Form</u-button>
   </view>
