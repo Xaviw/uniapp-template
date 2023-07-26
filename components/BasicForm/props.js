@@ -41,11 +41,6 @@ export default {
       type: Boolean,
       default: true,
     },
-    // 当前form的需要验证字段的集合
-    model: {
-      type: Object,
-      default: uni.$u.props.form.model,
-    },
     // 验证规则
     rules: {
       type: [Object, Function, Array],

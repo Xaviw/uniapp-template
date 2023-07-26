@@ -1,7 +1,7 @@
 <template>
   <view class="px-24 bg-white">
     <view class="text-24 font-bold text-primary text-center">HELLO</view>
-    <BasicForm ref="formRef" :model="model" :schemas="schemas" labelWidth="auto" :rules="rules">
+    <BasicForm ref="formRef" :schemas="schemas" labelWidth="auto" :rules="rules">
       <view class="border-2 border-dashed border-info text-center p-12" slot="uploadDefault">自定义上传插槽</view>
     </BasicForm>
     <u-button type="primary" @click="onConsole">Console Form</u-button>
@@ -12,7 +12,6 @@
 export default {
   data() {
     return {
-      model: {},
       rules: {
         'a.calendar': {
           required: true
@@ -22,7 +21,8 @@ export default {
         {
           prop: 'a.calendar',
           label: '日历',
-          component: 'Calendar'
+          component: 'Calendar',
+          componentProps: {}
         },
         {
           prop: 'picker',
@@ -46,12 +46,14 @@ export default {
         {
           prop: 'rate',
           label: '评分',
-          component: 'Rate'
+          component: 'Rate',
+          componentProps: {}
         },
         {
           prop: 'numberBox',
           label: '步进器',
-          component: 'NumberBox'
+          component: 'NumberBox',
+          componentProps: {}
         },
         {
           prop: 'upload',
@@ -66,20 +68,19 @@ export default {
           prop: 'code',
           label: '验证码输入框',
           component: 'Code',
-          componentProps: {
-            // buttonDisabled: true,
-            type: 'text'
-          }
+          componentProps: {}
         },
         {
           prop: 'input',
           label: '输入框',
-          component: 'Input'
+          component: 'Input',
+          componentProps: {}
         },
         {
           prop: 'textarea',
           label: '文本域',
-          component: 'Textarea'
+          component: 'Textarea',
+          componentProps: {}
         },
         {
           prop: 'checkbox',
@@ -110,19 +111,21 @@ export default {
         {
           prop: 'switch',
           label: '开关选择器',
-          component: 'Switch'
+          component: 'Switch',
+          componentProps: {}
         },
         {
           prop: 'slider',
           label: '滑动选择器',
-          component: 'Slider'
+          component: 'Slider',
+          componentProps: {}
         },
       ]
     }
   },
   methods: {
     onConsole(){
-      console.log(this.$refs.formRef);
+      console.log(this.$refs.formRef.model);
       this.$refs.formRef.validate()
     }
   }

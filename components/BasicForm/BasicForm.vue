@@ -16,8 +16,8 @@
     >
       <!-- 循环表单项 -->
       <u-form-item
-        v-for="item of items"
-        :key="getName(item)"
+        v-for="(item, fi) of items"
+        :key="fi"
         v-show="item.ifShow"
         :label="item.label"
         :prop="item.prop"
@@ -34,7 +34,11 @@
       >
         <slot :name="getName(item)">
           <!-- 请选择 -->
-          <template v-if="['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)">
+          <template
+            v-if="
+              ['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)
+            "
+          >
             <u--input
               :value="getShownValue(item)"
               :placeholder="item.componentProps.placeholder"
@@ -86,17 +90,9 @@
               :monthNum="item.componentProps.monthNum"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @confirm="
-                (...e) =>
-                  closeItem(
-                    item,
-                    onCalendarConfirm.bind(null, item, e[0]),
-                    item.componentProps.onConfirm,
-                    ...e
-                  )
-              "
+              @confirm="onCalendarConfirm(item, $event)"
               @close="
-                (...e) => closeItem(item, null, item.componentProps.onClose, ...e)
+                closeItem(item, null, item.componentProps.onClose, $event)
               "
             />
           </template>
@@ -125,7 +121,7 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @close="
-                (...e) => closeItem(item, null, item.componentProps.onClose, ...e)
+                closeItem(item, null, item.componentProps.onClose, $event)
               "
               @confirm="onPickerConfirm(item, $event)"
               @change="
@@ -136,8 +132,7 @@
                 )
               "
               @cancel="
-                (...e) =>
-                  closeItem(item, null, item.componentProps.onCancel, ...e)
+                closeItem(item, null, item.componentProps.onCancel, $event)
               "
             />
           </template>
@@ -174,15 +169,12 @@
               :customStyle="item.componentProps.customStyle"
               @confirm="onDatetimeConfirm(item, $event)"
               @close="
-                (...e) => closeItem(item, null, item.componentProps.onClose, ...e)
+                closeItem(item, null, item.componentProps.onClose, $event)
               "
               @cancel="
-                (...e) =>
-                  closeItem(item, null, item.componentProps.onCancel, ...e)
+                closeItem(item, null, item.componentProps.onCancel, $event)
               "
-              @change="
-                (...e) => onMethod(null, item.componentProps.onChange, ...e)
-              "
+              @change="onMethod(null, item.componentProps.onChange, $event)"
             />
           </template>
 
@@ -205,12 +197,11 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
             />
           </template>
@@ -242,18 +233,17 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @focus="(...e) => onMethod(null, item.componentProps.onFocus, ...e)"
-              @blur="(...e) => onMethod(null, item.componentProps.onBlur, ...e)"
+              @focus="onMethod(null, item.componentProps.onFocus, $event)"
+              @blur="onMethod(null, item.componentProps.onBlur, $event)"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0].value),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event.value),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
               @overlimit="
-                (...e) => onMethod(null, item.componentProps.onOverlimit, ...e)
+                onMethod(null, item.componentProps.onOverlimit, $event)
               "
             >
               <slot :name="`${getName(item)}Minus`"></slot>
@@ -293,13 +283,11 @@
               @afterRead="afterRead(item, $event)"
               @delete="deleteFile(item, $event)"
               @beforeRead="
-                (...e) => onMethod(null, item.componentProps.beforeRead, ...e)
+                onMethod(null, item.componentProps.beforeRead, $event)
               "
-              @oversize="
-                (...e) => onMethod(null, item.componentProps.oversize, ...e)
-              "
+              @oversize="onMethod(null, item.componentProps.oversize, $event)"
               @clickPreview="
-                (...e) => onMethod(null, item.componentProps.clickPreview, ...e)
+                onMethod(null, item.componentProps.clickPreview, $event)
               "
             >
               <slot :name="`${getName(item)}Default`"></slot>
@@ -308,42 +296,46 @@
 
           <!-- Code -->
           <template v-else-if="item.component === 'Code'">
-            <u--input
-              :value="get(model, item.prop)"
-              @change="set.bind(null, model, item.prop, $event)"
-              border="none"
-              :placeholder="item.componentProps.placeholder"
-              :disabled="isDisabled(item)"
-            ></u--input>
-            <!-- 按钮类型 -->
-            <u-button
-              v-if="item.componentProps.type === 'button'"
-              slot="right"
-              @click="getCode(item)"
-              :text="item.tips"
-              :type="item.componentProps.buttonType"
-              :size="item.componentProps.buttonSize"
-              :disabled="isDisabled(item) || item.componentProps.buttonDisabled"
-            />
-            <!-- 文本类型 -->
-            <text
-              v-else
-              slot="right"
-              :class="[
-                isDisabled(item) || item.componentProps.buttonDisabled
-                  ? 'text-info-disabled'
-                  : 'text-link',
-              ]"
-              :style="item.componentProps.textStyle"
-              @click="
-                getCode(
-                  item,
+            <view class="flex items-center basic-form-code">
+              <u--input
+                :value="get(model, item.prop)"
+                @input="set.bind(null, model, item.prop, $event)"
+                border="none"
+                :placeholder="item.componentProps.placeholder"
+                :disabled="isDisabled(item)"
+              ></u--input>
+
+              <u-button
+                v-if="item.componentProps.type === 'button'"
+                customStyle="width: auto;"
+                @click="getCode(item)"
+                :text="item.componentProps.tips"
+                :type="item.componentProps.buttonType"
+                :size="item.componentProps.buttonSize"
+                :disabled="
                   isDisabled(item) || item.componentProps.buttonDisabled
-                )
-              "
-            >
-              {{ item.tips }}
-            </text>
+                "
+              />
+
+              <text
+                v-else
+                :class="[
+                  isDisabled(item) || item.componentProps.buttonDisabled
+                    ? 'text-info-disabled'
+                    : 'text-link',
+                  'pl-6',
+                ]"
+                :style="item.componentProps.textStyle"
+                @click="
+                  getCode(
+                    item,
+                    isDisabled(item) || item.componentProps.buttonDisabled
+                  )
+                "
+              >
+                {{ item.componentProps.tips }}
+              </text>
+            </view>
 
             <u-code
               :ref="`${getName(item)}Ref`"
@@ -356,12 +348,11 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @change="
-                (...e) =>
-                  onMethod(
-                    codeChange.bind(null, item, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  codeChange.bind(null, item, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
               @start="onCodeStart(item)"
               @end="onCodeEnd(item)"
@@ -409,25 +400,25 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="(...e) => onMethod(null, item.componentProps.onBlur, ...e)"
-              @focus="(...e) => onMethod(null, item.componentProps.onFocus, ...e)"
-              @confirm="
-                (...e) => onMethod(null, item.componentProps.onConfirm, ...e)
-              "
+              @blur="onMethod(null, item.componentProps.onBlur, $event)"
+              @focus="onMethod(null, item.componentProps.onFocus, $event)"
+              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
               @keyboardheightchange="
-                (...e) =>
-                  onMethod(null, item.componentProps.onKeyboardheightchange, ...e)
+                onMethod(
+                  null,
+                  item.componentProps.onKeyboardheightchange,
+                  $event
+                )
               "
-              @input="(...e) => onMethod(null, item.componentProps.onInput, ...e)"
+              @input="onMethod(null, item.componentProps.onInput, $event)"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
-              @clear="(...e) => onMethod(null, item.componentProps.onClear, ...e)"
+              @clear="onMethod(null, item.componentProps.onClear, $event)"
             >
               <slot :name="`${getName(item)}Prefix`"></slot>
               <slot :name="`${getName(item)}suffix`"></slot>
@@ -474,25 +465,25 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="(...e) => onMethod(null, item.componentProps.onBlur, ...e)"
-              @focus="(...e) => onMethod(null, item.componentProps.onFocus, ...e)"
-              @confirm="
-                (...e) => onMethod(null, item.componentProps.onConfirm, ...e)
-              "
+              @blur="onMethod(null, item.componentProps.onBlur, $event)"
+              @focus="onMethod(null, item.componentProps.onFocus, $event)"
+              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
               @keyboardheightchange="
-                (...e) =>
-                  onMethod(null, item.componentProps.onKeyboardheightchange, ...e)
+                onMethod(
+                  null,
+                  item.componentProps.onKeyboardheightchange,
+                  $event
+                )
               "
-              @input="(...e) => onMethod(null, item.componentProps.onInput, ...e)"
+              @input="onMethod(null, item.componentProps.onInput, $event)"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
-              @clear="(...e) => onMethod(null, item.componentProps.onClear, ...e)"
+              @clear="onMethod(null, item.componentProps.onClear, $event)"
             >
               <slot :name="`${getName(item)}Prefix`"></slot>
               <slot :name="`${getName(item)}suffix`"></slot>
@@ -527,25 +518,25 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="(...e) => onMethod(null, item.componentProps.onBlur, ...e)"
-              @focus="(...e) => onMethod(null, item.componentProps.onFocus, ...e)"
-              @confirm="
-                (...e) => onMethod(null, item.componentProps.onConfirm, ...e)
-              "
+              @blur="onMethod(null, item.componentProps.onBlur, $event)"
+              @focus="onMethod(null, item.componentProps.onFocus, $event)"
+              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
               @keyboardheightchange="
-                (...e) =>
-                  onMethod(null, item.componentProps.onKeyboardheightchange, ...e)
+                onMethod(
+                  null,
+                  item.componentProps.onKeyboardheightchange,
+                  $event
+                )
               "
               @input="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onInput,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onInput,
+                  $event
+                )
               "
               @linechange="
-                (...e) => onMethod(null, item.componentProps.onLinechange, ...e)
+                onMethod(null, item.componentProps.onLinechange, $event)
               "
             />
           </template>
@@ -572,12 +563,11 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
             >
               <u-checkbox
@@ -625,12 +615,11 @@
               :customStyle="item.componentProps.customStyle"
               :disabled="isDisabled(item)"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
             >
               <u-radio
@@ -651,7 +640,7 @@
                 :name="option[item.componentProps.valueField]"
                 :customClass="option.customClass"
                 :customStyle="option.customStyle"
-                @change="(...e) => onMethod(null, option.onChange, ...e)"
+                @change="onMethod(null, option.onChange, $event)"
               >
               </u-radio>
             </u-radio-group>
@@ -674,14 +663,13 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @change="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onChange,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onChange,
+                  $event
+                )
               "
-              @input="(...e) => onMethod(null, item.componentProps.onInput, ...e)"
+              @input="onMethod(null, item.componentProps.onInput, $event)"
             />
           </template>
 
@@ -703,20 +691,15 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="
-                (...e) => onMethod(null, item.componentProps.onChange, ...e)
-              "
+              @change="onMethod(null, item.componentProps.onChange, $event)"
               @input="
-                (...e) =>
-                  onMethod(
-                    set.bind(null, model, item.prop, e[0]),
-                    item.componentProps.onInput,
-                    ...e
-                  )
+                onMethod(
+                  set.bind(null, model, item.prop, $event),
+                  item.componentProps.onInput,
+                  $event
+                )
               "
-              @changing="
-                (...e) => onMethod(null, item.componentProps.onChanging, ...e)
-              "
+              @changing="onMethod(null, item.componentProps.onChanging, $event)"
             />
           </template>
         </slot>
@@ -777,6 +760,11 @@ export default {
       this.$refs.formRef.setRules(ruleMap);
     }
   },
+  data() {
+    return {
+      model: {},
+    };
+  },
   computed: {
     // 处理schemas
     items() {
@@ -788,13 +776,39 @@ export default {
         }
         if (!item.componentProps) item.componentProps = {};
         // 合并默认值，在setUViewConfig.js-props-BasicForm中设置
-        const defaultProps = uni.$u.props.BasicForm[item.component];
-        if (defaultProps) {
-          item.componentProps = Object.assign(
-            cloneDeep(defaultProps),
-            item.componentProps
-          );
+        const customProps = uni.$u.props.BasicForm[item.component] || {};
+        const lowerCompName =
+          item.component[0].toLowerCase() + item.component.slice(1);
+        let groupName;
+        if (["Checkbox", "Radio"].includes(item.component)) {
+          groupName =
+            item.component[0].toLowerCase() + item.component.slice(1) + "Group";
         }
+        // #ifndef MP
+        item.componentProps = Object.assign(
+          cloneDeep(customProps),
+          item.componentProps
+        );
+        // #endif
+        // #ifdef MP
+        if (groupName) {
+          const optionProps = uni.$u.props[lowerCompName];
+          for (let i = 0; i < item.componentProps.options.length; i++) {
+            item.componentProps.options[i] = Object.assign(
+              cloneDeep(optionProps),
+              item.componentProps.options[i]
+            );
+          }
+        }
+        const defaultProps = groupName
+          ? uni.$u.props[groupName]
+          : uni.$u.props[lowerCompName];
+        item.componentProps = Object.assign(
+          cloneDeep(defaultProps),
+          cloneDeep(customProps),
+          item.componentProps
+        );
+        // #endif
         // 自动填充placeholder
         if (!item.componentProps.placeholder && this.autoSetPlaceholder) {
           if (
@@ -839,6 +853,10 @@ export default {
         ) {
           set(this.model, item.prop, item.componentProps.fileList[0].url);
         }
+        // 小程序中Switch必须设置初始值才能setRules
+        if(item.component === 'Switch' && !get(this.model, item.prop)) {
+          set(this.model, item.prop, false)
+        }
         return {
           ...item,
           // v-show控制表单项
@@ -852,7 +870,10 @@ export default {
           // 表单项级别禁用
           disabled: !!item.disabled,
           // 表单项动态禁用
-          dynamicDisabled: typeof item.dynamicDisabled === 'function' ? item.dynamicDisabled : !!item.dynamicDisabled,
+          dynamicDisabled:
+            typeof item.dynamicDisabled === "function"
+              ? item.dynamicDisabled
+              : !!item.dynamicDisabled,
         };
       });
     },
@@ -927,23 +948,23 @@ export default {
       return commonDisabled || itemDisabled || dynamicDisabled;
     },
     // 绑定事件
-    onMethod(func1, func2, ...e) {
+    onMethod(func1, func2, event) {
       func1?.();
-      func2?.(...e);
+      func2?.(event);
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的打开操作
-    showItem(item, func, ...e) {
+    showItem(item, func, event) {
       if (this.isDisabled(item)) return;
       item.show = true;
-      func?.(...e);
+      func?.(event);
       uni.hideKeyboard();
       this.$forceUpdate();
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的关闭操作
-    closeItem(item, func1, func2, ...e) {
+    closeItem(item, func1, func2, event) {
       item.show = false;
       func1?.();
-      func2?.(...e);
+      func2?.(event);
       this.$forceUpdate();
     },
     // 获取Calendar|Picker|DatetimePicker值,优先取model[`${item.prop}Text`],其次model[item.prop]
@@ -961,6 +982,7 @@ export default {
       } else {
         set(this.model, item.prop, e);
       }
+      this.closeItem(item, null, item.componentProps.onConfirm, e)
     },
     // 微信小程序无法将picker实例传出来，只能通过ref操作
     onPickerChange(e, refName, func) {
@@ -1004,16 +1026,16 @@ export default {
     },
     // Upload删除文件
     deleteFile(item, e) {
-      const origin = cloneDeep(item.componentProps.fileList)
+      const origin = cloneDeep(item.componentProps.fileList);
       origin.splice(e.index, 1);
-      item.componentProps.fileList = origin
+      item.componentProps.fileList = origin;
       if (item.componentProps.maxCount === 1) {
         set(this.model, item.prop, null);
       } else {
         const data = get(this.model, item.prop);
         data.splice(e.index, 1);
       }
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
     // Upload新增文件
     async afterRead(item, e) {
@@ -1036,8 +1058,8 @@ export default {
               src: url,
               ...item.componentProps.compress,
             });
-          } catch (e) {
-            console.log("压缩失败", e);
+          } catch (err) {
+            console.log("压缩失败", err);
           }
         }
         const result = await item.componentProps.api(url);
@@ -1095,7 +1117,7 @@ export default {
     },
     // 验证码组件改变显示文本
     codeChange(item, e) {
-      item.tips = e;
+      item.componentProps.tips = e;
       this.$forceUpdate();
     },
   },
