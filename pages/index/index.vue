@@ -1,12 +1,16 @@
 <template>
-  <view class="px-24 bg-white">
-    <view class="justify-center">
-      <text class="text-24 font-bold text-primary text-center">HELLO</text>
+  <view class="m-24">
+    <view class="flex justify-center">
+      <text class="text-24 font-bold text-primary">HELLO</text>
     </view>
+
+    <u-button @click="navToNVUE">跳转NVUE</u-button>
+
     <CustomForm ref="formRef" :schemas="schemas" labelPosition="top" labelWidth="200px" :rules="rules" :isNVUE="true">
       <view class="border-2 border-dashed border-info text-center p-12" slot="uploadDefault">自定义上传插槽</view>
       <view class="border-2 border-dashed border-info text-center p-12" slot="numberBoxMinus">==</view>
     </CustomForm>
+
     <u-button type="primary" @click="onConsole" text="Console Form" />
   </view>
 </template>
@@ -130,6 +134,9 @@ export default {
     onConsole(){
       console.log(this.$refs.formRef.model);
       this.$refs.formRef.validate()
+    },
+    navToNVUE(){
+      uni.$u.route('/pages/index/nvuePage')
     }
   }
 }

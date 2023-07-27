@@ -249,7 +249,7 @@
               @change="e => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
               @overlimit="onMethod($event, item.componentProps.onOverlimit)"
             >
-              <view slot="minus" v-if="!$slots[`${getName(item)}Minus`]">
+              <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
                 <slot :name="`${getName(item)}Minus`"></slot>
               </view>
               <view slot="input" v-if="$slots[`${getName(item)}Input`]">
