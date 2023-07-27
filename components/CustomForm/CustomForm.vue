@@ -1,4 +1,4 @@
-// 查看 README.md BasicForm 介绍
+// 查看 README.md CustomForm 介绍
 <template>
   <view>
     <!-- 表单配置 -->
@@ -37,27 +37,40 @@
           <template v-if="['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)">
             <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
             <!-- #ifdef APP-NVUE -->
-            <text
-              v-if="!getShownValue(item)"
-              :class="[item.componentProps.placeholderClass || 'input-placeholder']"
-              :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+            <view
+              :class="[
+                'flex',
+                'items-center',
+                item.componentProps.inputAlign==='center' ?
+                'justify-center' :
+                item.componentProps.inputAlign === 'right' ?
+                'justify-end' :
+                'justify-start'
+              ]"
             >
-              {{item.componentProps.placeholder}}
-            </text>
-            <text
-              v-else
-              :style="{
+              <text
+                v-if="!getShownValue(item)"
+                :class="[item.componentProps.placeholderClass || 'input-placeholder']"
+                :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+              >
+                {{item.componentProps.placeholder}}
+              </text>
+              <text
+                v-else
+                :style="{
                 fontSize:item.componentProps.fontSize || '15px',
                 color: item.componentProps.color || '#303133'
               }"
-            >
-              {{getShownValue(item)}}
-            </text>
+              >
+                {{getShownValue(item)}}
+              </text>
+            </view>
             <!-- #endif -->
             <!-- #ifndef APP-NVUE -->
             <u--input
               :value="getShownValue(item)"
               :placeholder="item.componentProps.placeholder"
+              :inputAlign="item.componentProps.inputAlign || 'left'"
               border="none"
               disabled
               disabledColor="#ffffff"
@@ -293,6 +306,8 @@
                 :value="get(model, item.prop)"
                 @change="onMethod($event, null, item.prop)"
                 border="none"
+                :type="item.componentProps.inputType"
+                :maxlength="item.componentProps.maxlength"
                 :placeholder="item.componentProps.placeholder"
                 :disabled="isDisabled(item)"
               ></u--input>
@@ -639,10 +654,10 @@ import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js";
 import props from "./props.js";
 
 // HACK: uview中的deepMerge有问题，无法在setUViewConfig中直接配置空数组
-uni.$u.props.BasicForm.Upload.fileList = [];
+uni.$u.props.CustomForm.Upload.fileList = [];
 
 export default {
-  name: "BasicForm",
+  name: "CustomForm",
   mixins: [props],
   mounted() {
     // 兼容微信小程序通过setRules注入rules
@@ -698,8 +713,8 @@ export default {
           item.labelWidth = 0.1;
         }
         if (!item.componentProps) item.componentProps = {};
-        // 合并默认值，在setUViewConfig.js-props-BasicForm中设置
-        const customProps = uni.$u.props.BasicForm[item.component] || {};
+        // 合并默认值，在setUViewConfig.js-props-CustomForm中设置
+        const customProps = uni.$u.props.CustomForm[item.component] || {};
         const lowerCompName =
           item.component[0].toLowerCase() + item.component.slice(1);
         let groupName;
@@ -820,14 +835,14 @@ export default {
       return cloneDeep(this.model)
     },
     // 实现Form方法,方便直接通过组件ref调用
-    validate() {
-      this.$refs.formRef.validate();
+    async validate() {
+      await this.$refs.formRef.validate();
     },
     setRules() {
       this.$refs.formRef.setRules();
     },
-    validateField() {
-      this.$refs.formRef.validateField();
+    async validateField() {
+      await this.$refs.formRef.validateField();
     },
     resetFields() {
       this.$refs.formRef.resetFields();
@@ -841,8 +856,9 @@ export default {
         for (let rule of rules) {
           this.fillRuleMessage(rule, label, prefix);
         }
-      } else if (typeof rules === "object" && !rules.message) {
-        if (!rules.trigger) rules.trigger = ["blur", "change"];
+      } else if (typeof rules === "object") {
+        if (!rules.trigger?.length) rules.trigger = ["blur", "change"];
+        if(rules.message) return
         if (rules.required) {
           rules.message = prefix + label;
         } else if (rules.type) {
@@ -935,9 +951,8 @@ export default {
       const labelField = item.componentProps.labelField;
       const actualValue = e.value.map((value) => value[valueField]);
       const labels = e.value.map((value) => value[labelField]);
-      this.model[item.prop] =
-        e.value.length === 1 ? actualValue[0] : actualValue;
-      this.model[`${item.prop}Text`] = e.value.length === 1 ? labels[0] : labels;
+      set(this.model, item.prop, e.value.length === 1 ? actualValue[0] : actualValue)
+      set(this.model, `${item.prop}Text`, e.value.length === 1 ? labels[0] : labels)
       this.closeItem(item, item.componentProps.onConfirm, {
         ...e,
         actualValue,

@@ -230,7 +230,7 @@ parse(data)
 
 滑动解锁组件，按需求修改内部实现`<slider-verify :text="text" @success="handleNext" :disabled="disabled" ref="verify">`
 
-### BasicForm
+### CustomForm
 
 通用表单组件，使用方法：
 
@@ -239,7 +239,7 @@ parse(data)
   // formProps同u-form属性，其余为扩展属性
   // 组件内u-form的方法已映射到组件方法中，可以直接this.$refs.formRef调用
   // 表单项组件的ref名为`${prop}Ref`，可以通过this.$refs.formRef.$refs[`${prop}Ref`][0]调用，v-if中的ref会放在数组中，所以需要用[0]获取
-  <BasicForm ref="formRef" v-bind="formProps" :schemas="schemas" :isNVUE="false" :disabled="false" :autoSetPlaceholder="true">
+  <CustomForm ref="formRef" v-bind="formProps" :schemas="schemas" :isNVUE="false" :disabled="false" :autoSetPlaceholder="true">
     // `${prop}`插槽可以覆盖schema中的配置
     <view slot="compA">自定义comA组件内容</view>
 
@@ -248,7 +248,7 @@ parse(data)
 
     // `${prop}${slot}`插槽可以配置组件具名插槽（小程序、APP-NVUE不兼容）
     <view clot="compCMinus">自定义compC步进器minus插槽</view>
-  </BasicForm>
+  </CustomForm>
 </template>
 
 <script>
@@ -299,7 +299,7 @@ export default {
 
 除uview组件默认配置项外，还增加以及修改了部分配置：
 
-BasicForm根属性：
+CustomForm根属性：
 - {Array} schemas：表单项配置
 - {boolean} [isNVUE=false]：因为Input组件的prefix、suffix插槽需要区分NVUE页面判断是否使用u--input
 - {boolean} [disabled=false]：配置全部表单项禁用
@@ -312,12 +312,12 @@ schema根属性：
 - {boolean} [disabled=false]：是否禁用
 - {boolean|({schema, schemas, model, prop}) => boolean} [dynamicDisabled=false]：动态禁用，支持配置函数
 
-component新增或修改默认值的属性（可以在utils/setUViewConfig.js中配置props.BasicForm修改）：
-- Picker、Checkbox、Radio组件增加options选项，表示数据数组；增加[labelField='label']、[valueField='value']属性，options必须传递包含labelField、valueField的对象数组
+component新增或修改默认值的属性（可以在utils/setUViewConfig.js中配置props.CustomForm修改）：
+- Picker、Checkbox、Radio组件增加options选项，表示数据数组；增加[labelField='label']、[valueField='value']属性，options必须传递包含labelField、valueField的对象数组；增加inputAlign属性，表示显示文本框的对齐方式，同u-input；
 - Picker组件支持使用options属性代替columns；同时还支持单层数组
 - DatetimePicker组件增加[format=true]属性，表示选择日期后是存储格式化的字符串还是时间戳
 - Upload组件增加api函数属性，为接收文件上传路径，返回文件链接字符串的函数
-- Code组件增加[type='button']属性，表示获取验证码是按钮还是文本（'text'）；增加[buttonType='primary']属性，对应u-button的type；增加[button-size='mini']属性，对应u-button的size；增加textStyle属性，为text的样式对象；增加api函数属性，为接收表单model，返回Promise的函数
+- Code组件增加[type='button']属性，表示获取验证码是按钮还是文本（'text'）；增加[buttonType='primary']属性，对应u-button的type；增加[button-size='mini']属性，对应u-button的size；增加textStyle属性，为text的样式对象；增加maxlength属性，表示输入框长度，默认4；增加inputType属性，表示输入框type，默认number；增加api函数属性，为接收表单model，返回Promise的函数
 
 ## 内置工具
 

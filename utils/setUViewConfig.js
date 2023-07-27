@@ -5,8 +5,8 @@ export default function setConfig() {
     config: {},
     // 修改$u.props对象的属性
     props: {
-      // 仅对BasicForm内组件生效
-      BasicForm: {
+      // 仅对CustomForm内组件生效
+      CustomForm: {
         Calendar: {
           closeOnClickOverlay: true,
         },
@@ -30,6 +30,10 @@ export default function setConfig() {
           buttonType: 'primary',
           buttonSize: 'mini',
           textStyle: {},
+          // 输入框最大长度
+          maxlength: 4,
+          // 输入框类型
+          inputType: 'number',
           // 可以配置默认发送验证码方法，参数为表单model
           api: model => {
             return Promise.resolve('test')

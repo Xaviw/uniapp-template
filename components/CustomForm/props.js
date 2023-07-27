@@ -1,4 +1,4 @@
-// 查看 README.md BasicForm 介绍
+// 查看 README.md CustomForm 介绍
 export default {
   props: {
     isNVUE: {
@@ -24,7 +24,7 @@ export default {
           }
           // 验证验证码组件发送验证码方法
           let codeCorrect = true
-          if (!uni.$u.props.BasicForm.Code.api && item.component === 'Code') {
+          if (!uni.$u.props.CustomForm.Code.api && item.component === 'Code') {
             codeCorrect = typeof item.componentProps.api === 'function'
           }
           return componentCorrect && optionsCorrect && codeCorrect
