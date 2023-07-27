@@ -30,8 +30,6 @@ export default function setConfig() {
           buttonType: 'primary',
           buttonSize: 'mini',
           textStyle: {},
-          // 小程序更新无效，放个默认值兜底
-          tips: '获取验证码',
           // 可以配置默认发送验证码方法，参数为表单model
           api: model => {
             return Promise.resolve('test')

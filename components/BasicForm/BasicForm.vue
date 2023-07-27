@@ -34,11 +34,27 @@
       >
         <slot :name="getName(item)">
           <!-- 请选择 -->
-          <template
-            v-if="
-              ['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)
-            "
-          >
+          <template v-if="['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)">
+            <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
+            <!-- #ifdef APP-NVUE -->
+            <text
+              v-if="!getShownValue(item)"
+              :class="[item.componentProps.placeholderClass || 'input-placeholder']"
+              :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+            >
+              {{item.componentProps.placeholder}}
+            </text>
+            <text
+              v-else
+              :style="{
+                fontSize:item.componentProps.fontSize || '15px',
+                color: item.componentProps.color || '#303133'
+              }"
+            >
+              {{getShownValue(item)}}
+            </text>
+            <!-- #endif -->
+            <!-- #ifndef APP-NVUE -->
             <u--input
               :value="getShownValue(item)"
               :placeholder="item.componentProps.placeholder"
@@ -46,6 +62,7 @@
               disabled
               disabledColor="#ffffff"
             />
+            <!-- #endif -->
             <u-icon slot="right" name="arrow-right" />
           </template>
 
@@ -60,6 +77,7 @@
             <u-calendar
               :ref="`${getName(item)}Ref`"
               @click.native.stop
+              @click.native="e => e.stopPropagation()"
               style="flex: 0"
               :title="item.componentProps.title"
               :showTitle="item.componentProps.showTitle"
@@ -91,9 +109,7 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @confirm="onCalendarConfirm(item, $event)"
-              @close="
-                closeItem(item, null, item.componentProps.onClose, $event)
-              "
+              @close="closeItem(item, item.componentProps.onClose, $event)"
             />
           </template>
 
@@ -102,6 +118,7 @@
             <u-picker
               :ref="`${getName(item)}Ref`"
               @click.native.stop
+              @click.native="e => e.stopPropagation()"
               style="flex: 0"
               :show="item.show"
               :showToolbar="item.componentProps.showToolbar"
@@ -120,20 +137,10 @@
               :columns="item.componentProps.options"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @close="
-                closeItem(item, null, item.componentProps.onClose, $event)
-              "
+              @close="closeItem(item, item.componentProps.onClose, $event)"
               @confirm="onPickerConfirm(item, $event)"
-              @change="
-                onPickerChange(
-                  $event,
-                  `${getName(item)}Ref`,
-                  item.componentProps.onChange
-                )
-              "
-              @cancel="
-                closeItem(item, null, item.componentProps.onCancel, $event)
-              "
+              @change="onPickerChange($event, `${getName(item)}Ref`, item.componentProps.onChange)"
+              @cancel="closeItem(item, item.componentProps.onCancel, $event)"
             />
           </template>
 
@@ -142,6 +149,7 @@
             <u-datetime-picker
               :ref="`${getName(item)}Ref`"
               @click.native.stop
+              @click.native="e => e.stopPropagation()"
               style="flex: 0"
               :showToolbar="item.componentProps.showToolbar"
               :title="item.componentProps.title"
@@ -168,13 +176,9 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @confirm="onDatetimeConfirm(item, $event)"
-              @close="
-                closeItem(item, null, item.componentProps.onClose, $event)
-              "
-              @cancel="
-                closeItem(item, null, item.componentProps.onCancel, $event)
-              "
-              @change="onMethod(null, item.componentProps.onChange, $event)"
+              @close="closeItem(item, item.componentProps.onClose, $event)"
+              @cancel="closeItem(item, item.componentProps.onCancel, $event)"
+              @change="onMethod($event, item.componentProps.onChange)"
             />
           </template>
 
@@ -196,13 +200,7 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="
-                onMethod(
-                  setModel.bind(null, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
             />
           </template>
 
@@ -233,20 +231,12 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @focus="onMethod(null, item.componentProps.onFocus, $event)"
-              @blur="onMethod(null, item.componentProps.onBlur, $event)"
-              @change="
-                onMethod(
-                  setModel.bind(null, item.prop, $event.value),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
-              @overlimit="
-                onMethod(null, item.componentProps.onOverlimit, $event)
-              "
+              @focus="onMethod($event, item.componentProps.onFocus)"
+              @blur="onMethod($event, item.componentProps.onBlur)"
+              @change="e => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
+              @overlimit="onMethod($event, item.componentProps.onOverlimit)"
             >
-              <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
+              <view slot="minus" v-if="!$slots[`${getName(item)}Minus`]">
                 <slot :name="`${getName(item)}Minus`"></slot>
               </view>
               <view slot="input" v-if="$slots[`${getName(item)}Input`]">
@@ -288,13 +278,9 @@
               :customStyle="item.componentProps.customStyle"
               @afterRead="afterRead(item, $event)"
               @delete="deleteFile(item, $event)"
-              @beforeRead="
-                onMethod(null, item.componentProps.beforeRead, $event)
-              "
-              @oversize="onMethod(null, item.componentProps.oversize, $event)"
-              @clickPreview="
-                onMethod(null, item.componentProps.clickPreview, $event)
-              "
+              @beforeRead="onMethod($event, item.componentProps.beforeRead)"
+              @oversize="onMethod($event, item.componentProps.oversize)"
+              @clickPreview="onMethod($event, item.componentProps.clickPreview)"
             >
               <slot :name="`${getName(item)}Default`"></slot>
             </u-upload>
@@ -302,10 +288,10 @@
 
           <!-- Code -->
           <template v-else-if="item.component === 'Code'">
-            <view class="flex items-center basic-form-code">
+            <view style="flex: 1;display: flex;flex-direction: row;">
               <u--input
                 :value="get(model, item.prop)"
-                @change="setModel(item.prop, $event)"
+                @change="onMethod($event, null, item.prop)"
                 border="none"
                 :placeholder="item.componentProps.placeholder"
                 :disabled="isDisabled(item)"
@@ -318,26 +304,17 @@
                 :text="item.componentProps.tips"
                 :type="item.componentProps.buttonType"
                 :size="item.componentProps.buttonSize"
-                :disabled="
-                  isDisabled(item) || item.componentProps.buttonDisabled
-                "
+                :disabled="isDisabled(item) || item.componentProps.buttonDisabled"
               />
 
               <text
                 v-else
                 :class="[
-                  isDisabled(item) || item.componentProps.buttonDisabled
-                    ? 'text-info-disabled'
-                    : 'text-link',
+                  isDisabled(item) || item.componentProps.buttonDisabled ? 'text-info-disabled' : 'text-link',
                   'pl-6',
                 ]"
                 :style="item.componentProps.textStyle"
-                @click="
-                  getCode(
-                    item,
-                    isDisabled(item) || item.componentProps.buttonDisabled
-                  )
-                "
+                @click="getCode(item, isDisabled(item) || item.componentProps.buttonDisabled)"
               >
                 {{ item.componentProps.tips }}
               </text>
@@ -353,13 +330,7 @@
               :uniqueKey="item.componentProps.uniqueKey || getName(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="
-                onMethod(
-                  codeChange.bind(null, item, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
+              @change="onCodeChange(item, $event)"
               @start="onCodeStart(item)"
               @end="onCodeEnd(item)"
             />
@@ -406,25 +377,13 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="onMethod(null, item.componentProps.onBlur, $event)"
-              @focus="onMethod(null, item.componentProps.onFocus, $event)"
-              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
-              @keyboardheightchange="
-                onMethod(
-                  null,
-                  item.componentProps.onKeyboardheightchange,
-                  $event
-                )
-              "
-              @input="onMethod(null, item.componentProps.onInput, $event)"
-              @change="
-                onMethod(
-                  setModel.bind(null, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
-              @clear="onMethod(null, item.componentProps.onClear, $event)"
+              @blur="onMethod($event, item.componentProps.onBlur)"
+              @focus="onMethod($event, item.componentProps.onFocus)"
+              @confirm="onMethod($event, item.componentProps.onConfirm)"
+              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+              @input="onMethod($event, item.componentProps.onInput)"
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              @clear="onMethod($event, item.componentProps.onClear)"
             >
               <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
                 <slot :name="`${getName(item)}Prefix`"></slot>
@@ -475,25 +434,13 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="onMethod(null, item.componentProps.onBlur, $event)"
-              @focus="onMethod(null, item.componentProps.onFocus, $event)"
-              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
-              @keyboardheightchange="
-                onMethod(
-                  null,
-                  item.componentProps.onKeyboardheightchange,
-                  $event
-                )
-              "
-              @input="onMethod(null, item.componentProps.onInput, $event)"
-              @change="
-                onMethod(
-                  setModel.bind(model, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
-              @clear="onMethod(null, item.componentProps.onClear, $event)"
+              @blur="onMethod($event, item.componentProps.onBlur)"
+              @focus="onMethod($event, item.componentProps.onFocus)"
+              @confirm="onMethod($event, item.componentProps.onConfirm)"
+              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+              @input="onMethod($event, item.componentProps.onInput)"
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              @clear="onMethod($event, item.componentProps.onClear)"
             >
               <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
                 <slot :name="`${getName(item)}Prefix`"></slot>
@@ -532,26 +479,12 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @blur="onMethod(null, item.componentProps.onBlur, $event)"
-              @focus="onMethod(null, item.componentProps.onFocus, $event)"
-              @confirm="onMethod(null, item.componentProps.onConfirm, $event)"
-              @keyboardheightchange="
-                onMethod(
-                  null,
-                  item.componentProps.onKeyboardheightchange,
-                  $event
-                )
-              "
-              @input="
-                onMethod(
-                  setModel.bind(model, item.prop, $event),
-                  item.componentProps.onInput,
-                  $event
-                )
-              "
-              @linechange="
-                onMethod(null, item.componentProps.onLinechange, $event)
-              "
+              @blur="onMethod($event, item.componentProps.onBlur)"
+              @focus="onMethod($event, item.componentProps.onFocus)"
+              @confirm="onMethod($event, item.componentProps.onConfirm)"
+              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+              @input="onMethod($event, item.componentProps.onInput, item.prop)"
+              @linechange="onMethod($event, item.componentProps.onLinechange)"
             />
           </template>
 
@@ -576,13 +509,7 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="
-                onMethod(
-                  setModel.bind(null, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
             >
               <u-checkbox
                 v-for="(option, index) in item.componentProps.options"
@@ -628,13 +555,7 @@
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               :disabled="isDisabled(item)"
-              @change="
-                onMethod(
-                  setModel.bind(null, item.prop, $event),
-                  item.componentProps.onChange,
-                  $event
-                )
-              "
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
             >
               <u-radio
                 v-for="(option, index) in item.componentProps.options"
@@ -654,7 +575,7 @@
                 :name="option[item.componentProps.valueField]"
                 :customClass="option.customClass"
                 :customStyle="option.customStyle"
-                @change="onMethod(null, option.onChange, $event)"
+                @change="onMethod($event, option.onChange)"
               >
               </u-radio>
             </u-radio-group>
@@ -676,8 +597,8 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="onMethod(setModel.bind(null, item.prop, $event), item.componentProps.onChange, $event)"
-              @input="onMethod(null, item.componentProps.onInput, $event)"
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              @input="onMethod($event, item.componentProps.onInput)"
             />
           </template>
 
@@ -699,15 +620,9 @@
               :disabled="isDisabled(item)"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
-              @change="onMethod(null, item.componentProps.onChange, $event)"
-              @input="
-                onMethod(
-                  setModel.bind(null, item.prop, $event),
-                  item.componentProps.onInput,
-                  $event
-                )
-              "
-              @changing="onMethod(null, item.componentProps.onChanging, $event)"
+              @change="onMethod($event, item.componentProps.onChange)"
+              @input="onMethod($event, item.componentProps.onInput, item.prop)"
+              @changing="onMethod($event, item.componentProps.onChanging)"
             />
           </template>
         </slot>
@@ -719,7 +634,7 @@
 </template>
 
 <script>
-import { cloneDeep, set, get } from "lodash-es";
+import { cloneDeep, set, get, isPlainObject } from "lodash-es";
 import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js";
 import props from "./props.js";
 
@@ -892,8 +807,17 @@ export default {
     // 导入的方法template中无法直接使用,这里映射一遍
     get,
     // 兼容小程序template中直接set可能无效问题
-    setModel(prop, value){
-      set(this.model, prop, value)
+    // 提供组件ref设置、获取model方法
+    setModel(map){
+      if(!isPlainObject(map)) {
+        throw Error('setModel只能接收对象')
+      }
+      for(let key in map) {
+        set(this.model, key, map[key])
+      }
+    },
+    getModelClone(){
+      return cloneDeep(this.model)
     },
     // 实现Form方法,方便直接通过组件ref调用
     validate() {
@@ -959,9 +883,11 @@ export default {
       return commonDisabled || itemDisabled || dynamicDisabled;
     },
     // 绑定事件
-    onMethod(func1, func2, event) {
-      func1?.();
-      func2?.(event);
+    onMethod(event, func, modelKey, value) {
+      if(modelKey) {
+        this.setModel({[modelKey]: value === undefined ? event : value})
+      }
+      func?.(event);
       this.$forceUpdate()
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的打开操作
@@ -975,16 +901,14 @@ export default {
       }
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的关闭操作
-    closeItem(item, func1, func2, event) {
+    closeItem(item, func, event) {
       item.show = false;
-      func1?.();
-      func2?.(event);
+      func?.(event);
       this.$forceUpdate();
     },
     // 获取Calendar|Picker|DatetimePicker值,优先取model[`${item.prop}Text`],其次model[item.prop]
     getShownValue(item) {
-      const value =
-        get(this.model, `${item.prop}Text`) || get(this.model, item.prop);
+      const value = get(this.model, `${item.prop}Text`) || get(this.model, item.prop);
       if (typeof value === "string") return value;
       if (value === undefined || value === null) return "";
       return value?.toString();
@@ -996,7 +920,7 @@ export default {
       } else {
         set(this.model, item.prop, e);
       }
-      this.closeItem(item, null, item.componentProps.onConfirm, e)
+      this.closeItem(item, item.componentProps.onConfirm, e)
     },
     // 微信小程序无法将picker实例传出来，只能通过ref操作
     onPickerChange(e, refName, func) {
@@ -1013,9 +937,8 @@ export default {
       const labels = e.value.map((value) => value[labelField]);
       this.model[item.prop] =
         e.value.length === 1 ? actualValue[0] : actualValue;
-      this.model[`${item.prop}Text`] =
-        e.value.length === 1 ? labels[0] : labels;
-      this.closeItem(item, null, item.componentProps.onConfirm, {
+      this.model[`${item.prop}Text`] = e.value.length === 1 ? labels[0] : labels;
+      this.closeItem(item, item.componentProps.onConfirm, {
         ...e,
         actualValue,
         labels,
@@ -1036,7 +959,7 @@ export default {
       } else {
         set(this.model, item.prop, e.value);
       }
-      this.closeItem(item, null, item.componentProps.onConfirm, e);
+      this.closeItem(item, item.componentProps.onConfirm, e);
     },
     // Upload删除文件
     deleteFile(item, e) {
@@ -1119,6 +1042,12 @@ export default {
         uni.$u.toast("请倒计时结束后再发送");
       }
     },
+    // 验证码组件改变显示文本
+    onCodeChange(item, e) {
+      item.componentProps.tips = e;
+      item.componentProps.onChange?.(e)
+      this.$forceUpdate();
+    },
     // 验证码开始倒计时回调
     onCodeStart(item) {
       item.componentProps.buttonDisabled = true;
@@ -1128,11 +1057,6 @@ export default {
     onCodeEnd(item) {
       item.componentProps.buttonDisabled = false;
       item.componentProps.onEnd?.();
-    },
-    // 验证码组件改变显示文本
-    codeChange(item, e) {
-      item.componentProps.tips = e;
-      this.$forceUpdate();
     },
   },
 };

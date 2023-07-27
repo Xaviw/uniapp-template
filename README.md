@@ -246,7 +246,7 @@ parse(data)
     // `${prop}Default`插槽可以配置组件默认插槽
     <view clot="compBDefault">自定义Upload</view>
 
-    // `${prop}${slot}`插槽可以配置组件具名插槽
+    // `${prop}${slot}`插槽可以配置组件具名插槽（小程序、APP-NVUE不兼容）
     <view clot="compCMinus">自定义compC步进器minus插槽</view>
   </BasicForm>
 </template>
@@ -255,7 +255,8 @@ parse(data)
 export default {
   data(){
     return {
-      model: {},
+      // 仅为示例，属性同u-form
+      formProps: {},
       schemas: [
         // 每一个schema项根属性同u-form-item属性
         {
@@ -280,6 +281,18 @@ export default {
       ]
     }
   },
+  methods: {
+    getModel(){
+      // 获取组件内model值
+      const originModel = this.$refs.formRef.model
+      const cloneModel = this.$refs.formRef.getModelClone()
+      // 设置组件内model值
+      this.$refs.formRef.setModel({
+        'a.b.c': 1,
+        'compA': 2
+      })
+    }
+  }
 }
 </script>
 ```
