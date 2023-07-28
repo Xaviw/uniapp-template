@@ -19,7 +19,6 @@
     "backgroundTextStyle": "dark", // 微信小程序下拉三个圆点样式，仅支持dark/light
     "backgroundColorTop": "#F8F8F8", // ios回弹区域背景色
     "backgroundColorBottom": "#F8F8F8", // ios底部回弹区域背景色
-    "enablePullDownRefresh": true,
     "app-plus": {
       "background": "#ffffff", // 页面底色，vue页面需要设置page背景色透明
       "bounce": "none", // 回弹效果，安卓测试无效

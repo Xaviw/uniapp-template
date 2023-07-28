@@ -4,7 +4,7 @@ $step: 2; //步长，由于设计稿2rpx=1px，故此处步长为2
 $unit: 'rpx'; //单位
 
 @while $num < ($sum + 1) {
-  /* #ifndef APP-NVUE */
+  // #ifndef APP-NVUE
 
   // 层级
   .z-#{$num} {
@@ -19,7 +19,7 @@ $unit: 'rpx'; //单位
     letter-spacing: #{$num * $step}#{$unit};
   }
 
-  /* #endif */
+  // #endif
 
   // 字号
   .text-#{$num} {
@@ -47,66 +47,115 @@ $unit: 'rpx'; //单位
     width: #{$num * $step}#{$unit};
   }
   .w-#{$num + $sum} {
-    width: #{$num + $sum}#{$unit};
+    width: #{($num + $sum) * $step}#{$unit};
   }
   .h-#{$num } {
     height: #{$num * $step}#{$unit};
   }
   .h-#{$num + $sum} {
-    height: #{$num + $sum}#{$unit};
+    height: #{($num + $sum) * $step}#{$unit};
   }
 
   //padding
   .p-#{$num} {
     padding: #{$num * $step}#{$unit};
   }
+  .p-#{$num + $sum} {
+    padding: #{($num + $sum) * $step}#{$unit};
+  }
   .px-#{$num} {
     padding-left: #{$num * $step}#{$unit};
     padding-right: #{$num * $step}#{$unit};
+  }
+  .px-#{$num + $sum} {
+    padding-left: #{($num + $sum) * $step}#{$unit};
+    padding-right: #{($num + $sum) * $step}#{$unit};
   }
   .py-#{$num} {
     padding-top: #{$num * $step}#{$unit};
     padding-bottom: #{$num * $step}#{$unit};
   }
+  .py-#{$num + $sum} {
+    padding-top: #{($num + $sum) * $step}#{$unit};
+    padding-bottom: #{($num + $sum) * $step}#{$unit};
+  }
   .pt-#{$num} {
     padding-top: #{$num * $step}#{$unit};
+  }
+  .pt-#{$num + $sum} {
+    padding-top: #{($num + $sum) * $step}#{$unit};
   }
   .pr-#{$num} {
     padding-right: #{$num * $step}#{$unit};
   }
+  .pr-#{$num + $sum} {
+    padding-right: #{($num + $sum) * $step}#{$unit};
+  }
   .pb-#{$num} {
     padding-bottom: #{$num * $step}#{$unit};
   }
+  .pb-#{$num + $sum} {
+    padding-bottom: #{($num + $sum) * $step}#{$unit};
+  }
   .pl-#{$num} {
     padding-left: #{$num * $step}#{$unit};
+  }
+  .pl-#{$num + $sum} {
+    padding-left: #{($num + $sum) * $step}#{$unit};
   }
   //margin
   .m-#{$num} {
     margin: #{$num * $step}#{$unit};
   }
+  .m-#{$num + $sum} {
+    margin: #{($num + $sum) * $step}#{$unit};
+  }
   .mx-#{$num} {
     margin-left: #{$num * $step}#{$unit};
     margin-right: #{$num * $step}#{$unit};
+  }
+  .mx-#{$num + $sum} {
+    margin-left: #{($num + $sum) * $step}#{$unit};
+    margin-right: #{($num + $sum) * $step}#{$unit};
   }
   .my-#{$num} {
     margin-top: #{$num * $step}#{$unit};
     margin-bottom: #{$num * $step}#{$unit};
   }
+  .my-#{$num + $sum} {
+    margin-top: #{($num + $sum) * $step}#{$unit};
+    margin-bottom: #{($num + $sum) * $step}#{$unit};
+  }
   .mt-#{$num} {
     margin-top: #{$num * $step}#{$unit};
+  }
+  .mt-#{$num + $sum} {
+    margin-top: #{($num + $sum) * $step}#{$unit};
   }
   .mr-#{$num} {
     margin-right: #{$num * $step}#{$unit};
   }
+  .mr-#{$num + $sum} {
+    margin-right: #{($num + $sum) * $step}#{$unit};
+  }
   .mb-#{$num} {
     margin-bottom: #{$num * $step}#{$unit};
+  }
+  .mb-#{$num + $sum} {
+    margin-bottom: #{($num + $sum) * $step}#{$unit};
   }
   .ml-#{$num} {
     margin-left: #{$num * $step}#{$unit};
   }
+  .ml-#{$num + $sum} {
+    margin-left: #{($num + $sum) * $step}#{$unit};
+  }
   // 边框半径
   .rounded-#{$num} {
     border-radius: #{$num * $step}#{$unit};
+  }
+  .rounded-#{$num + $sum} {
+    border-radius: #{($num + $sum) * $step}#{$unit};
   }
   // 边框宽度
   .border-#{$num} {
@@ -129,7 +178,7 @@ $unit: 'rpx'; //单位
 
 @for $i from 0 through 12 {
   @if $i <= 10 {
-    /* #ifndef APP-NVUE */
+    // #ifndef APP-NVUE
     // 列
     .columns-#{$i} {
       columns: #{$i};
@@ -141,7 +190,7 @@ $unit: 'rpx'; //单位
     .h-p-#{$i * 10} {
       height: #{$i * 10}#{'%'};
     }
-    /* #endif */
+    // #endif
 
     // 透明度
     .opacity-#{$i} {
@@ -149,14 +198,14 @@ $unit: 'rpx'; //单位
     }
   }
 
-  /* #ifndef APP-NVUE */
+  // #ifndef APP-NVUE
   // flex基础大小
   @for $j from 1 to $i {
     .basis-#{$j}-#{$i} {
-      flex-basis: #{$j / $i}#{'%'};
+      flex-basis: #{$j * 100 / $i}#{'%'};
     }
   }
-  /* #endif */
+  // #endif
 }
 
 // 颜色
@@ -348,9 +397,9 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  /* #ifndef APP-NVUE */
+  // #ifndef APP-NVUE
   white-space: nowrap;
-  /* #endif */
+  // #endif
 }
 
 .text-black {
@@ -374,8 +423,11 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .overflow-hidden {
   overflow: hidden;
 }
+.w-screen {
+  width: 750rpx;
+}
 
-/* #ifndef APP-NVUE */
+// #ifndef APP-NVUE
 .overline {
   text-decoration-line: overline;
 }
@@ -455,9 +507,6 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 }
 .h-full {
   height: 100%;
-}
-.w-screen {
-  width: 100vw;
 }
 .h-screen {
   height: 100vh;
@@ -945,4 +994,4 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .wrap-all {
   word-wrap: anywhere;
 }
-/* #endif */
+// #endif

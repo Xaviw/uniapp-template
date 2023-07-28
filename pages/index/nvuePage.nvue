@@ -1,10 +1,14 @@
 <template>
   <view class="m-24">
-    <view class="flex justify-center">
-      <text class="text-24 font-bold text-primary">HELLO</text>
+    <view>
+      <text class="text-12">12-</text>
+      <text class="text-14">14-</text>
+      <text class="text-16">16-</text>
+      <text class="text-17">17-</text>
+      <text>17默认字号18-</text>
+      <text class="text-18">18-</text>
+      <text class="text-20">20</text>
     </view>
-
-    <u-button @click="navToNVUE">跳转NVUE</u-button>
 
     <CustomForm ref="formRef" :schemas="schemas" labelPosition="top" labelWidth="200px" :rules="rules">
       <view class="border-2 border-dashed border-info text-center p-12" slot="uploadDefault">自定义上传插槽</view>
@@ -138,9 +142,6 @@ export default {
     async onConsole(){
       await this.$refs.formRef.validate()
       console.log(this.$refs.formRef.model);
-    },
-    navToNVUE(){
-      uni.$u.route('/pages/index/nvuePage')
     }
   }
 }

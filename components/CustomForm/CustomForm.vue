@@ -352,13 +352,13 @@
           </template>
 
           <!-- Input 插槽需要区分NVUE页面 -->
-          <!-- NVUE Input -->
-          <template v-else-if="item.component === 'Input' && isNVUE">
-            <u--input
+          <!-- #ifndef APP-NVUE -->
+          <template v-else-if="item.component === 'Input'">
+            <u-input
               :ref="`${getName(item)}Ref`"
               :type="item.componentProps.type"
               :fixed="item.componentProps.fixed"
-              :disabledColor="item.componentProps.disabledColor"
+              :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
               :clearable="item.componentProps.clearable"
               :password="item.componentProps.password"
               :maxlength="item.componentProps.maxlength"
@@ -389,7 +389,160 @@
               :shape="item.componentProps.shape"
               :formatter="item.componentProps.formatter"
               :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
+              :disabled="isDisabled(item) || !!item.componentProps.keyboard"
+              :customClass="item.componentProps.customClass"
+              :customStyle="item.componentProps.customStyle"
+              @blur="onMethod($event, item.componentProps.onBlur)"
+              @focus="onMethod($event, item.componentProps.onFocus)"
+              @confirm="onMethod($event, item.componentProps.onConfirm)"
+              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+              @input="onMethod($event, item.componentProps.onInput)"
+              @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              @clear="onMethod($event, item.componentProps.onClear)"
+            >
+              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
+                <slot :name="`${getName(item)}Prefix`"></slot>
+              </view>
+              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
+                <slot :name="`${getName(item)}suffix`"></slot>
+              </view>
+            </u-input>
+
+            <template v-if="item.componentProps.keyboard">
+              <u-keyboard
+                :ref="`${getName(item)}Keyboard`"
+                @click.native.stop
+                @click.native="e => e.stopPropagation()"
+                style="flex: 0"
+                :show="item.show"
+                :mode="item.componentProps.keyboard.mode"
+                :dotDisabled="item.componentProps.keyboard.dotDisabled"
+                :tooltip="item.componentProps.keyboard.tooltip"
+                :showTips="item.componentProps.keyboard.showTips"
+                :tips="item.componentProps.keyboard.tips"
+                :showCancel="item.componentProps.keyboard.showCancel"
+                :showConfirm="item.componentProps.keyboard.showConfirm"
+                :random="item.componentProps.keyboard.random"
+                :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
+                :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
+                :overlay="item.componentProps.keyboard.overlay"
+                :zIndex="item.componentProps.keyboard.zIndex"
+                :confirmText="item.componentProps.keyboard.confirmText"
+                :cancelText="item.componentProps.keyboard.cancelText"
+                :customStyle="item.componentProps.keyboard.customStyle"
+                :autoChange="item.componentProps.keyboard.autoChange"
+                @change="onInputKeyboardChange(item, $event)"
+                @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
+                @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
+                @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
+                @backspace="onInputKeyboardBackspace(item, $event)"
+              >
+                <slot :name="`${getName(item)}KeyboardDefault`"></slot>
+              </u-keyboard>
+            </template>
+          </template>
+          <!-- #endif -->
+
+          <!-- #ifdef APP-NVUE -->
+          <!-- NVUE Input Keyboard -->
+          <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
+          <template v-else-if="item.component === 'Input' && item.componentProps.keyboard">
+            <view
+              :class="[
+                'flex',
+                'items-center',
+                item.componentProps.inputAlign==='center' ?
+                'justify-center' :
+                item.componentProps.inputAlign === 'right' ?
+                'justify-end' :
+                'justify-start'
+              ]"
+            >
+              <text
+                v-if="!getShownValue(item)"
+                :class="[item.componentProps.placeholderClass || 'input-placeholder']"
+                :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+              >
+                {{item.componentProps.placeholder}}
+              </text>
+              <text
+                v-else
+                :style="{
+                            fontSize:item.componentProps.fontSize || '15px',
+                            color: item.componentProps.color || '#303133'
+                          }"
+              >
+                {{getShownValue(item)}}
+              </text>
+            </view>
+            <u-keyboard
+              :ref="`${getName(item)}Keyboard`"
+              @click.native.stop
+              @click.native="e => e.stopPropagation()"
+              style="flex: 0"
+              :show="item.show"
+              :mode="item.componentProps.keyboard.mode"
+              :dotDisabled="item.componentProps.keyboard.dotDisabled"
+              :tooltip="item.componentProps.keyboard.tooltip"
+              :showTips="item.componentProps.keyboard.showTips"
+              :tips="item.componentProps.keyboard.tips"
+              :showCancel="item.componentProps.keyboard.showCancel"
+              :showConfirm="item.componentProps.keyboard.showConfirm"
+              :random="item.componentProps.keyboard.random"
+              :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
+              :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
+              :overlay="item.componentProps.keyboard.overlay"
+              :zIndex="item.componentProps.keyboard.zIndex"
+              :confirmText="item.componentProps.keyboard.confirmText"
+              :cancelText="item.componentProps.keyboard.cancelText"
+              :customStyle="item.componentProps.keyboard.customStyle"
+              :autoChange="item.componentProps.keyboard.autoChange"
+              @change="onInputKeyboardChange(item, $event)"
+              @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
+              @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
+              @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
+              @backspace="onInputKeyboardBackspace(item, $event)"
+            >
+              <slot :name="`${getName(item)}KeyboardDefault`"></slot>
+            </u-keyboard>
+          </template>
+          <template v-else-if="item.component === 'Input'">
+            <u--input
+              :ref="`${getName(item)}Ref`"
+              :type="item.componentProps.type"
+              :fixed="item.componentProps.fixed"
+              :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
+              :clearable="item.componentProps.clearable"
+              :password="item.componentProps.password"
+              :maxlength="item.componentProps.maxlength"
+              :placeholder="item.componentProps.placeholder"
+              :placeholderClass="item.componentProps.placeholderClass"
+              :placeholderStyle="item.componentProps.placeholderStyle"
+              :showWordLimit="item.componentProps.showWordLimit"
+              :confirmType="item.componentProps.confirmType"
+              :confirmHold="item.componentProps.confirmHold"
+              :holdKeyboard="item.componentProps.holdKeyboard"
+              :focus="item.componentProps.focus"
+              :autoBlur="item.componentProps.autoBlur"
+              :disableDefaultPadding="item.componentProps.disableDefaultPadding"
+              :cursor="item.componentProps.cursor"
+              :cursorSpacing="item.componentProps.cursorSpacing"
+              :selectionStart="item.componentProps.selectionStart"
+              :selectionEnd="item.componentProps.selectionEnd"
+              :adjustPosition="item.componentProps.adjustPosition"
+              :inputAlign="item.componentProps.inputAlign"
+              :fontSize="item.componentProps.fontSize"
+              :color="item.componentProps.color"
+              :prefixIcon="item.componentProps.prefixIcon"
+              :prefixIconStyle="item.componentProps.prefixIconStyle"
+              :suffixIcon="item.componentProps.suffixIcon"
+              :suffixIconStyle="item.componentProps.suffixIconStyle"
+              :border="item.componentProps.border"
+              :readonly="item.componentProps.readonly"
+              :shape="item.componentProps.shape"
+              :formatter="item.componentProps.formatter"
+              :value="get(model, item.prop)"
+              :disabled="isDisabled(item) || !!item.componentProps.keyboard"
               :customClass="item.componentProps.customClass"
               :customStyle="item.componentProps.customStyle"
               @blur="onMethod($event, item.componentProps.onBlur)"
@@ -408,63 +561,7 @@
               </view>
             </u--input>
           </template>
-
-          <!-- VUE Input -->
-          <template v-else-if="item.component === 'Input' && !isNVUE">
-            <u-input
-              :ref="`${getName(item)}Ref`"
-              :type="item.componentProps.type"
-              :fixed="item.componentProps.fixed"
-              :disabledColor="item.componentProps.disabledColor"
-              :clearable="item.componentProps.clearable"
-              :password="item.componentProps.password"
-              :maxlength="item.componentProps.maxlength"
-              :placeholder="item.componentProps.placeholder"
-              :placeholderClass="item.componentProps.placeholderClass"
-              :placeholderStyle="item.componentProps.placeholderStyle"
-              :showWordLimit="item.componentProps.showWordLimit"
-              :confirmType="item.componentProps.confirmType"
-              :confirmHold="item.componentProps.confirmHold"
-              :holdKeyboard="item.componentProps.holdKeyboard"
-              :focus="item.componentProps.focus"
-              :autoBlur="item.componentProps.autoBlur"
-              :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-              :cursor="item.componentProps.cursor"
-              :cursorSpacing="item.componentProps.cursorSpacing"
-              :selectionStart="item.componentProps.selectionStart"
-              :selectionEnd="item.componentProps.selectionEnd"
-              :adjustPosition="item.componentProps.adjustPosition"
-              :inputAlign="item.componentProps.inputAlign"
-              :fontSize="item.componentProps.fontSize"
-              :color="item.componentProps.color"
-              :prefixIcon="item.componentProps.prefixIcon"
-              :prefixIconStyle="item.componentProps.prefixIconStyle"
-              :suffixIcon="item.componentProps.suffixIcon"
-              :suffixIconStyle="item.componentProps.suffixIconStyle"
-              :border="item.componentProps.border"
-              :readonly="item.componentProps.readonly"
-              :shape="item.componentProps.shape"
-              :formatter="item.componentProps.formatter"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @blur="onMethod($event, item.componentProps.onBlur)"
-              @focus="onMethod($event, item.componentProps.onFocus)"
-              @confirm="onMethod($event, item.componentProps.onConfirm)"
-              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
-              @input="onMethod($event, item.componentProps.onInput)"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-              @clear="onMethod($event, item.componentProps.onClear)"
-            >
-              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
-                <slot :name="`${getName(item)}Prefix`"></slot>
-              </view>
-              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
-                <slot :name="`${getName(item)}suffix`"></slot>
-              </view>
-            </u-input>
-          </template>
+          <!-- #endif -->
 
           <!-- Textarea -->
           <template v-else-if="item.component === 'Textarea'">
@@ -669,7 +766,7 @@ export default {
           const rules = ruleMap[prop];
           const { label, component } = this.items.find(
             (item) => item.prop === prop
-          );
+          ) || {};
           let prefix = "请输入";
           if (
             [
@@ -717,17 +814,28 @@ export default {
         const customProps = uni.$u.props.CustomForm[item.component] || {};
         const lowerCompName =
           item.component[0].toLowerCase() + item.component.slice(1);
+        // Checkbox,Radio还需要合并group属性
         let groupName;
         if (["Checkbox", "Radio"].includes(item.component)) {
           groupName =
             item.component[0].toLowerCase() + item.component.slice(1) + "Group";
         }
+        // Input可能需要合并Keyboard属性
+        if(item.component === 'Input' && item.componentProps.keyboard) {
+          item.componentProps.keyboard = Object.assign(
+            cloneDeep(uni.$u.props.keyboard),
+            cloneDeep(uni.$u.props.CustomForm.Keyboard || {}),
+            item.componentProps.keyboard
+          )
+        }
+        // 非小程序能够正常处理undefined prop值，直接合并即可
         // #ifndef MP
         item.componentProps = Object.assign(
           cloneDeep(customProps),
           item.componentProps
         );
         // #endif
+        // 小程序中使用undefined prop值后组件不会使用默认值，需要单独映射默认值
         // #ifdef MP
         if (groupName) {
           const optionProps = uni.$u.props[lowerCompName];
@@ -800,7 +908,7 @@ export default {
           // v-show控制表单项
           ifShow: item.ifShow === false ? false : true,
           // 弹出类型组件,独立控制显示隐藏
-          show: ["Calendar", "Picker", "DatetimePicker"].includes(
+          show: ["Calendar", "Picker", "DatetimePicker", "Input"].includes(
             item.component
           )
             ? false
@@ -869,6 +977,7 @@ export default {
           rules.message = "校验不通过";
         }
       }
+
     },
     // 处理表单项prop可能带"."的情况,返回处理后的小驼峰prop名
     getName(item) {
@@ -910,7 +1019,7 @@ export default {
     showItem(item, func, event) {
       if (this.isDisabled(item)) return;
       func?.(event);
-      if(['Calendar','Picker','DatetimePicker'].includes(item.component)) {
+      if(['Calendar','Picker','DatetimePicker'].includes(item.component) || (item.component === 'Input' && item.componentProps.keyboard)) {
         item.show = true;
         uni.hideKeyboard();
         this.$forceUpdate();
@@ -1073,6 +1182,26 @@ export default {
       item.componentProps.buttonDisabled = false;
       item.componentProps.onEnd?.();
     },
+    // 自定义键盘change事件
+    onInputKeyboardChange(item, e) {
+      const oldValue = get(this.model, item.prop) || ''
+      // 处理Input最大长度设置
+      const maxlength = (typeof item.componentProps.maxlength !== 'number' || item.componentProps.maxlength < 1) ? Infinity : item.componentProps.maxlength
+      if(oldValue.length < maxlength) {
+        set(this.model, item.prop, oldValue + e)
+      }
+      item.componentProps.keyboard.onChange?.(e)
+      this.$forceUpdate()
+    },
+    // 自定义键盘删除事件
+    onInputKeyboardBackspace(item, e) {
+      const oldValue = get(this.model, item.prop)
+      if(oldValue?.length) {
+        set(this.model, item.prop, oldValue.slice(0, oldValue.length-1))
+      }
+      item.componentProps.keyboard.onBackspace?.(e)
+      this.$forceUpdate()
+    }
   },
 };
 </script>

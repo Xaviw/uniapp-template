@@ -23,7 +23,7 @@
 
 ## 样式
 
-1. 定义了[WindiCSS](https://cn.windicss.org/utilities/general/typography.html)中大部分常用原子化css类，具体查看`styles/common.scss`，`font-size`、`width`、`height`等范围值修改为具体值，默认生成范围为`0-30`（`width`、`height`为定义范围乘2），可以自行修改文件顶部的配置项
+1. 定义了[WindiCSS](https://cn.windicss.org/utilities/general/typography.html)中大部分常用原子化css类，具体查看`styles/common.scss`，`font-size`、`width`、`height`等范围值修改为具体值，默认生成范围为`0-30`（`width`、`height`、`padding`、`margin`、`rounded`为定义范围乘2），可以自行修改文件顶部的配置项
 2. 按需在`styles/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
 3. 按需在`utils/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
 
@@ -239,7 +239,7 @@ parse(data)
   // formProps同u-form属性，其余为扩展属性
   // 组件内u-form的方法已映射到组件方法中，可以直接this.$refs.formRef调用
   // 表单项组件的ref名为`${prop}Ref`，可以通过this.$refs.formRef.$refs[`${prop}Ref`][0]调用，v-if中的ref会放在数组中，所以需要用[0]获取
-  <CustomForm ref="formRef" v-bind="formProps" :schemas="schemas" :isNVUE="false" :disabled="false" :autoSetPlaceholder="true">
+  <CustomForm ref="formRef" v-bind="formProps" :schemas="schemas" :disabled="false" :autoSetPlaceholder="true">
     // `${prop}`插槽可以覆盖schema中的配置
     <view slot="compA">自定义comA组件内容</view>
 
@@ -301,7 +301,6 @@ export default {
 
 CustomForm根属性：
 - {Array} schemas：表单项配置
-- {boolean} [isNVUE=false]：因为Input组件的prefix、suffix插槽需要区分NVUE页面判断是否使用u--input
 - {boolean} [disabled=false]：配置全部表单项禁用
 - {boolean} [autoSetPlaceholder=true]：schema中未设置placeholder时自动填充为“请输入${label}”或“请选择${label}”
 
@@ -318,6 +317,7 @@ component新增或修改默认值的属性（可以在utils/setUViewConfig.js中
 - DatetimePicker组件增加[format=true]属性，表示选择日期后是存储格式化的字符串还是时间戳
 - Upload组件增加api函数属性，为接收文件上传路径，返回文件链接字符串的函数
 - Code组件增加[type='button']属性，表示获取验证码是按钮还是文本（'text'）；增加[buttonType='primary']属性，对应u-button的type；增加[button-size='mini']属性，对应u-button的size；增加textStyle属性，为text的样式对象；增加maxlength属性，表示输入框长度，默认4；增加inputType属性，表示输入框type，默认number；增加api函数属性，为接收表单model，返回Promise的函数
+- Input增加keyboard对象，对象属性同u-keyboard，keyboard组件用`${propName}Keyboard`获取，keyboard插槽用`${propName}KeyboardDefault`
 
 ## 内置工具
 

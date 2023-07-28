@@ -50,6 +50,11 @@ export default function setConfig() {
         Input: {
           border: 'none',
         },
+        Keyboard: {
+          safeAreaInsetBottom: true,
+          closeOnClickOverlay: true,
+          autoChange: true,
+        },
       },
       formItem: {
         borderBottom: true,
