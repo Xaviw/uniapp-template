@@ -763,7 +763,7 @@ uni.$u.props.CustomForm.Upload.fileList = [];
 
 export default {
   name: "CustomForm",
-  mixins: [props],
+	mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
   mounted() {
     // 兼容微信小程序通过setRules注入rules
     // 自动填充trigger与message

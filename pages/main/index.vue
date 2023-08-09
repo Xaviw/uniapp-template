@@ -140,7 +140,7 @@ export default {
       console.log(this.$refs.formRef.model);
     },
     navToNVUE(){
-      uni.$u.route('/pages/index/nvuePage')
+      uni.$u.route('/pages/main/nvuePage')
     }
   }
 }

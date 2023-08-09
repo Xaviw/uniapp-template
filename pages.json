@@ -1,15 +1,15 @@
 {
   // 用于模拟直达页面，仅开发期间生效
-  "condition": {
-    "current": 0, // 当前激活的模式(list的索引项)
-    "list": [
-      {
-        "name": "test", // 模式名称
-        "path": "pages/index/index", // 启动页面，必填
-        "query": "" // 启动参数，在页面的onLoad函数里面得到
-      }
-    ]
-  },
+  // "condition": {
+  //   "current": 0, // 当前激活的模式(list的索引项)
+  //   "list": [
+  //     {
+  //       "name": "test", // 模式名称
+  //       "path": "", // 启动页面，必填
+  //       "query": "" // 启动参数，在页面的onLoad函数里面得到
+  //     }
+  //   ]
+  // },
   // 修改后APP端需要重新运行
   "globalStyle": {
     "navigationBarBackgroundColor": "#F8F8F8", // 导航栏连带状态栏颜色

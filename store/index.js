@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import user from "./modules/user.js";
-import address from "./modules/address.js";
 import { set } from "lodash-es";
 import createPersistedState from "vuex-persistedstate";
 import getters from "./getters.js";
@@ -11,7 +10,6 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   modules: {
     user,
-    address,
   },
   getters,
   mutations: {
