@@ -5,7 +5,7 @@ import { LOGIN_PATH } from '@/config.js'
 
 // 页面白名单
 const whiteList = [
-  LOGIN_PATH, '/pages/common/webview/index',
+  LOGIN_PATH, '/pages/common/webview',
 ]
 
 // 检查地址白名单

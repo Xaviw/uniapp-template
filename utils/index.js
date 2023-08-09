@@ -3,12 +3,6 @@ import { useSocket } from './socket.js'
 import { MINI_ORIGINAL_ID, MINI_PAYMENT_PATH, HOME_PATH } from '@/config.js'
 import { socketLogin } from './socketHandler.js'
 import { getToken } from './auth.js'
-import {
-  divide as uviewDivide,
-  minus as uviewMinus,
-  plus as uviewPlus,
-  times as uviewTimes,
-} from '@/uni_modules/uview-ui/libs/function/digit.js'
 import store from '@/store'
 
 /**
@@ -26,7 +20,7 @@ export function connectSocket() {
       },
       onMessage: (_, message) => {
         uni.$emit("socketMessage", message)
-      }
+      },
     })
   })
 }
@@ -117,62 +111,15 @@ export function navToFirstPage() {
  */
 export function watchNetworkState() {
   uni.onNetworkStatusChange(({ isConnected }) => {
-    const currentlyIsNoNetworkPage = uni.$u.page() == '/pages/common/noNetwork/noNetwork'
+    const currentlyIsNoNetworkPage = uni.$u.page() == '/pages/common/noNetwork'
     if (currentlyIsNoNetworkPage && isConnected) {
       uni.navigateBack()
     } else if (!isConnected && !currentlyIsNoNetworkPage) {
       uni.navigateTo({
-        url: '/pages/common/noNetwork/noNetwork',
+        url: '/pages/common/noNetwork',
       })
     }
   })
-}
-
-/**
- * 高精度加法，无法识别为数字的参数会看作0
- * plus函数名与H5+ API plus冲突，不应该使用plus作为函数名
- * @param {...*} nums 计算参数
- * @returns {number}
- */
-export function add(...nums) {
-  return uviewPlus(calcNormalize(nums))
-}
-
-/**
- * 高精度减法，无法识别为数字的参数会看作0
- * @param {...*} nums 计算参数
- * @returns {number}
- */
-export function minus(...nums) {
-  return uviewMinus(calcNormalize(nums))
-}
-
-/**
- * 高精度乘法，无法识别为数字的参数会看作0
- * @param {...*} nums 计算参数
- * @returns {number}
- */
-export function multiply(...nums) {
-  return uviewTimes(calcNormalize(nums))
-}
-
-/**
- * 高精度除法，无法识别为数字的参数会看作0
- * @param {...*} nums 计算参数
- * @returns {number}
- */
-export function divide(...nums) {
-  return uviewDivide(calcNormalize(nums))
-}
-
-/**
- * 计算方法参数标准化，将无法识别的参数看作0
- * @private
- * @param {...*} nums 计算参数
- * @return {...number}
- */
-function calcNormalize(...nums) {
-  return nums.map(item => parseFloat(item) || 0)
 }
 
 /**

@@ -28,387 +28,460 @@
         :leftIcon="item.leftIcon"
         :leftIconStyle="item.leftIconStyle"
         :required="item.required"
-        :customClass="item.customClass"
-        :customStyle="item.customStyle"
         @click="showItem(item, item.onClick)"
       >
-        <slot :name="getName(item)">
-          <!-- 请选择 -->
-          <template v-if="['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)">
-            <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
-            <!-- #ifdef APP-NVUE -->
-            <view
-              :class="[
-                'flex',
-                'items-center',
-                item.componentProps.inputAlign==='center' ?
-                'justify-center' :
-                item.componentProps.inputAlign === 'right' ?
-                'justify-end' :
-                'justify-start'
-              ]"
-            >
-              <text
-                v-if="!getShownValue(item)"
-                :class="[item.componentProps.placeholderClass || 'input-placeholder']"
-                :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+        <view
+          :class="item.customClass"
+          :style="[$u.addStyle(item.customStyle), {
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }]"
+        >
+          <slot :name="getName(item)">
+            <!-- 请选择 -->
+            <template v-if="['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)">
+              <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
+              <!-- #ifdef APP-NVUE -->
+              <view
+                :class="[
+                          'flex',
+                          'items-center',
+                          item.componentProps.inputAlign==='center' ?
+                          'justify-center' :
+                          item.componentProps.inputAlign === 'right' ?
+                          'justify-end' :
+                          'justify-start'
+                        ]"
               >
-                {{item.componentProps.placeholder}}
-              </text>
-              <text
-                v-else
-                :style="{
-                fontSize:item.componentProps.fontSize || '15px',
-                color: item.componentProps.color || '#303133'
-              }"
-              >
-                {{getShownValue(item)}}
-              </text>
-            </view>
-            <!-- #endif -->
-            <!-- #ifndef APP-NVUE -->
-            <u--input
-              :value="getShownValue(item)"
-              :placeholder="item.componentProps.placeholder"
-              :inputAlign="item.componentProps.inputAlign || 'left'"
-              border="none"
-              disabled
-              disabledColor="#ffffff"
-            />
-            <!-- #endif -->
-            <u-icon slot="right" name="arrow-right" />
-          </template>
-
-          <!-- Calendar、Picker、DatetimePicker中： -->
-          <!-- flex:0避免占input的位置， -->
-          <!-- @click.native.stop避免点击背景隐藏时冒泡到form-item的点击事件 -->
-          <!-- Calendar、Picker没有v-model -->
-          <!-- 微信小程序不支持v-bind语法,只能逐个绑定 -->
-
-          <!-- Calendar -->
-          <template v-if="item.component === 'Calendar'">
-            <u-calendar
-              :ref="`${getName(item)}Ref`"
-              @click.native.stop
-              @click.native="e => e.stopPropagation()"
-              style="flex: 0"
-              :title="item.componentProps.title"
-              :showTitle="item.componentProps.showTitle"
-              :showSubtitle="item.componentProps.showSubtitle"
-              :mode="item.componentProps.mode"
-              :startText="item.componentProps.startText"
-              :endText="item.componentProps.endText"
-              :customList="item.componentProps.customList"
-              :color="item.componentProps.color"
-              :minDate="item.componentProps.minDate"
-              :maxDate="item.componentProps.maxDate"
-              :defaultDate="item.componentProps.defaultDate"
-              :maxCount="item.componentProps.maxCount"
-              :rowHeight="item.componentProps.rowHeight"
-              :formatter="item.componentProps.formatter"
-              :showLunar="item.componentProps.showLunar"
-              :showMark="item.componentProps.showMark"
-              :confirmText="item.componentProps.confirmText"
-              :confirmDisabledText="item.componentProps.confirmDisabledText"
-              :show="item.show"
-              :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-              :readonly="item.componentProps.readonly"
-              :maxRange="item.componentProps.maxRange"
-              :rangePrompt="item.componentProps.rangePrompt"
-              :showRangePrompt="item.componentProps.showRangePrompt"
-              :allowSameDay="item.componentProps.allowSameDay"
-              :round="item.componentProps.round"
-              :monthNum="item.componentProps.monthNum"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @confirm="onCalendarConfirm(item, $event)"
-              @close="closeItem(item, item.componentProps.onClose, $event)"
-            />
-          </template>
-
-          <!-- Picker -->
-          <template v-else-if="item.component === 'Picker'">
-            <u-picker
-              :ref="`${getName(item)}Ref`"
-              @click.native.stop
-              @click.native="e => e.stopPropagation()"
-              style="flex: 0"
-              :show="item.show"
-              :showToolbar="item.componentProps.showToolbar"
-              :title="item.componentProps.title"
-              :loading="item.componentProps.loading"
-              :itemHeight="item.componentProps.itemHeight"
-              :cancelText="item.componentProps.cancelText"
-              :confirmText="item.componentProps.confirmText"
-              :cancelColor="item.componentProps.cancelColor"
-              :confirmColor="item.componentProps.confirmColor"
-              :visibleItemCount="item.componentProps.visibleItemCount"
-              :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-              :defaultIndex="item.componentProps.defaultIndex"
-              :immediateChange="item.componentProps.immediateChange"
-              :keyName="item.componentProps.labelField"
-              :columns="item.componentProps.options"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @close="closeItem(item, item.componentProps.onClose, $event)"
-              @confirm="onPickerConfirm(item, $event)"
-              @change="onPickerChange($event, `${getName(item)}Ref`, item.componentProps.onChange)"
-              @cancel="closeItem(item, item.componentProps.onCancel, $event)"
-            />
-          </template>
-
-          <!-- DatetimePicker -->
-          <template v-else-if="item.component === 'DatetimePicker'">
-            <u-datetime-picker
-              :ref="`${getName(item)}Ref`"
-              @click.native.stop
-              @click.native="e => e.stopPropagation()"
-              style="flex: 0"
-              :showToolbar="item.componentProps.showToolbar"
-              :title="item.componentProps.title"
-              :mode="item.componentProps.mode"
-              :maxDate="item.componentProps.maxDate"
-              :minDate="item.componentProps.minDate"
-              :minHour="item.componentProps.minHour"
-              :maxHour="item.componentProps.maxHour"
-              :minMinute="item.componentProps.minMinute"
-              :maxMinute="item.componentProps.maxMinute"
-              :filter="item.componentProps.filter"
-              :formatter="item.componentProps.formatter"
-              :loading="item.componentProps.loading"
-              :itemHeight="item.componentProps.itemHeight"
-              :cancelText="item.componentProps.cancelText"
-              :confirmText="item.componentProps.confirmText"
-              :cancelColor="item.componentProps.cancelColor"
-              :confirmColor="item.componentProps.confirmColor"
-              :visibleItemCount="item.componentProps.visibleItemCount"
-              :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-              :defaultIndex="item.componentProps.defaultIndex"
-              :value="get(model, item.prop)"
-              :show="item.show"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @confirm="onDatetimeConfirm(item, $event)"
-              @close="closeItem(item, item.componentProps.onClose, $event)"
-              @cancel="closeItem(item, item.componentProps.onCancel, $event)"
-              @change="onMethod($event, item.componentProps.onChange)"
-            />
-          </template>
-
-          <!-- Rate -->
-          <template v-else-if="item.component === 'Rate'">
-            <u-rate
-              :ref="`${getName(item)}Ref`"
-              :count="item.componentProps.count"
-              :size="item.componentProps.size"
-              :inactiveColor="item.componentProps.inactiveColor"
-              :activeColor="item.componentProps.activeColor"
-              :gutter="item.componentProps.gutter"
-              :minCount="item.componentProps.minCount"
-              :allowHalf="item.componentProps.allowHalf"
-              :activeIcon="item.componentProps.activeIcon"
-              :inactiveIcon="item.componentProps.inactiveIcon"
-              :touchable="item.componentProps.touchable"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-            />
-          </template>
-
-          <!-- NumberBox -->
-          <template v-else-if="item.component === 'NumberBox'">
-            <u-number-box
-              :ref="`${getName(item)}Ref`"
-              :name="item.componentProps.name"
-              :min="item.componentProps.min"
-              :max="item.componentProps.max"
-              :step="item.componentProps.step"
-              :integer="item.componentProps.integer"
-              :disabledInput="item.componentProps.disabledInput"
-              :asyncChange="item.componentProps.asyncChange"
-              :inputWidth="item.componentProps.inputWidth"
-              :showMinus="item.componentProps.showMinus"
-              :showPlus="item.componentProps.showPlus"
-              :decimalLength="item.componentProps.decimalLength"
-              :longPress="item.componentProps.longPress"
-              :color="item.componentProps.color"
-              :buttonSize="item.componentProps.buttonSize"
-              :bgColor="item.componentProps.bgColor"
-              :cursorSpacing="item.componentProps.cursorSpacing"
-              :disableMinus="item.componentProps.disableMinus"
-              :disablePlus="item.componentProps.disablePlus"
-              :iconStyle="item.componentProps.iconStyle"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @focus="onMethod($event, item.componentProps.onFocus)"
-              @blur="onMethod($event, item.componentProps.onBlur)"
-              @change="e => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
-              @overlimit="onMethod($event, item.componentProps.onOverlimit)"
-            >
-              <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
-                <slot :name="`${getName(item)}Minus`"></slot>
+                <text
+                  v-if="!getShownValue(item)"
+                  :class="[item.componentProps.placeholderClass || 'input-placeholder']"
+                  :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+                >
+                  {{item.componentProps.placeholder}}
+                </text>
+                <text
+                  v-else
+                  :style="{
+                          fontSize:item.componentProps.fontSize || '15px',
+                          color: item.componentProps.color || '#303133'
+                        }"
+                >
+                  {{getShownValue(item)}}
+                </text>
               </view>
-              <view slot="input" v-if="$slots[`${getName(item)}Input`]">
-                <slot :name="`${getName(item)}Input`"></slot>
-              </view>
-              <view slot="plus" v-if="$slots[`${getName(item)}Plus`]">
-                <slot :name="`${getName(item)}Plus`"></slot>
-              </view>
-            </u-number-box>
-          </template>
-
-          <!-- Upload -->
-          <template v-else-if="item.component === 'Upload'">
-            <u-upload
-              :ref="`${getName(item)}Ref`"
-              :accept="item.componentProps.accept"
-              :capture="item.componentProps.capture"
-              :compressed="item.componentProps.compressed"
-              :camera="item.componentProps.camera"
-              :maxDuration="item.componentProps.maxDuration"
-              :uploadIcon="item.componentProps.uploadIcon"
-              :uploadIconColor="item.componentProps.uploadIconColor"
-              :useBeforeRead="item.componentProps.useBeforeRead"
-              :previewFullImage="item.componentProps.previewFullImage"
-              :maxCount="item.componentProps.maxCount"
-              :imageMode="item.componentProps.imageMode"
-              :sizeType="item.componentProps.sizeType"
-              :multiple="item.componentProps.multiple"
-              :deletable="item.componentProps.deletable"
-              :maxSize="item.componentProps.maxSize"
-              :uploadText="item.componentProps.uploadText"
-              :width="item.componentProps.width"
-              :height="item.componentProps.height"
-              :previewImage="item.componentProps.previewImage"
-              :fileList="item.componentProps.fileList"
-              :name="item.componentProps.name || getName(item)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @afterRead="afterRead(item, $event)"
-              @delete="deleteFile(item, $event)"
-              @beforeRead="onMethod($event, item.componentProps.beforeRead)"
-              @oversize="onMethod($event, item.componentProps.oversize)"
-              @clickPreview="onMethod($event, item.componentProps.clickPreview)"
-            >
-              <slot :name="`${getName(item)}Default`"></slot>
-            </u-upload>
-          </template>
-
-          <!-- Code -->
-          <template v-else-if="item.component === 'Code'">
-            <view style="flex: 1;display: flex;flex-direction: row;">
+              <!-- #endif -->
+              <!-- #ifndef APP-NVUE -->
               <u--input
-                :value="get(model, item.prop)"
-                @change="onMethod($event, null, item.prop)"
+                :value="getShownValue(item)"
+                :placeholder="item.componentProps.placeholder"
+                :inputAlign="item.componentProps.inputAlign || 'left'"
                 border="none"
-                :type="item.componentProps.inputType"
+                disabled
+                disabledColor="#ffffff"
+              />
+              <!-- #endif -->
+              <u-icon slot="right" name="arrow-right" />
+            </template>
+
+            <!-- Calendar、Picker、DatetimePicker中： -->
+            <!-- flex:0避免占input的位置， -->
+            <!-- @click.native.stop避免点击背景隐藏时冒泡到form-item的点击事件 -->
+            <!-- Calendar、Picker没有v-model -->
+            <!-- 微信小程序不支持v-bind语法,只能逐个绑定 -->
+
+            <!-- Calendar -->
+            <template v-if="item.component === 'Calendar'">
+              <u-calendar
+                :ref="`${getName(item)}Ref`"
+                @click.native.stop
+                @click.native="e => e.stopPropagation()"
+                style="flex: 0"
+                :title="item.componentProps.title"
+                :showTitle="item.componentProps.showTitle"
+                :showSubtitle="item.componentProps.showSubtitle"
+                :mode="item.componentProps.mode"
+                :startText="item.componentProps.startText"
+                :endText="item.componentProps.endText"
+                :customList="item.componentProps.customList"
+                :color="item.componentProps.color"
+                :minDate="item.componentProps.minDate"
+                :maxDate="item.componentProps.maxDate"
+                :defaultDate="item.componentProps.defaultDate"
+                :maxCount="item.componentProps.maxCount"
+                :rowHeight="item.componentProps.rowHeight"
+                :formatter="item.componentProps.formatter"
+                :showLunar="item.componentProps.showLunar"
+                :showMark="item.componentProps.showMark"
+                :confirmText="item.componentProps.confirmText"
+                :confirmDisabledText="item.componentProps.confirmDisabledText"
+                :show="item.show"
+                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
+                :readonly="item.componentProps.readonly"
+                :maxRange="item.componentProps.maxRange"
+                :rangePrompt="item.componentProps.rangePrompt"
+                :showRangePrompt="item.componentProps.showRangePrompt"
+                :allowSameDay="item.componentProps.allowSameDay"
+                :round="item.componentProps.round"
+                :monthNum="item.componentProps.monthNum"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @confirm="onCalendarConfirm(item, $event)"
+                @close="closeItem(item, item.componentProps.onClose, $event)"
+              />
+            </template>
+
+            <!-- Picker -->
+            <template v-else-if="item.component === 'Picker'">
+              <u-picker
+                :ref="`${getName(item)}Ref`"
+                @click.native.stop
+                @click.native="e => e.stopPropagation()"
+                style="flex: 0"
+                :show="item.show"
+                :showToolbar="item.componentProps.showToolbar"
+                :title="item.componentProps.title"
+                :loading="item.componentProps.loading"
+                :itemHeight="item.componentProps.itemHeight"
+                :cancelText="item.componentProps.cancelText"
+                :confirmText="item.componentProps.confirmText"
+                :cancelColor="item.componentProps.cancelColor"
+                :confirmColor="item.componentProps.confirmColor"
+                :visibleItemCount="item.componentProps.visibleItemCount"
+                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
+                :defaultIndex="item.componentProps.defaultIndex"
+                :immediateChange="item.componentProps.immediateChange"
+                :keyName="item.componentProps.labelField"
+                :columns="item.componentProps.options"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @close="closeItem(item, item.componentProps.onClose, $event)"
+                @confirm="onPickerConfirm(item, $event)"
+                @change="onPickerChange($event, `${getName(item)}Ref`, item.componentProps.onChange)"
+                @cancel="closeItem(item, item.componentProps.onCancel, $event)"
+              />
+            </template>
+
+            <!-- DatetimePicker -->
+            <template v-else-if="item.component === 'DatetimePicker'">
+              <u-datetime-picker
+                :ref="`${getName(item)}Ref`"
+                @click.native.stop
+                @click.native="e => e.stopPropagation()"
+                style="flex: 0"
+                :showToolbar="item.componentProps.showToolbar"
+                :title="item.componentProps.title"
+                :mode="item.componentProps.mode"
+                :maxDate="item.componentProps.maxDate"
+                :minDate="item.componentProps.minDate"
+                :minHour="item.componentProps.minHour"
+                :maxHour="item.componentProps.maxHour"
+                :minMinute="item.componentProps.minMinute"
+                :maxMinute="item.componentProps.maxMinute"
+                :filter="item.componentProps.filter"
+                :formatter="item.componentProps.formatter"
+                :loading="item.componentProps.loading"
+                :itemHeight="item.componentProps.itemHeight"
+                :cancelText="item.componentProps.cancelText"
+                :confirmText="item.componentProps.confirmText"
+                :cancelColor="item.componentProps.cancelColor"
+                :confirmColor="item.componentProps.confirmColor"
+                :visibleItemCount="item.componentProps.visibleItemCount"
+                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
+                :defaultIndex="item.componentProps.defaultIndex"
+                :value="get(model, item.prop)"
+                :show="item.show"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @confirm="onDatetimeConfirm(item, $event)"
+                @close="closeItem(item, item.componentProps.onClose, $event)"
+                @cancel="closeItem(item, item.componentProps.onCancel, $event)"
+                @change="onMethod($event, item.componentProps.onChange)"
+              />
+            </template>
+
+            <!-- Rate -->
+            <template v-else-if="item.component === 'Rate'">
+              <u-rate
+                :ref="`${getName(item)}Ref`"
+                :count="item.componentProps.count"
+                :size="item.componentProps.size"
+                :inactiveColor="item.componentProps.inactiveColor"
+                :activeColor="item.componentProps.activeColor"
+                :gutter="item.componentProps.gutter"
+                :minCount="item.componentProps.minCount"
+                :allowHalf="item.componentProps.allowHalf"
+                :activeIcon="item.componentProps.activeIcon"
+                :inactiveIcon="item.componentProps.inactiveIcon"
+                :touchable="item.componentProps.touchable"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              />
+            </template>
+
+            <!-- NumberBox -->
+            <template v-else-if="item.component === 'NumberBox'">
+              <u-number-box
+                :ref="`${getName(item)}Ref`"
+                :name="item.componentProps.name"
+                :min="item.componentProps.min"
+                :max="item.componentProps.max"
+                :step="item.componentProps.step"
+                :integer="item.componentProps.integer"
+                :disabledInput="item.componentProps.disabledInput"
+                :asyncChange="item.componentProps.asyncChange"
+                :inputWidth="item.componentProps.inputWidth"
+                :showMinus="item.componentProps.showMinus"
+                :showPlus="item.componentProps.showPlus"
+                :decimalLength="item.componentProps.decimalLength"
+                :longPress="item.componentProps.longPress"
+                :color="item.componentProps.color"
+                :buttonSize="item.componentProps.buttonSize"
+                :bgColor="item.componentProps.bgColor"
+                :cursorSpacing="item.componentProps.cursorSpacing"
+                :disableMinus="item.componentProps.disableMinus"
+                :disablePlus="item.componentProps.disablePlus"
+                :iconStyle="item.componentProps.iconStyle"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @focus="onMethod($event, item.componentProps.onFocus)"
+                @blur="onMethod($event, item.componentProps.onBlur)"
+                @change="e => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
+                @overlimit="onMethod($event, item.componentProps.onOverlimit)"
+              >
+                <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
+                  <slot :name="`${getName(item)}Minus`"></slot>
+                </view>
+                <view slot="input" v-if="$slots[`${getName(item)}Input`]">
+                  <slot :name="`${getName(item)}Input`"></slot>
+                </view>
+                <view slot="plus" v-if="$slots[`${getName(item)}Plus`]">
+                  <slot :name="`${getName(item)}Plus`"></slot>
+                </view>
+              </u-number-box>
+            </template>
+
+            <!-- Upload -->
+            <template v-else-if="item.component === 'Upload'">
+              <u-upload
+                :ref="`${getName(item)}Ref`"
+                :accept="item.componentProps.accept"
+                :capture="item.componentProps.capture"
+                :compressed="item.componentProps.compressed"
+                :camera="item.componentProps.camera"
+                :maxDuration="item.componentProps.maxDuration"
+                :uploadIcon="item.componentProps.uploadIcon"
+                :uploadIconColor="item.componentProps.uploadIconColor"
+                :useBeforeRead="item.componentProps.useBeforeRead"
+                :previewFullImage="item.componentProps.previewFullImage"
+                :maxCount="item.componentProps.maxCount"
+                :imageMode="item.componentProps.imageMode"
+                :sizeType="item.componentProps.sizeType"
+                :multiple="item.componentProps.multiple"
+                :deletable="item.componentProps.deletable"
+                :maxSize="item.componentProps.maxSize"
+                :uploadText="item.componentProps.uploadText"
+                :width="item.componentProps.width"
+                :height="item.componentProps.height"
+                :previewImage="item.componentProps.previewImage"
+                :fileList="item.componentProps.fileList"
+                :name="item.componentProps.name || getName(item)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @afterRead="afterRead(item, $event)"
+                @delete="deleteFile(item, $event)"
+                @beforeRead="onMethod($event, item.componentProps.beforeRead)"
+                @oversize="onMethod($event, item.componentProps.oversize)"
+                @clickPreview="onMethod($event, item.componentProps.clickPreview)"
+              >
+                <slot :name="`${getName(item)}Default`"></slot>
+              </u-upload>
+            </template>
+
+            <!-- Code -->
+            <template v-else-if="item.component === 'Code'">
+              <view style="flex: 1;display: flex;flex-direction: row;">
+                <u--input
+                  :value="get(model, item.prop)"
+                  @change="onMethod($event, null, item.prop)"
+                  border="none"
+                  :type="item.componentProps.inputType"
+                  :maxlength="item.componentProps.maxlength"
+                  :placeholder="item.componentProps.placeholder"
+                  :disabled="isDisabled(item)"
+                ></u--input>
+
+                <u-button
+                  v-if="item.componentProps.type === 'button'"
+                  customStyle="width: auto;"
+                  @click="getCode(item)"
+                  :text="item.componentProps.tips"
+                  :type="item.componentProps.buttonType"
+                  :size="item.componentProps.buttonSize"
+                  :disabled="isDisabled(item) || item.componentProps.buttonDisabled"
+                />
+
+                <text
+                  v-else
+                  :class="[
+                            isDisabled(item) || item.componentProps.buttonDisabled ? 'text-info-disabled' : 'text-link',
+                            'pl-6',
+                          ]"
+                  :style="item.componentProps.textStyle"
+                  @click="getCode(item, isDisabled(item) || item.componentProps.buttonDisabled)"
+                >
+                  {{ item.componentProps.tips }}
+                </text>
+              </view>
+
+              <u-code
+                :ref="`${getName(item)}Ref`"
+                :seconds="item.componentProps.seconds"
+                :startText="item.componentProps.startText"
+                :changeText="item.componentProps.changeText"
+                :endText="item.componentProps.endText"
+                :keepRunning="item.componentProps.keepRunning"
+                :uniqueKey="item.componentProps.uniqueKey || getName(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @change="onCodeChange(item, $event)"
+                @start="onCodeStart(item)"
+                @end="onCodeEnd(item)"
+              />
+            </template>
+
+            <!-- Input 插槽需要区分NVUE页面 -->
+            <!-- #ifndef APP-NVUE -->
+            <template v-else-if="item.component === 'Input'">
+              <u-input
+                :ref="`${getName(item)}Ref`"
+                :type="item.componentProps.type"
+                :fixed="item.componentProps.fixed"
+                :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
+                :clearable="item.componentProps.clearable"
+                :password="item.componentProps.password"
                 :maxlength="item.componentProps.maxlength"
                 :placeholder="item.componentProps.placeholder"
-                :disabled="isDisabled(item)"
-              ></u--input>
-
-              <u-button
-                v-if="item.componentProps.type === 'button'"
-                customStyle="width: auto;"
-                @click="getCode(item)"
-                :text="item.componentProps.tips"
-                :type="item.componentProps.buttonType"
-                :size="item.componentProps.buttonSize"
-                :disabled="isDisabled(item) || item.componentProps.buttonDisabled"
-              />
-
-              <text
-                v-else
-                :class="[
-                  isDisabled(item) || item.componentProps.buttonDisabled ? 'text-info-disabled' : 'text-link',
-                  'pl-6',
-                ]"
-                :style="item.componentProps.textStyle"
-                @click="getCode(item, isDisabled(item) || item.componentProps.buttonDisabled)"
+                :placeholderClass="item.componentProps.placeholderClass"
+                :placeholderStyle="item.componentProps.placeholderStyle"
+                :showWordLimit="item.componentProps.showWordLimit"
+                :confirmType="item.componentProps.confirmType"
+                :confirmHold="item.componentProps.confirmHold"
+                :holdKeyboard="item.componentProps.holdKeyboard"
+                :focus="item.componentProps.focus"
+                :autoBlur="item.componentProps.autoBlur"
+                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
+                :cursor="item.componentProps.cursor"
+                :cursorSpacing="item.componentProps.cursorSpacing"
+                :selectionStart="item.componentProps.selectionStart"
+                :selectionEnd="item.componentProps.selectionEnd"
+                :adjustPosition="item.componentProps.adjustPosition"
+                :inputAlign="item.componentProps.inputAlign"
+                :fontSize="item.componentProps.fontSize"
+                :color="item.componentProps.color"
+                :prefixIcon="item.componentProps.prefixIcon"
+                :prefixIconStyle="item.componentProps.prefixIconStyle"
+                :suffixIcon="item.componentProps.suffixIcon"
+                :suffixIconStyle="item.componentProps.suffixIconStyle"
+                :border="item.componentProps.border"
+                :readonly="item.componentProps.readonly"
+                :shape="item.componentProps.shape"
+                :formatter="item.componentProps.formatter"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item) || !!item.componentProps.keyboard"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @blur="onMethod($event, item.componentProps.onBlur)"
+                @focus="onMethod($event, item.componentProps.onFocus)"
+                @confirm="onMethod($event, item.componentProps.onConfirm)"
+                @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+                @input="onMethod($event, item.componentProps.onInput)"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+                @clear="onMethod($event, item.componentProps.onClear)"
               >
-                {{ item.componentProps.tips }}
-              </text>
-            </view>
+                <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
+                  <slot :name="`${getName(item)}Prefix`"></slot>
+                </view>
+                <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
+                  <slot :name="`${getName(item)}suffix`"></slot>
+                </view>
+              </u-input>
 
-            <u-code
-              :ref="`${getName(item)}Ref`"
-              :seconds="item.componentProps.seconds"
-              :startText="item.componentProps.startText"
-              :changeText="item.componentProps.changeText"
-              :endText="item.componentProps.endText"
-              :keepRunning="item.componentProps.keepRunning"
-              :uniqueKey="item.componentProps.uniqueKey || getName(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @change="onCodeChange(item, $event)"
-              @start="onCodeStart(item)"
-              @end="onCodeEnd(item)"
-            />
-          </template>
+              <template v-if="item.componentProps.keyboard">
+                <u-keyboard
+                  :ref="`${getName(item)}Keyboard`"
+                  @click.native.stop
+                  @click.native="e => e.stopPropagation()"
+                  style="flex: 0"
+                  :show="item.show"
+                  :mode="item.componentProps.keyboard.mode"
+                  :dotDisabled="item.componentProps.keyboard.dotDisabled"
+                  :tooltip="item.componentProps.keyboard.tooltip"
+                  :showTips="item.componentProps.keyboard.showTips"
+                  :tips="item.componentProps.keyboard.tips"
+                  :showCancel="item.componentProps.keyboard.showCancel"
+                  :showConfirm="item.componentProps.keyboard.showConfirm"
+                  :random="item.componentProps.keyboard.random"
+                  :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
+                  :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
+                  :overlay="item.componentProps.keyboard.overlay"
+                  :zIndex="item.componentProps.keyboard.zIndex"
+                  :confirmText="item.componentProps.keyboard.confirmText"
+                  :cancelText="item.componentProps.keyboard.cancelText"
+                  :customStyle="item.componentProps.keyboard.customStyle"
+                  :autoChange="item.componentProps.keyboard.autoChange"
+                  @change="onInputKeyboardChange(item, $event)"
+                  @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
+                  @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
+                  @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
+                  @backspace="onInputKeyboardBackspace(item, $event)"
+                >
+                  <slot :name="`${getName(item)}KeyboardDefault`"></slot>
+                </u-keyboard>
+              </template>
+            </template>
+            <!-- #endif -->
 
-          <!-- Input 插槽需要区分NVUE页面 -->
-          <!-- #ifndef APP-NVUE -->
-          <template v-else-if="item.component === 'Input'">
-            <u-input
-              :ref="`${getName(item)}Ref`"
-              :type="item.componentProps.type"
-              :fixed="item.componentProps.fixed"
-              :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
-              :clearable="item.componentProps.clearable"
-              :password="item.componentProps.password"
-              :maxlength="item.componentProps.maxlength"
-              :placeholder="item.componentProps.placeholder"
-              :placeholderClass="item.componentProps.placeholderClass"
-              :placeholderStyle="item.componentProps.placeholderStyle"
-              :showWordLimit="item.componentProps.showWordLimit"
-              :confirmType="item.componentProps.confirmType"
-              :confirmHold="item.componentProps.confirmHold"
-              :holdKeyboard="item.componentProps.holdKeyboard"
-              :focus="item.componentProps.focus"
-              :autoBlur="item.componentProps.autoBlur"
-              :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-              :cursor="item.componentProps.cursor"
-              :cursorSpacing="item.componentProps.cursorSpacing"
-              :selectionStart="item.componentProps.selectionStart"
-              :selectionEnd="item.componentProps.selectionEnd"
-              :adjustPosition="item.componentProps.adjustPosition"
-              :inputAlign="item.componentProps.inputAlign"
-              :fontSize="item.componentProps.fontSize"
-              :color="item.componentProps.color"
-              :prefixIcon="item.componentProps.prefixIcon"
-              :prefixIconStyle="item.componentProps.prefixIconStyle"
-              :suffixIcon="item.componentProps.suffixIcon"
-              :suffixIconStyle="item.componentProps.suffixIconStyle"
-              :border="item.componentProps.border"
-              :readonly="item.componentProps.readonly"
-              :shape="item.componentProps.shape"
-              :formatter="item.componentProps.formatter"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item) || !!item.componentProps.keyboard"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @blur="onMethod($event, item.componentProps.onBlur)"
-              @focus="onMethod($event, item.componentProps.onFocus)"
-              @confirm="onMethod($event, item.componentProps.onConfirm)"
-              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
-              @input="onMethod($event, item.componentProps.onInput)"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-              @clear="onMethod($event, item.componentProps.onClear)"
-            >
-              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
-                <slot :name="`${getName(item)}Prefix`"></slot>
+            <!-- #ifdef APP-NVUE -->
+            <!-- NVUE Input Keyboard -->
+            <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
+            <template v-else-if="item.component === 'Input' && item.componentProps.keyboard">
+              <view
+                :class="[
+                          'flex',
+                          'items-center',
+                          item.componentProps.inputAlign==='center' ?
+                          'justify-center' :
+                          item.componentProps.inputAlign === 'right' ?
+                          'justify-end' :
+                          'justify-start'
+                        ]"
+              >
+                <text
+                  v-if="!getShownValue(item)"
+                  :class="[item.componentProps.placeholderClass || 'input-placeholder']"
+                  :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+                >
+                  {{item.componentProps.placeholder}}
+                </text>
+                <text
+                  v-else
+                  :style="{
+                                      fontSize:item.componentProps.fontSize || '15px',
+                                      color: item.componentProps.color || '#303133'
+                                    }"
+                >
+                  {{getShownValue(item)}}
+                </text>
               </view>
-              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
-                <slot :name="`${getName(item)}suffix`"></slot>
-              </view>
-            </u-input>
-
-            <template v-if="item.componentProps.keyboard">
               <u-keyboard
                 :ref="`${getName(item)}Keyboard`"
                 @click.native.stop
@@ -440,304 +513,239 @@
                 <slot :name="`${getName(item)}KeyboardDefault`"></slot>
               </u-keyboard>
             </template>
-          </template>
-          <!-- #endif -->
-
-          <!-- #ifdef APP-NVUE -->
-          <!-- NVUE Input Keyboard -->
-          <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
-          <template v-else-if="item.component === 'Input' && item.componentProps.keyboard">
-            <view
-              :class="[
-                'flex',
-                'items-center',
-                item.componentProps.inputAlign==='center' ?
-                'justify-center' :
-                item.componentProps.inputAlign === 'right' ?
-                'justify-end' :
-                'justify-start'
-              ]"
-            >
-              <text
-                v-if="!getShownValue(item)"
-                :class="[item.componentProps.placeholderClass || 'input-placeholder']"
-                :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+            <template v-else-if="item.component === 'Input'">
+              <u--input
+                :ref="`${getName(item)}Ref`"
+                :type="item.componentProps.type"
+                :fixed="item.componentProps.fixed"
+                :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
+                :clearable="item.componentProps.clearable"
+                :password="item.componentProps.password"
+                :maxlength="item.componentProps.maxlength"
+                :placeholder="item.componentProps.placeholder"
+                :placeholderClass="item.componentProps.placeholderClass"
+                :placeholderStyle="item.componentProps.placeholderStyle"
+                :showWordLimit="item.componentProps.showWordLimit"
+                :confirmType="item.componentProps.confirmType"
+                :confirmHold="item.componentProps.confirmHold"
+                :holdKeyboard="item.componentProps.holdKeyboard"
+                :focus="item.componentProps.focus"
+                :autoBlur="item.componentProps.autoBlur"
+                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
+                :cursor="item.componentProps.cursor"
+                :cursorSpacing="item.componentProps.cursorSpacing"
+                :selectionStart="item.componentProps.selectionStart"
+                :selectionEnd="item.componentProps.selectionEnd"
+                :adjustPosition="item.componentProps.adjustPosition"
+                :inputAlign="item.componentProps.inputAlign"
+                :fontSize="item.componentProps.fontSize"
+                :color="item.componentProps.color"
+                :prefixIcon="item.componentProps.prefixIcon"
+                :prefixIconStyle="item.componentProps.prefixIconStyle"
+                :suffixIcon="item.componentProps.suffixIcon"
+                :suffixIconStyle="item.componentProps.suffixIconStyle"
+                :border="item.componentProps.border"
+                :readonly="item.componentProps.readonly"
+                :shape="item.componentProps.shape"
+                :formatter="item.componentProps.formatter"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item) || !!item.componentProps.keyboard"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @blur="onMethod($event, item.componentProps.onBlur)"
+                @focus="onMethod($event, item.componentProps.onFocus)"
+                @confirm="onMethod($event, item.componentProps.onConfirm)"
+                @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+                @input="onMethod($event, item.componentProps.onInput)"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+                @clear="onMethod($event, item.componentProps.onClear)"
               >
-                {{item.componentProps.placeholder}}
-              </text>
-              <text
-                v-else
-                :style="{
-                            fontSize:item.componentProps.fontSize || '15px',
-                            color: item.componentProps.color || '#303133'
-                          }"
-              >
-                {{getShownValue(item)}}
-              </text>
-            </view>
-            <u-keyboard
-              :ref="`${getName(item)}Keyboard`"
-              @click.native.stop
-              @click.native="e => e.stopPropagation()"
-              style="flex: 0"
-              :show="item.show"
-              :mode="item.componentProps.keyboard.mode"
-              :dotDisabled="item.componentProps.keyboard.dotDisabled"
-              :tooltip="item.componentProps.keyboard.tooltip"
-              :showTips="item.componentProps.keyboard.showTips"
-              :tips="item.componentProps.keyboard.tips"
-              :showCancel="item.componentProps.keyboard.showCancel"
-              :showConfirm="item.componentProps.keyboard.showConfirm"
-              :random="item.componentProps.keyboard.random"
-              :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
-              :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
-              :overlay="item.componentProps.keyboard.overlay"
-              :zIndex="item.componentProps.keyboard.zIndex"
-              :confirmText="item.componentProps.keyboard.confirmText"
-              :cancelText="item.componentProps.keyboard.cancelText"
-              :customStyle="item.componentProps.keyboard.customStyle"
-              :autoChange="item.componentProps.keyboard.autoChange"
-              @change="onInputKeyboardChange(item, $event)"
-              @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
-              @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
-              @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
-              @backspace="onInputKeyboardBackspace(item, $event)"
-            >
-              <slot :name="`${getName(item)}KeyboardDefault`"></slot>
-            </u-keyboard>
-          </template>
-          <template v-else-if="item.component === 'Input'">
-            <u--input
-              :ref="`${getName(item)}Ref`"
-              :type="item.componentProps.type"
-              :fixed="item.componentProps.fixed"
-              :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
-              :clearable="item.componentProps.clearable"
-              :password="item.componentProps.password"
-              :maxlength="item.componentProps.maxlength"
-              :placeholder="item.componentProps.placeholder"
-              :placeholderClass="item.componentProps.placeholderClass"
-              :placeholderStyle="item.componentProps.placeholderStyle"
-              :showWordLimit="item.componentProps.showWordLimit"
-              :confirmType="item.componentProps.confirmType"
-              :confirmHold="item.componentProps.confirmHold"
-              :holdKeyboard="item.componentProps.holdKeyboard"
-              :focus="item.componentProps.focus"
-              :autoBlur="item.componentProps.autoBlur"
-              :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-              :cursor="item.componentProps.cursor"
-              :cursorSpacing="item.componentProps.cursorSpacing"
-              :selectionStart="item.componentProps.selectionStart"
-              :selectionEnd="item.componentProps.selectionEnd"
-              :adjustPosition="item.componentProps.adjustPosition"
-              :inputAlign="item.componentProps.inputAlign"
-              :fontSize="item.componentProps.fontSize"
-              :color="item.componentProps.color"
-              :prefixIcon="item.componentProps.prefixIcon"
-              :prefixIconStyle="item.componentProps.prefixIconStyle"
-              :suffixIcon="item.componentProps.suffixIcon"
-              :suffixIconStyle="item.componentProps.suffixIconStyle"
-              :border="item.componentProps.border"
-              :readonly="item.componentProps.readonly"
-              :shape="item.componentProps.shape"
-              :formatter="item.componentProps.formatter"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item) || !!item.componentProps.keyboard"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @blur="onMethod($event, item.componentProps.onBlur)"
-              @focus="onMethod($event, item.componentProps.onFocus)"
-              @confirm="onMethod($event, item.componentProps.onConfirm)"
-              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
-              @input="onMethod($event, item.componentProps.onInput)"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-              @clear="onMethod($event, item.componentProps.onClear)"
-            >
-              <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
-                <slot :name="`${getName(item)}Prefix`"></slot>
-              </view>
-              <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
-                <slot :name="`${getName(item)}suffix`"></slot>
-              </view>
-            </u--input>
-          </template>
-          <!-- #endif -->
+                <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
+                  <slot :name="`${getName(item)}Prefix`"></slot>
+                </view>
+                <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
+                  <slot :name="`${getName(item)}suffix`"></slot>
+                </view>
+              </u--input>
+            </template>
+            <!-- #endif -->
 
-          <!-- Textarea -->
-          <template v-else-if="item.component === 'Textarea'">
-            <u--textarea
-              :ref="`${getName(item)}Ref`"
-              :placeholder="item.componentProps.placeholder"
-              :placeholderClass="item.componentProps.placeholderClass"
-              :placeholderStyle="item.componentProps.placeholderStyle"
-              :height="item.componentProps.height"
-              :confirmType="item.componentProps.confirmType"
-              :count="item.componentProps.count"
-              :focus="item.componentProps.focus"
-              :autoHeight="item.componentProps.autoHeight"
-              :fixed="item.componentProps.fixed"
-              :cursorSpacing="item.componentProps.cursorSpacing"
-              :cursor="item.componentProps.cursor"
-              :showConfirmBar="item.componentProps.showConfirmBar"
-              :selectionStart="item.componentProps.selectionStart"
-              :selectionEnd="item.componentProps.selectionEnd"
-              :adjustPosition="item.componentProps.adjustPosition"
-              :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-              :holdKeyboard="item.componentProps.holdKeyboard"
-              :maxlength="item.componentProps.maxlength"
-              :border="item.componentProps.border"
-              :formatter="item.componentProps.formatter"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @blur="onMethod($event, item.componentProps.onBlur)"
-              @focus="onMethod($event, item.componentProps.onFocus)"
-              @confirm="onMethod($event, item.componentProps.onConfirm)"
-              @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
-              @input="onMethod($event, item.componentProps.onInput, item.prop)"
-              @linechange="onMethod($event, item.componentProps.onLinechange)"
-            />
-          </template>
-
-          <!-- Checkbox -->
-          <template v-else-if="item.component === 'Checkbox'">
-            <u-checkbox-group
-              :ref="`${getName(item)}Ref`"
-              :name="item.componentProps.name"
-              :shape="item.componentProps.shape"
-              :activeColor="item.componentProps.activeColor"
-              :inactiveColor="item.componentProps.inactiveColor"
-              :size="item.componentProps.size"
-              :placement="item.componentProps.placement"
-              :labelSize="item.componentProps.labelSize"
-              :labelColor="item.componentProps.labelColor"
-              :labelDisabled="item.componentProps.labelDisabled"
-              :iconColor="item.componentProps.iconColor"
-              :iconSize="item.componentProps.iconSize"
-              :iconPlacement="item.componentProps.iconPlacement"
-              :borderBottom="item.componentProps.borderBottom"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-            >
-              <u-checkbox
-                v-for="(option, index) in item.componentProps.options"
-                :key="index"
-                :shape="option.shape"
-                :size="option.size"
-                :checkbox="option.checkbox"
-                :disabled="option.disabled"
-                :activeColor="option.activeColor"
-                :inactiveColor="option.inactiveColor"
-                :iconSize="option.iconSize"
-                :iconColor="option.iconColor"
-                :labelSize="option.labelSize"
-                :labelColor="option.labelColor"
-                :labelDisabled="option.labelDisabled"
-                :label="option[item.componentProps.labelField]"
-                :name="option[item.componentProps.valueField]"
-                :customClass="option.customClass"
-                :customStyle="option.customStyle"
+            <!-- Textarea -->
+            <template v-else-if="item.component === 'Textarea'">
+              <u--textarea
+                :ref="`${getName(item)}Ref`"
+                :placeholder="item.componentProps.placeholder"
+                :placeholderClass="item.componentProps.placeholderClass"
+                :placeholderStyle="item.componentProps.placeholderStyle"
+                :height="item.componentProps.height"
+                :confirmType="item.componentProps.confirmType"
+                :count="item.componentProps.count"
+                :focus="item.componentProps.focus"
+                :autoHeight="item.componentProps.autoHeight"
+                :fixed="item.componentProps.fixed"
+                :cursorSpacing="item.componentProps.cursorSpacing"
+                :cursor="item.componentProps.cursor"
+                :showConfirmBar="item.componentProps.showConfirmBar"
+                :selectionStart="item.componentProps.selectionStart"
+                :selectionEnd="item.componentProps.selectionEnd"
+                :adjustPosition="item.componentProps.adjustPosition"
+                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
+                :holdKeyboard="item.componentProps.holdKeyboard"
+                :maxlength="item.componentProps.maxlength"
+                :border="item.componentProps.border"
+                :formatter="item.componentProps.formatter"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @blur="onMethod($event, item.componentProps.onBlur)"
+                @focus="onMethod($event, item.componentProps.onFocus)"
+                @confirm="onMethod($event, item.componentProps.onConfirm)"
+                @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+                @input="onMethod($event, item.componentProps.onInput, item.prop)"
+                @linechange="onMethod($event, item.componentProps.onLinechange)"
               />
-            </u-checkbox-group>
-          </template>
+            </template>
 
-          <!-- Radio -->
-          <template v-else-if="item.component === 'Radio'">
-            <u-radio-group
-              :ref="`${getName(item)}Ref`"
-              :shape="item.componentProps.shape"
-              :activeColor="item.componentProps.activeColor"
-              :inactiveColor="item.componentProps.inactiveColor"
-              :name="item.componentProps.name"
-              :size="item.componentProps.size"
-              :placement="item.componentProps.placement"
-              :label="item.componentProps.label"
-              :labelColor="item.componentProps.labelColor"
-              :labelSize="item.componentProps.labelSize"
-              :labelDisabled="item.componentProps.labelDisabled"
-              :iconColor="item.componentProps.iconColor"
-              :iconSize="item.componentProps.iconSize"
-              :borderBottom="item.componentProps.borderBottom"
-              :iconPlacement="item.componentProps.iconPlacement"
-              :value="get(model, item.prop)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              :disabled="isDisabled(item)"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-            >
-              <u-radio
-                v-for="(option, index) in item.componentProps.options"
-                :key="index"
-                :shape="option.shape"
-                :disabled="option.disabled"
-                :labelDisabled="option.labelDisabled"
-                :activeColor="option.activeColor"
-                :inactiveColor="option.inactiveColor"
-                :iconSize="option.iconSize"
-                :labelSize="option.labelSize"
-                :labelColor="option.labelColor"
-                :size="option.size"
-                :iconColor="option.iconColor"
-                :placement="option.placement"
-                :label="option[item.componentProps.labelField]"
-                :name="option[item.componentProps.valueField]"
-                :customClass="option.customClass"
-                :customStyle="option.customStyle"
-                @change="onMethod($event, option.onChange)"
+            <!-- Checkbox -->
+            <template v-else-if="item.component === 'Checkbox'">
+              <u-checkbox-group
+                :ref="`${getName(item)}Ref`"
+                :name="item.componentProps.name"
+                :shape="item.componentProps.shape"
+                :activeColor="item.componentProps.activeColor"
+                :inactiveColor="item.componentProps.inactiveColor"
+                :size="item.componentProps.size"
+                :placement="item.componentProps.placement"
+                :labelSize="item.componentProps.labelSize"
+                :labelColor="item.componentProps.labelColor"
+                :labelDisabled="item.componentProps.labelDisabled"
+                :iconColor="item.componentProps.iconColor"
+                :iconSize="item.componentProps.iconSize"
+                :iconPlacement="item.componentProps.iconPlacement"
+                :borderBottom="item.componentProps.borderBottom"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
               >
-              </u-radio>
-            </u-radio-group>
-          </template>
+                <u-checkbox
+                  v-for="(option, index) in item.componentProps.options"
+                  :key="index"
+                  :shape="option.shape"
+                  :size="option.size"
+                  :checkbox="option.checkbox"
+                  :disabled="option.disabled"
+                  :activeColor="option.activeColor"
+                  :inactiveColor="option.inactiveColor"
+                  :iconSize="option.iconSize"
+                  :iconColor="option.iconColor"
+                  :labelSize="option.labelSize"
+                  :labelColor="option.labelColor"
+                  :labelDisabled="option.labelDisabled"
+                  :label="option[item.componentProps.labelField]"
+                  :name="option[item.componentProps.valueField]"
+                  :customClass="option.customClass"
+                  :customStyle="option.customStyle"
+                />
+              </u-checkbox-group>
+            </template>
 
-          <!-- Switch -->
-          <template v-else-if="item.component === 'Switch'">
-            <u-switch
-              :ref="`${getName(item)}Ref`"
-              :loading="item.componentProps.loading"
-              :size="item.componentProps.size"
-              :activeColor="item.componentProps.activeColor"
-              :inactiveColor="item.componentProps.inactiveColor"
-              :activeValue="item.componentProps.activeValue"
-              :inactiveValue="item.componentProps.inactiveValue"
-              :asyncChange="item.componentProps.asyncChange"
-              :space="item.componentProps.space"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @change="onMethod($event, item.componentProps.onChange, item.prop)"
-              @input="onMethod($event, item.componentProps.onInput)"
-            />
-          </template>
+            <!-- Radio -->
+            <template v-else-if="item.component === 'Radio'">
+              <u-radio-group
+                :ref="`${getName(item)}Ref`"
+                :shape="item.componentProps.shape"
+                :activeColor="item.componentProps.activeColor"
+                :inactiveColor="item.componentProps.inactiveColor"
+                :name="item.componentProps.name"
+                :size="item.componentProps.size"
+                :placement="item.componentProps.placement"
+                :label="item.componentProps.label"
+                :labelColor="item.componentProps.labelColor"
+                :labelSize="item.componentProps.labelSize"
+                :labelDisabled="item.componentProps.labelDisabled"
+                :iconColor="item.componentProps.iconColor"
+                :iconSize="item.componentProps.iconSize"
+                :borderBottom="item.componentProps.borderBottom"
+                :iconPlacement="item.componentProps.iconPlacement"
+                :value="get(model, item.prop)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                :disabled="isDisabled(item)"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+              >
+                <u-radio
+                  v-for="(option, index) in item.componentProps.options"
+                  :key="index"
+                  :shape="option.shape"
+                  :disabled="option.disabled"
+                  :labelDisabled="option.labelDisabled"
+                  :activeColor="option.activeColor"
+                  :inactiveColor="option.inactiveColor"
+                  :iconSize="option.iconSize"
+                  :labelSize="option.labelSize"
+                  :labelColor="option.labelColor"
+                  :size="option.size"
+                  :iconColor="option.iconColor"
+                  :placement="option.placement"
+                  :label="option[item.componentProps.labelField]"
+                  :name="option[item.componentProps.valueField]"
+                  :customClass="option.customClass"
+                  :customStyle="option.customStyle"
+                  @change="onMethod($event, option.onChange)"
+                >
+                </u-radio>
+              </u-radio-group>
+            </template>
 
-          <!-- Slider -->
-          <template v-else-if="item.component === 'Slider'">
-            <u-slider
-              :ref="`${getName(item)}Ref`"
-              style="flex: 1"
-              :blockSize="item.componentProps.blockSize"
-              :min="item.componentProps.min"
-              :max="item.componentProps.max"
-              :step="item.componentProps.step"
-              :activeColor="item.componentProps.activeColor"
-              :inactiveColor="item.componentProps.inactiveColor"
-              :blockColor="item.componentProps.blockColor"
-              :showValue="item.componentProps.showValue"
-              :blockStyle="item.componentProps.blockStyle"
-              :value="get(model, item.prop)"
-              :disabled="isDisabled(item)"
-              :customClass="item.componentProps.customClass"
-              :customStyle="item.componentProps.customStyle"
-              @change="onMethod($event, item.componentProps.onChange)"
-              @input="onMethod($event, item.componentProps.onInput, item.prop)"
-              @changing="onMethod($event, item.componentProps.onChanging)"
-            />
-          </template>
-        </slot>
+            <!-- Switch -->
+            <template v-else-if="item.component === 'Switch'">
+              <u-switch
+                :ref="`${getName(item)}Ref`"
+                :loading="item.componentProps.loading"
+                :size="item.componentProps.size"
+                :activeColor="item.componentProps.activeColor"
+                :inactiveColor="item.componentProps.inactiveColor"
+                :activeValue="item.componentProps.activeValue"
+                :inactiveValue="item.componentProps.inactiveValue"
+                :asyncChange="item.componentProps.asyncChange"
+                :space="item.componentProps.space"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+                @input="onMethod($event, item.componentProps.onInput)"
+              />
+            </template>
+
+            <!-- Slider -->
+            <template v-else-if="item.component === 'Slider'">
+              <u-slider
+                :ref="`${getName(item)}Ref`"
+                style="flex: 1"
+                :blockSize="item.componentProps.blockSize"
+                :min="item.componentProps.min"
+                :max="item.componentProps.max"
+                :step="item.componentProps.step"
+                :activeColor="item.componentProps.activeColor"
+                :inactiveColor="item.componentProps.inactiveColor"
+                :blockColor="item.componentProps.blockColor"
+                :showValue="item.componentProps.showValue"
+                :blockStyle="item.componentProps.blockStyle"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item)"
+                :customClass="item.componentProps.customClass"
+                :customStyle="item.componentProps.customStyle"
+                @change="onMethod($event, item.componentProps.onChange)"
+                @input="onMethod($event, item.componentProps.onInput, item.prop)"
+                @changing="onMethod($event, item.componentProps.onChanging)"
+              />
+            </template>
+          </slot>
+        </view>
       </u-form-item>
     </u--form>
 
@@ -1205,3 +1213,5 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped></style>

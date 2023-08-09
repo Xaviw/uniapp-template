@@ -34,16 +34,13 @@
   },
   "pages": [
     {
-      "path": "pages/index/index"
+      "path": "pages/main/index"
     },
     {
-      "path": "pages/login"
+      "path": "pages/common/webview"
     },
     {
-      "path": "pages/common/webview/webview"
-    },
-    {
-      "path": "pages/common/noNetwork/noNetwork",
+      "path": "pages/common/noNetwork",
       "style": {
         "navigationStyle": "custom",
         "app-plus": {
@@ -53,7 +50,7 @@
       }
     },
     {
-      "path": "pages/index/nvuePage",
+      "path": "pages/main/nvuePage",
       "style": {
         "navigationBarTitleText": "NVUE页面"
       }

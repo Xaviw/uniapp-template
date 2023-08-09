@@ -4,8 +4,7 @@ $step: 2; //步长，由于设计稿2rpx=1px，故此处步长为2
 $unit: 'rpx'; //单位
 
 @while $num < ($sum + 1) {
-  // #ifndef APP-NVUE
-
+  /* #ifndef APP-NVUE */
   // 层级
   .z-#{$num} {
     z-index: #{$num};
@@ -19,7 +18,7 @@ $unit: 'rpx'; //单位
     letter-spacing: #{$num * $step}#{$unit};
   }
 
-  // #endif
+  /* #endif */
 
   // 字号
   .text-#{$num} {
@@ -178,7 +177,7 @@ $unit: 'rpx'; //单位
 
 @for $i from 0 through 12 {
   @if $i <= 10 {
-    // #ifndef APP-NVUE
+    /* #ifndef APP-NVUE */
     // 列
     .columns-#{$i} {
       columns: #{$i};
@@ -190,7 +189,7 @@ $unit: 'rpx'; //单位
     .h-p-#{$i * 10} {
       height: #{$i * 10}#{'%'};
     }
-    // #endif
+    /* #endif */
 
     // 透明度
     .opacity-#{$i} {
@@ -198,14 +197,14 @@ $unit: 'rpx'; //单位
     }
   }
 
-  // #ifndef APP-NVUE
+  /* #ifndef APP-NVUE */
   // flex基础大小
   @for $j from 1 to $i {
     .basis-#{$j}-#{$i} {
       flex-basis: #{$j * 100 / $i}#{'%'};
     }
   }
-  // #endif
+  /* #endif */
 }
 
 // 颜色
@@ -331,7 +330,15 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 }
 // NVUE仅支持该写法
 .flex-1 {
+  /* #ifdef APP-VUE */
+  flex: 1 1 0%;
+  /* #endif */
+  /* #ifdef APP-NVUE */
   flex: 1;
+  /* #endif */
+}
+.flex-0 {
+  flex: 0;
 }
 
 .fixed {
@@ -397,9 +404,9 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
-  // #ifndef APP-NVUE
+  /* #ifndef APP-NVUE */
   white-space: nowrap;
-  // #endif
+  /* #endif */
 }
 
 .text-black {
@@ -420,14 +427,26 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .bg-white {
   background-color: #fff;
 }
+.border-black {
+  border-color: black;
+}
+.black-white {
+  border-color: white;
+}
 .overflow-hidden {
   overflow: hidden;
 }
 .w-screen {
   width: 750rpx;
 }
+.border {
+  border: 1px solid $u-border-color;
+}
 
-// #ifndef APP-NVUE
+/* #ifndef APP-NVUE */
+.status-bar-height {
+  margin-top: var(--status-bar-height);
+}
 .overline {
   text-decoration-line: overline;
 }
@@ -544,59 +563,31 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 }
 
 // 拉伸
-.flex-1 {
-  -webkit-box-flex: 1;
-  -ms-flex: 1 1 0%;
-  -webkit-flex: 1 1 0%;
-  flex: 1 1 0%;
-}
 .flex-auto {
-  -webkit-box-flex: 1;
-  -ms-flex: 1 1 auto;
-  -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
 }
 .flex-initial {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 1 auto;
-  -webkit-flex: 0 1 auto;
   flex: 0 1 auto;
 }
 .flex-none {
-  -webkit-box-flex: 0;
-  -ms-flex: none;
-  -webkit-flex: none;
   flex: none;
 }
 // 放大
 .flex-grow-0 {
-  -webkit-box-flex: 0;
-  -ms-flex-positive: 0;
-  -webkit-flex-grow: 0;
   flex-grow: 0;
 }
 .flex-grow {
-  -webkit-box-flex: 1;
-  -ms-flex-positive: 1;
-  -webkit-flex-grow: 1;
   flex-grow: 1;
 }
 // 缩小
 .flex-shrink-0 {
-  -ms-flex-negative: 0;
-  -webkit-flex-shrink: 0;
   flex-shrink: 0;
 }
 .flex-shrink {
-  -ms-flex-negative: 1;
-  -webkit-flex-shrink: 1;
   flex-shrink: 1;
 }
 // 对齐方式
 .justify-evenly {
-  -webkit-box-pack: space-evenly;
-  -ms-flex-pack: space-evenly;
-  -webkit-justify-content: space-evenly;
   justify-content: space-evenly;
 }
 .justify-items-auto {
@@ -615,87 +606,54 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
   justify-items: stretch;
 }
 .justify-self-auto {
-  -ms-grid-column-align: auto;
   justify-self: auto;
 }
 .justify-self-start {
-  -ms-grid-column-align: start;
   justify-self: start;
 }
 .justify-self-end {
-  -ms-grid-column-align: end;
   justify-self: end;
 }
 .justify-self-center {
-  -ms-grid-column-align: center;
   justify-self: center;
 }
 .justify-self-stretch {
-  -ms-grid-column-align: stretch;
   justify-self: stretch;
 }
 .content-center {
-  -ms-flex-line-pack: center;
-  -webkit-align-content: center;
   align-content: center;
 }
 .content-start {
-  -ms-flex-line-pack: start;
-  -webkit-align-content: flex-start;
   align-content: flex-start;
 }
 .content-end {
-  -ms-flex-line-pack: end;
-  -webkit-align-content: flex-end;
   align-content: flex-end;
 }
 .content-between {
-  -ms-flex-line-pack: justify;
-  -webkit-align-content: space-between;
   align-content: space-between;
 }
 .content-around {
-  -ms-flex-line-pack: distribute;
-  -webkit-align-content: space-around;
   align-content: space-around;
 }
 .content-evenly {
-  -ms-flex-line-pack: space-evenly;
-  -webkit-align-content: space-evenly;
   align-content: space-evenly;
 }
 .items-baseline {
-  -webkit-box-align: baseline;
-  -ms-flex-align: baseline;
-  -webkit-align-items: baseline;
   align-items: baseline;
 }
 .self-auto {
-  -ms-flex-item-align: auto;
-  -ms-grid-row-align: auto;
-  -webkit-align-self: auto;
   align-self: auto;
 }
 .self-start {
-  -ms-flex-item-align: start;
-  -webkit-align-self: flex-start;
   align-self: flex-start;
 }
 .self-end {
-  -ms-flex-item-align: end;
-  -webkit-align-self: flex-end;
   align-self: flex-end;
 }
 .self-center {
-  -ms-flex-item-align: center;
-  -ms-grid-row-align: center;
-  -webkit-align-self: center;
   align-self: center;
 }
 .self-stretch {
-  -ms-flex-item-align: stretch;
-  -ms-grid-row-align: stretch;
-  -webkit-align-self: stretch;
   align-self: stretch;
 }
 .static {
@@ -725,11 +683,9 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 }
 
 .box-border {
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 .box-content {
-  -webkit-box-sizing: content-box;
   box-sizing: content-box;
 }
 
@@ -829,19 +785,15 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 
 // 背景裁剪
 .bg-clip-border {
-  -webkit-background-clip: border-box;
   background-clip: border-box;
 }
 .bg-clip-padding {
-  -webkit-background-clip: padding-box;
   background-clip: padding-box;
 }
 .bg-clip-content {
-  -webkit-background-clip: content-box;
   background-clip: content-box;
 }
 .bg-clip-text {
-  -webkit-background-clip: text;
   background-clip: text;
 }
 
@@ -926,27 +878,15 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 
 // 选择行为
 .select-none {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 .select-text {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
   user-select: text;
 }
 .select-all {
-  -webkit-user-select: all;
-  -moz-user-select: all;
-  -ms-user-select: all;
   user-select: all;
 }
 .select-auto {
-  -webkit-user-select: auto;
-  -moz-user-select: auto;
-  -ms-user-select: auto;
   user-select: auto;
 }
 .border-double {
@@ -994,4 +934,4 @@ $color_type: 'primary', 'success', 'warning', 'error', 'info';
 .wrap-all {
   word-wrap: anywhere;
 }
-// #endif
+/* #endif */

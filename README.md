@@ -23,9 +23,9 @@
 
 ## 样式
 
-1. 定义了[WindiCSS](https://cn.windicss.org/utilities/general/typography.html)中大部分常用原子化css类，具体查看`styles/common.scss`，`font-size`、`width`、`height`等范围值修改为具体值，默认生成范围为`0-30`（`width`、`height`、`padding`、`margin`、`rounded`为定义范围乘2），可以自行修改文件顶部的配置项
+1. 定义了[WindiCSS](https://cn.windicss.org/utilities/general/typography.html)中大部分常用原子化css类，具体查看`styles/common.scss`，与`windicss`区别在于`font-size`、`width`、`height`等值修改为具体值，默认生成范围为`0-30`（`width`、`height`、`padding`、`margin`、`rounded`为定义范围乘2），可以自行修改文件顶部的配置项
 2. 按需在`styles/uview.theme.scss`中替换uview主题颜色，uview组件样式并不是直接使用的主题色变量，所以还需要单独配置组件
-3. 按需在`utils/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)
+3. 按需在`utils/setUViewConfig.js`中自定义uview组件配置，参考[官网介绍](https://www.uviewui.com/components/setting.html#修改uview内置配置方案)，该文件中还包括了模板自定义组件的默认值配置
 
 ### CSS类列表
 
@@ -71,29 +71,39 @@ $unit: 'rpx'; //单位
 
 ### 页面样式
 
-App.vue中设置了全局的根样式
+App.vue中设置了全局的根样式，也可以定义全局的类样式
 
 ```scss
 // APP NVUE页面不支持标签样式，此处定义类样式是可以vue、nvue通用的
-// APP NVUE页面默认字号18px，其他默认字号16px
 // 除H5外，page标签样式只能写在非scope style中
+// APP NVUE页面默认字体大小19px，其余默认16px
+// 默认字体可能数字和汉字不等高，导致仅有数字的时候显示偏移较大，可以设置行高解决
+@import '@/uni_modules/uview-ui/index.scss';
+@import '@/styles/common.scss';
+
+/* #ifndef APP-NVUE */
+// APP VUE端需要设置页面背景色透明才能看到app-plus background颜色（页面背景默认白色）
 page {
   color: $u-content-color;
-  background-color: $u-bg-color;
+  background-color: transparent;
+  line-height: 1
 }
+/* #endif */
 ```
 
-NVUE页面不支持标签样式，需要单独定义。`pages.json -> globalStyle -> app-plus -> background`属性与这里的背景色设置一致，便能保证所有页面背景色统一
+NVUE页面不支持标签样式，需要在`pages.json -> globalStyle -> app-plus -> background`中定义
 
 另外`pages.json`文件中对其他样式属性做了说明，可以按需求进行修改
 
 ### 扩展图标
 
-如果有扩展图标的需求，请在[iconfont](https://www.iconfont.cn/)中将图标保存至一个项目后，按uview官方指南-[CustomIcon 扩展自定义图标库](https://www.uviewui.com/guide/customIcon.html)进行操作
+因为nvue页面扩展图标无法完成，uview官方暂未退出扩展图标功能
+
+可以根据u-icon创建新的自定义图标组件，实现自定义图标，提供了快速创建工具[@xavi/uicon](https://github.com/Xaviw/uview-icon-generate)
 
 ## 请求
 
-使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`utils/http.js`中。请求接口定义在根目录apis文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`utils/http.js`文件，重新定义一个实例即可
+使用了[luch-request](https://www.quanzhan.co/luch-request/guide/3.x/)库处理请求，相关配置定义在`utils/http.js`中。请求接口定义在根目录`apis`文件夹下，定义方式已有例子，如需额外的请求器实例，参考`api/external.js`文件与`utils/http.js`文件，重新定义一个实例即可
 
 同时还扩展了几个自定义属性：
 
@@ -218,17 +228,29 @@ parse(data)
 
 5. tki-qrcode
 
-  生成二维码组件`<tki-qrcode :size="320" :val="val" loadMake />`
+  生成二维码组件`<TkiQrcode :size="320" :val="val" loadMake />`
 
 ## 内置组件
 
 ### Captcha
 
-组件传入字符生成图像验证码`<captcha :code="code" @click.native="fetchCode" />`
+组件传入字符生成图像验证码`<Captcha :code="code" @click.native="fetchCode" />`
 
 ### SliderVerify
 
-滑动解锁组件，按需求修改内部实现`<slider-verify :text="text" @success="handleNext" :disabled="disabled" ref="verify">`
+滑动解锁组件，查看源码了解详情
+
+`<SliderVerify :text="text" @success="handleNext" :disabled="disabled" ref="verify">`
+
+### CustomPicker
+
+更易用的Picker组件，通过options属性控制选项内容
+
+通过labelField（默认label）和valueField（默认value）控制显示、赋值
+
+为单层数组时返回单项的value值，为多层数组时返回所选value数组
+
+可以通过传入show或ref.open()、ref.close()方法控制显隐
 
 ### CustomForm
 
@@ -238,15 +260,16 @@ parse(data)
 <template>
   // formProps同u-form属性，其余为扩展属性
   // 组件内u-form的方法已映射到组件方法中，可以直接this.$refs.formRef调用
-  // 表单项组件的ref名为`${prop}Ref`，可以通过this.$refs.formRef.$refs[`${prop}Ref`][0]调用，v-if中的ref会放在数组中，所以需要用[0]获取
+  // 表单项组件的ref名为`${prop}Ref`，可以通过this.$refs.formRef.$refs[`${prop}Ref`][0]调用，v-for中的ref会放在数组中，所以需要用[0]获取
   <CustomForm ref="formRef" v-bind="formProps" :schemas="schemas" :disabled="false" :autoSetPlaceholder="true">
-    // `${prop}`插槽可以覆盖schema中的配置
+    // `${prop}`插槽可以覆盖schema中的配置，自定义表单项
+    // 设置labelWidth为0，以及自定义元素设置margin负值（form-item有10px的padding）等方法可以使自定义元素占满表单项空间
     <view slot="compA">自定义comA组件内容</view>
 
     // `${prop}Default`插槽可以配置组件默认插槽
     <view clot="compBDefault">自定义Upload</view>
 
-    // `${prop}${slot}`插槽可以配置组件具名插槽（小程序、APP-NVUE不兼容）
+    // `${prop}${slot}`插槽可以配置组件具名插槽（小程序、APP-NVUE不兼容，但可以使用`${prop}`插槽完全自定义表单项）
     <view clot="compCMinus">自定义compC步进器minus插槽</view>
   </CustomForm>
 </template>
@@ -327,6 +350,8 @@ component新增或修改默认值的属性（可以在utils/setUViewConfig.js中
 
 ```js
 import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js'
+// 高精度计算方法，需要注意plus在APP端项目中被HTML plus API占用，需要重命名
+import { divide, minus, plus as add, times } from '@/uni_modules/uview-ui/libs/function/digit.js'
 ```
 
 此外utils目录下定义了部分常用工具函数:
@@ -334,10 +359,10 @@ import dayjs from '@/uni_modules/uview-ui/libs/util/dayjs.js'
 ```js
 // 手机号、银行卡号脱敏
 import { hideMobile, hideBankCard } from '@/utils/formatter.js'
-// 高精度计算
-import { add, minus, multiply, divide } from '@/utils/index.js'
 // uni定位方法promise化
 import { getLocation, isSameLocation } from '@/utils/map.js'
 // 密码校验、银行卡号校验
 import { checkPwd, checkBankCard } from '@/utils/test.js'
 ```
+
+> 此外在非APP NVUE页面中，uview全局混入了`@/uni_modules/uview-ui/libs/mixin/mixin.js`文件，文件中定义了url、customStyle等prop，所以需要注意不能在data中重复定义，同时提供了bem、openPage、preventEvent等实用方法，具体可以查看源码

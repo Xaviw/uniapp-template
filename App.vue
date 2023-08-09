@@ -23,7 +23,7 @@ export default {
 <style lang="scss">
 // APP NVUE页面不支持标签样式，此处定义类样式是可以vue、nvue通用的
 // 除H5外，page标签样式只能写在非scope style中
-// APP NVUE页面默认字体大小17px，其余默认16px
+// APP NVUE页面默认字体大小19px，其余默认16px
 @import '@/uni_modules/uview-ui/index.scss';
 @import '@/styles/common.scss';
 

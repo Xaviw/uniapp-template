@@ -1,34 +1,36 @@
-import Vue from 'vue'
-import uView from '@/uni_modules/uview-ui'
-import App from './App'
-import store from '@/store'
-import http from '@/utils/http.js'
-import setUViewConfig from '@/utils/setUViewConfig.js'
-import modal from '@/utils/modal.js'
-import { promiseify } from './utils'
+import Vue from "vue";
+import uView from "@/uni_modules/uview-ui";
+import App from "./App";
+import store from "@/store";
+import http from "@/utils/http.js";
+import setUViewConfig from "@/utils/setUViewConfig.js";
+import { msg, modal, loading } from "@/utils/prompt.js";
+import { promiseify } from "./utils";
 // TODO: 按需开启
 // import permission from '@/utils/permission.js'
 // import '@/utils/routerGuard.js'
 
 // 统一uni api为Vue3项目promise格式
-promiseify()
+promiseify();
 
-Vue.config.productionTip = false
-App.mpType = 'app'
+Vue.config.productionTip = false;
+App.mpType = "app";
 
-Vue.prototype.$store = store
-Vue.prototype.$modal = modal
+Vue.prototype.$store = store;
+Vue.prototype.$msg = msg;
+Vue.prototype.$modal = modal;
+Vue.prototype.$loading = loading;
 // Vue.prototype.$permi = permission
 
-Vue.use(uView)
+Vue.use(uView);
 // 配置uview
-setUViewConfig()
+setUViewConfig();
 
 const app = new Vue({
   ...App,
-})
+});
 
 // 配置请求器
-Vue.use(http, app)
+Vue.use(http, app);
 
-app.$mount()
+app.$mount();
