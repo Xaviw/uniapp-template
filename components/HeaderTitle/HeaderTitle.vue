@@ -24,7 +24,7 @@ export default {
       if (this.hasNavbar) return '30px'
       const navbarHeight = uni.$u.getPx(uni.$u.props.navbar.height)
       const statusBarHeight = uni.$u.sys().statusBarHeight
-      return uni.$u.addUnit(navbarHeight + statusBarHeight, 'px')
+      return uni.$u.addUnit(navbarHeight + statusBarHeight + 30, 'px')
     }
   }
 }

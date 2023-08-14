@@ -22,11 +22,11 @@ export function getLocation(options = {}) {
 /**
  * 通过经纬度获取地址信息
  * @param {string} lnglat - 逗号分隔的经纬度
- * @returns {Object} data - 返回地址信息对象
- * @returns {string} data.name - POI名称
- * @returns {string} data.address - 地址
- * @returns {string} data.adCode - 6位城市编码
- * @returns {string} data.cityCode - 3位城市编码
+ * @return {Object} data - 返回地址信息对象
+ * @return {string} data.name - POI名称
+ * @return {string} data.address - 地址
+ * @return {string} data.adCode - 6位城市编码
+ * @return {string} data.cityCode - 3位城市编码
  */
 export function getAddress(lnglat) {
   if (!checkLnglat(lnglat)) throw new Error("getAddress 接收参数错误");
@@ -50,14 +50,14 @@ export function getAddress(lnglat) {
 
 /**
  * 通过uni.location和amap.getRegeo获取详细地址信息方法
- * @returns {Object} data - 返回地址信息对象
- * @returns {number} data.latitude - 纬度
- * @returns {number} data.longitude - 经度
- * @returns {string} data.lnglat - 经纬度逗号分隔
- * @returns {string} data.name - POI名称
- * @returns {string} data.address - 地址
- * @returns {string} data.adCode - 6位城市编码
- * @returns {string} data.cityCode - 3位城市编码
+ * @return {Object} data - 返回地址信息对象
+ * @return {number} data.latitude - 纬度
+ * @return {number} data.longitude - 经度
+ * @return {string} data.lnglat - 经纬度逗号分隔
+ * @return {string} data.name - POI名称
+ * @return {string} data.address - 地址
+ * @return {string} data.adCode - 6位城市编码
+ * @return {string} data.cityCode - 3位城市编码
  */
 export async function getLocationInfo() {
   try {
@@ -78,7 +78,7 @@ export async function getLocationInfo() {
 /**
  * 根据经纬度获取polyline
  * @param {Object} options - getDrivingRoute参数，查看https://lbs.amap.com/api/wx/reference/core
- * @returns {{longitude, latitude}[]} - 经纬度数组
+ * @return {{longitude, latitude}[]} - 经纬度数组
  */
 export async function getRoutes(options) {
   if (!checkLnglat(options.origin) || !checkLnglat(options.destination)) {
@@ -114,7 +114,7 @@ export function isSameLocation(a, b) {
 /**
  * 校验经纬度是否合法
  * @param {string} lnglat
- * @returns {boolean}
+ * @return {boolean}
  */
 function checkLnglat(lnglat) {
   if (typeof lnglat !== "string") return false;

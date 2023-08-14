@@ -97,9 +97,9 @@ NVUE页面不支持标签样式，需要在`pages.json -> globalStyle -> app-plu
 
 ### 扩展图标
 
-因为nvue页面扩展图标无法完成，uview官方暂未退出扩展图标功能
+nvue页面自动扩展图标uview官方暂未实现，所以u-icon组件并未推出扩展图标功能
 
-可以根据u-icon创建新的自定义图标组件，实现自定义图标，提供了快速创建工具[@xavi/uicon](https://github.com/Xaviw/uview-icon-generate)
+可以根据u-icon创建新的自定义图标组件，实现自定义图标。提供了快速创建工具[@xaviw/uicon](https://github.com/Xaviw/uview-icon-generate)，使用方式查看仓库README
 
 ## 请求
 

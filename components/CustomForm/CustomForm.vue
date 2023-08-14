@@ -764,6 +764,14 @@ uni.$u.props.CustomForm.Upload.fileList = [];
 export default {
   name: "CustomForm",
 	mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
+  created() {
+    // HACK:源码中只有Object.keys(this.model).length判断通过才会注入rules
+    // 且必须在form组件创建完成前，因为源码中clone首次接收到的值进行判断
+    if (this.rules && !Object.keys(this.model).length) {
+      const firstProp = this.schemas[0].prop;
+      firstProp && set(this.model, firstProp, null);
+    }
+  },
   mounted() {
     // 兼容微信小程序通过setRules注入rules
     // 自动填充trigger与message
@@ -794,11 +802,6 @@ export default {
           }
           this.fillRuleMessage(rules, label, prefix);
         }
-      }
-      // HACK:源码中只有Object.keys(this.model).length判断通过才会注入rules
-      if (!Object.keys(this.model).length) {
-        const firstProp = this.schemas[0].prop;
-        firstProp && set(this.model, firstProp, null);
       }
       this.$refs.formRef.setRules(ruleMap);
     }
@@ -862,6 +865,8 @@ export default {
           cloneDeep(customProps),
           item.componentProps
         );
+        const defaultItemProps = uni.$u.props.formItem
+        item = data[index] = Object.assign(cloneDeep(defaultItemProps), cloneDeep(item))
         // #endif
         // 自动填充placeholder
         if (!item.componentProps.placeholder && this.autoSetPlaceholder) {
