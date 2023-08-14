@@ -1,5 +1,5 @@
-import { Login, BaseDefine, Other } from '@/libs/proto.js';
-import { encode, decode } from './protobuf.js'
+import { decode, encode } from './protobuf.js'
+import { BaseDefine, Login, Other } from '@/libs/proto.js'
 import { LOGIN_PATH } from '@/config.js'
 import store from '@/store'
 
@@ -8,8 +8,8 @@ const strategies = [
   {
     type: BaseDefine.LoginCmdID.CID_LOGIN_RES_USERLOGIN,
     parser: Login.IMLoginRes,
-    handler: data => {
-      console.log('socket登录响应', data);
+    handler: (data) => {
+      console.log('socket登录响应', data)
     },
   },
   // 心跳响应
@@ -41,13 +41,13 @@ const strategies = [
 ]
 
 export function watchSocketMessage() {
-  uni.$on('socketMessage', e => {
+  uni.$on('socketMessage', (e) => {
     const message = decode(e.data)
-    for (let item of strategies) {
-      if (message.commandId == item.type) {
+    for (const item of strategies) {
+      if (message.commandId === item.type) {
         const data = item.parser.decode(new Uint8Array(message.body))
         item.handler(data)
-        break;
+        break
       }
     }
   })
@@ -63,7 +63,7 @@ export function genHeartbeatData() {
 export function socketLogin() {
   const param = Login.IMLoginReq.create({
     onlineStatus: 1,
-    clientType: os == 'ios' ? 17 : 18,
+    clientType: os === 'ios' ? 17 : 18,
     clientVersion: '0',
     token: uni.getStorageSync('token')?.replace('Bearer ', ''),
     userType: 2,

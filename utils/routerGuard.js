@@ -11,24 +11,25 @@ const whiteList = [
 // 检查地址白名单
 function checkWhite(url) {
   const path = url.split('?')[0]
-  return whiteList.indexOf(path) !== -1
+  return whiteList.includes(path)
 }
 
 // 页面跳转验证拦截器
-let list = ["navigateTo", "redirectTo", "reLaunch", "switchTab", ]
-list.forEach(item => {
+const list = ['navigateTo', 'redirectTo', 'reLaunch', 'switchTab']
+list.forEach((item) => {
   uni.addInterceptor(item, {
     invoke(to) {
       if (getToken()) {
-        if (to.url === loginPage) {
-          uni.reLaunch({ url: "/", })
-        }
+        if (to.url === LOGIN_PATH)
+          uni.reLaunch({ url: '/' })
+
         return true
-      } else {
-        if (checkWhite(to.url)) {
+      }
+      else {
+        if (checkWhite(to.url))
           return true
-        }
-        uni.reLaunch({ url: loginPage, })
+
+        uni.reLaunch({ url: LOGIN_PATH })
         return false
       }
     },

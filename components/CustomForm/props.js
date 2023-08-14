@@ -8,25 +8,25 @@ export default {
     schemas: {
       type: Array,
       required: true,
-      validator: schemas => {
-        return schemas.every(item => {
+      validator: (schemas) => {
+        return schemas.every((item) => {
           // 验证组件名
           const componentCorrect = ['Calendar', 'Picker', 'DatetimePicker', 'Rate', 'NumberBox', 'Upload', 'Code',
             'Input', 'Textarea', 'Checkbox', 'Radio', 'Switch', 'Slider',
           ].includes(item.component)
           // 验证选项组件options
           let optionsCorrect = true
-          if (['Checkbox', 'radio'].includes(item.component)) {
+          if (['Checkbox', 'radio'].includes(item.component))
             optionsCorrect = !!item.componentProps?.options?.length
-          }
-          if (item.component === 'Picker') {
+
+          if (item.component === 'Picker')
             optionsCorrect = !!item.componentProps?.options?.length || !!item.componentProps?.columns?.length
-          }
+
           // 验证验证码组件发送验证码方法
           let codeCorrect = true
-          if (!uni.$u.props.CustomForm.Code.api && item.component === 'Code') {
+          if (!uni.$u.props.CustomForm.Code.api && item.component === 'Code')
             codeCorrect = typeof item.componentProps.api === 'function'
-          }
+
           return componentCorrect && optionsCorrect && codeCorrect
         })
       },

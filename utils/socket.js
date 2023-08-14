@@ -1,4 +1,4 @@
-const DEFAULT_PING_MESSAGE = 'ping';
+const DEFAULT_PING_MESSAGE = 'ping'
 
 /**
  * 连接webSocket方法
@@ -40,55 +40,58 @@ export function useSocket(url, options = {}) {
     header,
     method = 'GET',
     protocols = [],
-  } = options;
+  } = options
 
-  let status = 'CLOSED';
+  let status = 'CLOSED'
   let task
 
-  let heartbeatPause;
-  let heartbeatResume;
+  let heartbeatPause
+  let heartbeatResume
 
-  let explicitlyClosed = false;
-  let retried = 0;
+  let explicitlyClosed = false
+  let retried = 0
 
-  let bufferedData = [];
+  let bufferedData = []
 
-  let pongTimeoutWait;
+  let pongTimeoutWait
 
   // 1000 表示正常关闭
   // https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
   // https://uniapp.dcloud.net.cn/api/request/socket-task.html#sockettask-close
   const close = ({ code = 1000, reason } = {}) => {
-    if (!task) return;
-    explicitlyClosed = true;
-    heartbeatPause?.();
-    task.close({ code, reason });
-  };
+    if (!task)
+      return
+    explicitlyClosed = true
+    heartbeatPause?.()
+    task.close({ code, reason })
+  }
 
   const _sendBuffer = () => {
     if (bufferedData.length > 0 && task && status === 'OPEN') {
-      for (const buffer of bufferedData) task.send({ data: buffer });
-      bufferedData = [];
+      for (const buffer of bufferedData) task.send({ data: buffer })
+      bufferedData = []
     }
-  };
+  }
 
   const resetHeartbeat = () => {
-    clearTimeout(pongTimeoutWait);
-    pongTimeoutWait = undefined;
-  };
+    clearTimeout(pongTimeoutWait)
+    pongTimeoutWait = undefined
+  }
 
   const send = (data, useBuffer = true) => {
     if (!task || status !== 'OPEN') {
-      if (useBuffer) bufferedData.push(data);
-      return false;
+      if (useBuffer)
+        bufferedData.push(data)
+      return false
     }
-    _sendBuffer();
-    task.send({ data });
-    return true;
-  };
+    _sendBuffer()
+    task.send({ data })
+    return true
+  }
 
   const _init = () => {
-    if (explicitlyClosed || urlRef === undefined) return;
+    if (explicitlyClosed)
+      return
 
     task = uni.connectSocket({
       url,
@@ -99,50 +102,52 @@ export function useSocket(url, options = {}) {
       complete: () => {
         // just for correct types
       },
-    });
-    status = 'CONNECTING';
+    })
+    status = 'CONNECTING'
 
     task.onOpen((result) => {
-      status = 'OPEN';
-      onConnected?.(task, result);
-      heartbeatResume?.();
-      _sendBuffer();
-    });
+      status = 'OPEN'
+      onConnected?.(task, result)
+      heartbeatResume?.()
+      _sendBuffer()
+    })
 
     task.onClose((result) => {
-      status = 'CLOSED';
-      task = undefined;
-      onClosed?.(task, result);
+      status = 'CLOSED'
+      task = undefined
+      onClosed?.(task, result)
       if (!explicitlyClosed && autoReconnect) {
-        const { retries = -1, delay = 1000, onFailed } = resolveNestedOptions(autoReconnect);
-        retried += 1;
+        const { retries = -1, delay = 1000, onFailed } = resolveNestedOptions(autoReconnect)
+        retried += 1
         if (typeof retries === 'number' && (retries < 0 || retried < retries))
-          setTimeout(_init, delay);
-        else if (typeof retries === 'function' && retries()) setTimeout(_init, delay);
-        else onFailed?.();
+          setTimeout(_init, delay)
+        else if (typeof retries === 'function' && retries())
+          setTimeout(_init, delay)
+        else onFailed?.()
       }
-    });
+    })
 
     task.onError((error) => {
-      onError?.(task, error);
-    });
+      onError?.(task, error)
+    })
 
     task.onMessage((result) => {
       if (heartbeat) {
-        resetHeartbeat();
-        const { message = DEFAULT_PING_MESSAGE } = resolveNestedOptions(heartbeat);
-        if (result.data === message) return;
+        resetHeartbeat()
+        const { message = DEFAULT_PING_MESSAGE } = resolveNestedOptions(heartbeat)
+        if (result.data === message)
+          return
       }
-      onMessage?.(task, result);
-    });
-  };
+      onMessage?.(task, result)
+    })
+  }
 
   if (heartbeat) {
     const {
       message = DEFAULT_PING_MESSAGE,
-        interval = 1000,
-        pongTimeout = 1000,
-    } = resolveNestedOptions(heartbeat);
+      interval = 1000,
+      pongTimeout = 1000,
+    } = resolveNestedOptions(heartbeat)
 
     let timer = null
 
@@ -154,30 +159,33 @@ export function useSocket(url, options = {}) {
     }
 
     function resume() {
-      if (interval <= 0) return
+      if (interval <= 0)
+        return
       clean()
       timer = setInterval(() => {
-        send(message, false);
-        if (pongTimeoutWait != null) return;
+        send(message, false)
+        if (pongTimeoutWait != null)
+          return
         pongTimeoutWait = setTimeout(() => {
           // 明确关闭连接以避免重试
-          close({});
-        }, pongTimeout);
+          close({})
+        }, pongTimeout)
       }, interval)
     }
 
-    heartbeatPause = clean;
-    heartbeatResume = resume;
+    heartbeatPause = clean
+    heartbeatResume = resume
   }
 
   const open = () => {
-    close({});
-    explicitlyClosed = false;
-    retried = 0;
-    _init();
-  };
+    close({})
+    explicitlyClosed = false
+    retried = 0
+    _init()
+  }
 
-  if (immediate) open();
+  if (immediate)
+    open()
 
   return {
     status,
@@ -185,10 +193,11 @@ export function useSocket(url, options = {}) {
     close,
     send,
     task,
-  };
+  }
 }
 
 function resolveNestedOptions(options) {
-  if (options === true) return {};
-  return options;
+  if (options === true)
+    return {}
+  return options
 }

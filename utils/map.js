@@ -1,9 +1,9 @@
-import { AMAP_MINI_KEY } from "@/config.js";
-import amapFile from "@/libs/amap-wx.js";
-import { checkLatitude, checkLongitude } from "./test.js";
+import { checkLatitude, checkLongitude } from './test.js'
+import { AMAP_MINI_KEY } from '@/config.js'
+import amapFile from '@/libs/amap-wx.js'
 
 /* Promise化后的amap-wx方法 */
-export const amap = useAMap();
+export const amap = useAMap()
 
 /**
  * uni.getLocation Promise化方法
@@ -11,12 +11,12 @@ export const amap = useAMap();
  */
 export function getLocation(options = {}) {
   return uni.getLocation({
-    type: "gcj02",
+    type: 'gcj02',
     geocode: true,
-    highAccuracyExpireTime: "5000",
+    highAccuracyExpireTime: '5000',
     isHighAccuracy: true,
     ...options,
-  });
+  })
 }
 
 /**
@@ -29,23 +29,25 @@ export function getLocation(options = {}) {
  * @return {string} data.cityCode - 3位城市编码
  */
 export function getAddress(lnglat) {
-  if (!checkLnglat(lnglat)) throw new Error("getAddress 接收参数错误");
+  if (!checkLnglat(lnglat))
+    throw new Error('getAddress 接收参数错误')
   return new Promise((resolve, reject) => {
     amap
       .getRegeo({ location: lnglat })
       .then(([addressData]) => {
         if (addressData) {
-          const name = addressData.regeocodeData.pois[0].name;
-          const address = addressData.name;
-          const adCode = addressData.regeocodeData.addressComponent.adcode;
-          const cityCode = addressData.regeocodeData.addressComponent.citycode;
-          resolve({ name, address, adCode, cityCode });
-        } else {
-          reject("未解析到数据");
+          const name = addressData.regeocodeData.pois[0].name
+          const address = addressData.name
+          const adCode = addressData.regeocodeData.addressComponent.adcode
+          const cityCode = addressData.regeocodeData.addressComponent.citycode
+          resolve({ name, address, adCode, cityCode })
+        }
+        else {
+          reject(Error('未解析到数据'))
         }
       })
-      .catch(reject);
-  });
+      .catch(reject)
+  })
 }
 
 /**
@@ -62,16 +64,17 @@ export function getAddress(lnglat) {
 export async function getLocationInfo() {
   try {
     // 获取定位信息
-    const { latitude, longitude } = await getLocation({ geocode: false });
+    const { latitude, longitude } = await getLocation({ geocode: false })
 
-    const lnglat = `${longitude},${latitude}`;
+    const lnglat = `${longitude},${latitude}`
 
     // 始终通过amap方法获取地址信息，因为非APP端没有address且返回中没有adCode等信息
-    const { name, address, adCode, cityCode } = await getAddress(lnglat);
+    const { name, address, adCode, cityCode } = await getAddress(lnglat)
 
-    return { latitude, longitude, lnglat, name, address, adCode, cityCode };
-  } catch (e) {
-    return Promise.reject(e);
+    return { latitude, longitude, lnglat, name, address, adCode, cityCode }
+  }
+  catch (e) {
+    return Promise.reject(e)
   }
 }
 
@@ -81,19 +84,19 @@ export async function getLocationInfo() {
  * @return {{longitude, latitude}[]} - 经纬度数组
  */
 export async function getRoutes(options) {
-  if (!checkLnglat(options.origin) || !checkLnglat(options.destination)) {
-    throw new Error("getRoutes 参数错误");
-  }
+  if (!checkLnglat(options.origin) || !checkLnglat(options.destination))
+    throw new Error('getRoutes 参数错误')
+
   return amap.getDrivingRoute(options).then((res) => {
     const polyline = res.paths[0].steps.map((path) => {
-      const points = path.polyline.split(";");
+      const points = path.polyline.split(';')
       return points.map((point) => {
-        const [longitude, latitude] = point.split(",");
-        return { longitude, latitude };
-      });
-    });
-    return polyline.flat();
-  });
+        const [longitude, latitude] = point.split(',')
+        return { longitude, latitude }
+      })
+    })
+    return polyline.flat()
+  })
 }
 
 /**
@@ -103,12 +106,13 @@ export async function getRoutes(options) {
  * @return {boolean}
  */
 export function isSameLocation(a, b) {
-  const lon1 = parseFloat(a.longitude);
-  const lon2 = parseFloat(b.longitude);
-  const lat1 = parseFloat(a.latitude);
-  const lat2 = parseFloat(b.latitude);
-  if (!lon1 || !lon2 || !lat1 || !lat2) return false;
-  return Math.abs(lon1 - lon2) < 0.00001 && Math.abs(lat1 - lat2) < 0.00001;
+  const lon1 = Number.parseFloat(a.longitude)
+  const lon2 = Number.parseFloat(b.longitude)
+  const lat1 = Number.parseFloat(a.latitude)
+  const lat2 = Number.parseFloat(b.latitude)
+  if (!lon1 || !lon2 || !lat1 || !lat2)
+    return false
+  return Math.abs(lon1 - lon2) < 0.00001 && Math.abs(lat1 - lat2) < 0.00001
 }
 
 /**
@@ -117,42 +121,46 @@ export function isSameLocation(a, b) {
  * @return {boolean}
  */
 function checkLnglat(lnglat) {
-  if (typeof lnglat !== "string") return false;
+  if (typeof lnglat !== 'string')
+    return false
   // 处理逗号错误情况
-  if (lnglat.includes("，")) lnglat.replace("，", ",");
-  if (!lnglat.includes(",")) return false;
-  const [lng, lat] = lnglat.split(",");
-  return checkLatitude(lat) && checkLongitude(lng);
+  if (lnglat.includes('，'))
+    lnglat.replace('，', ',')
+  if (!lnglat.includes(','))
+    return false
+  const [lng, lat] = lnglat.split(',')
+  return checkLatitude(lat) && checkLongitude(lng)
 }
 
 // amap-wx方法promise化
 function useAMap() {
-  const amapInstance = new amapFile.AMapWX({ key: AMAP_MINI_KEY });
-  let amap = {};
-  for (let key in amapInstance) {
-    if (typeof amapInstance[key] === "function") {
+  const amapInstance = new amapFile.AMapWX({ key: AMAP_MINI_KEY })
+  const amap = {}
+  for (const key in amapInstance) {
+    if (typeof amapInstance[key] === 'function') {
       const func = function (options) {
-        if (typeof options.success === "function") {
+        if (typeof options.success === 'function') {
           // 传了回调，直接调用原方法，跟未处理效果一致
-          amapInstance[key](options);
-          return Promise.resolve();
-        } else {
+          amapInstance[key](options)
+          return Promise.resolve()
+        }
+        else {
           // 未传回调，包装为Promise
           return new Promise((resolve, reject) => {
             amapInstance[key]({
               ...options,
               success: (result) => {
-                resolve(result);
+                resolve(result)
               },
               fail: (error) => {
-                reject(error);
+                reject(error)
               },
-            });
-          });
+            })
+          })
         }
-      };
-      amap[key] = func.bind(amapInstance);
+      }
+      amap[key] = func.bind(amapInstance)
     }
   }
-  return amap;
+  return amap
 }

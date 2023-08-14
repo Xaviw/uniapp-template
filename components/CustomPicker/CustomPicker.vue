@@ -25,7 +25,7 @@
 
 <script>
 export default {
-  name: "CustomPicker",
+  name: 'CustomPicker',
   props: {
     value: [String, Number, Array],
     options: {
@@ -34,11 +34,11 @@ export default {
     },
     labelField: {
       type: String,
-      default: "label",
+      default: 'label',
     },
     valueField: {
       type: String,
-      default: "value",
+      default: 'value',
     },
     // 是否展示picker弹窗
     show: {
@@ -114,49 +114,49 @@ export default {
   data() {
     return {
       visible: false,
-    };
+    }
   },
   computed: {
     columns() {
-      if (!Array.isArray(this.options[1])) {
-        return [this.options];
-      }
-      return this.options;
+      if (!Array.isArray(this.options[1]))
+        return [this.options]
+
+      return this.options
     },
   },
   methods: {
     open() {
-      this.visible = true;
+      this.visible = true
     },
     close() {
-      this.visible = false;
+      this.visible = false
     },
     setIndexs(...e) {
-      this.$refs.pickerRef.setIndexs(...e);
+      this.$refs.pickerRef.setIndexs(...e)
     },
     setColumnValues(...e) {
-      this.$refs.pickerRef.setColumnValues(...e);
+      this.$refs.pickerRef.setColumnValues(...e)
     },
     onClose() {
-      this.close();
-      this.$emit("close");
+      this.close()
+      this.$emit('close')
     },
     onConfirm(e) {
       const value = e.value.map(item => item[this.valueField])
       this.$emit('input', value.length === 1 ? value[0] : value)
-      this.close();
-      this.$emit("confirm", {...e, targetValue: value});
+      this.close()
+      this.$emit('confirm', { ...e, targetValue: value })
     },
     onChange(e) {
-      e.picker = this.$refs.pickerRef;
-      this.$emit("change", e);
+      e.picker = this.$refs.pickerRef
+      this.$emit('change', e)
     },
     onCancel() {
-      this.close();
-      this.$emit("cancel");
+      this.close()
+      this.$emit('cancel')
     },
   },
-};
+}
 </script>
 
 <style lang="scss" scoped></style>

@@ -1,8 +1,8 @@
-import { fetchSocketServer, fetchPaymentStatus } from '@/apis/index.js'
 import { useSocket } from './socket.js'
-import { MINI_ORIGINAL_ID, MINI_PAYMENT_PATH, HOME_PATH } from '@/config.js'
 import { socketLogin } from './socketHandler.js'
 import { getToken } from './auth.js'
+import { HOME_PATH, MINI_ORIGINAL_ID, MINI_PAYMENT_PATH } from '@/config.js'
+import { fetchPaymentStatus, fetchSocketServer } from '@/apis/index.js'
 import store from '@/store'
 
 /**
@@ -10,7 +10,7 @@ import store from '@/store'
  */
 export function connectSocket() {
   // TODO:获取socket地址
-  return fetchSocketServer().then(res => {
+  return fetchSocketServer().then((res) => {
     const url = `wss://${res.domain}:${res.sslPort}`
     uni.$socket = useSocket(url, {
       autoReconnect: true,
@@ -19,7 +19,7 @@ export function connectSocket() {
         uni.$socket = null
       },
       onMessage: (_, message) => {
-        uni.$emit("socketMessage", message)
+        uni.$emit('socketMessage', message)
       },
     })
   })
@@ -32,8 +32,8 @@ export function connectSocket() {
  */
 export function wxPayment(params = {}, type = 0) {
   return new Promise((resolve, reject) => {
-    plus.share.getServices(res => {
-      const wx = res.find(item => item.id == 'weixin')
+    plus.share.getServices((res) => {
+      const wx = res.find(item => item.id === 'weixin')
       if (wx.nativeClient) {
         const launchOption = {
           id: MINI_ORIGINAL_ID, // 微信小程序原始ID（"g_"开头的字符串）
@@ -45,19 +45,22 @@ export function wxPayment(params = {}, type = 0) {
           store.commit('setPaymentId', params.id)
           // 监听检查支付状态的结果
           uni.$once('paymentResult', (id, state) => {
-            if (id !== params.id) return
+            if (id !== params.id)
+              return
             if (state) {
               uni.$u.toast('支付成功！')
               resolve()
-            } else {
+            }
+            else {
               uni.$u.toast('支付失败，请重新支付！')
-              reject()
+              reject(Error('支付失败，请重新支付！'))
             }
           })
         })
-      } else {
+      }
+      else {
         uni.$u.toast('请先安装微信')
-        reject()
+        reject(Error('请先安装微信'))
       }
     })
   })
@@ -73,7 +76,7 @@ export function watchMiniPaymentState() {
     // 调用检查支付状态的api
     // TODO: 检查支付状态
     fetchPaymentStatus({ id: paymentId })
-      .then(state => {
+      .then((state) => {
         // 发射支付检查结果
         uni.$emit('paymentResult', paymentId, state)
       })
@@ -101,7 +104,8 @@ export function navToFirstPage() {
         plus.navigator.closeSplashscreen()
       },
     })
-  } else {
+  }
+  else {
     plus.navigator.closeSplashscreen()
   }
 }
@@ -111,10 +115,11 @@ export function navToFirstPage() {
  */
 export function watchNetworkState() {
   uni.onNetworkStatusChange(({ isConnected }) => {
-    const currentlyIsNoNetworkPage = uni.$u.page() == '/pages/common/noNetwork'
+    const currentlyIsNoNetworkPage = uni.$u.page() === '/pages/common/noNetwork'
     if (currentlyIsNoNetworkPage && isConnected) {
       uni.navigateBack()
-    } else if (!isConnected && !currentlyIsNoNetworkPage) {
+    }
+    else if (!isConnected && !currentlyIsNoNetworkPage) {
       uni.navigateTo({
         url: '/pages/common/noNetwork',
       })
@@ -125,27 +130,22 @@ export function watchNetworkState() {
 /**
  * @desc 统一Vue2 Promise化API返回格式
  */
-export function promiseify() {
+export function promisify() {
   function isPromise(obj) {
-    return (
-      !!obj &&
-      (typeof obj === "object" || typeof obj === "function") &&
-      typeof obj.then === "function"
-    )
+    return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
   }
 
   uni.addInterceptor({
     returnValue(res) {
-      if (!isPromise(res)) {
+      if (!isPromise(res))
         return res
-      }
+
       return new Promise((resolve, reject) => {
-        res.then(res => {
-          if (res[0]) {
+        res.then((res) => {
+          if (res[0])
             reject(res[0])
-          } else {
+          else
             resolve(res[1])
-          }
         })
       })
     },

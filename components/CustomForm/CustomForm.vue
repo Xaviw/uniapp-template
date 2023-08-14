@@ -1,43 +1,47 @@
-// 查看 README.md CustomForm 介绍
 <template>
   <view>
+    <!-- 查看 README.md CustomForm 介绍 -->
+    <!-- 微信小程序不支持v-bind语法,只能逐个绑定 -->
     <!-- 表单配置 -->
     <u--form
       ref="formRef"
       :model="model"
-      :errorType="errorType"
-      :borderBottom="borderBottom"
-      :labelPosition="labelPosition"
-      :labelWidth="labelWidth"
-      :labelAlign="labelAlign"
-      :labelStyle="labelStyle"
-      :customClass="customClass"
-      :customStyle="customStyle"
+      :error-type="errorType"
+      :border-bottom="borderBottom"
+      :label-position="labelPosition"
+      :label-width="labelWidth"
+      :label-align="labelAlign"
+      :label-style="labelStyle"
+      :custom-class="customClass"
+      :custom-style="customStyle"
     >
       <!-- 循环表单项 -->
       <u-form-item
         v-for="(item, fi) of items"
-        :key="fi"
         v-show="item.ifShow"
+        :key="fi"
         :label="item.label"
         :prop="item.prop"
-        :borderBottom="item.borderBottom"
-        :labelWidth="item.labelWidth"
-        :labelPosition="item.labelPosition"
-        :rightIcon="item.rightIcon"
-        :leftIcon="item.leftIcon"
-        :leftIconStyle="item.leftIconStyle"
+        :border-bottom="item.borderBottom"
+        :label-width="item.labelWidth"
+        :label-position="item.labelPosition"
+        :right-icon="item.rightIcon"
+        :left-icon="item.leftIcon"
+        :left-icon-style="item.leftIconStyle"
         :required="item.required"
         @click="showItem(item, item.onClick)"
       >
         <view
           :class="item.customClass"
-          :style="[$u.addStyle(item.customStyle), {
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center'
-          }]"
+          :style="[
+            $u.addStyle(item.customStyle),
+            {
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+            },
+          ]"
         >
           <slot :name="getName(item)">
             <!-- 请选择 -->
@@ -45,31 +49,23 @@
               <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
               <!-- #ifdef APP-NVUE -->
               <view
-                :class="[
-                          'flex',
-                          'items-center',
-                          item.componentProps.inputAlign==='center' ?
-                          'justify-center' :
-                          item.componentProps.inputAlign === 'right' ?
-                          'justify-end' :
-                          'justify-start'
-                        ]"
+                :class="['flex', 'items-center', 'flex-1', item.componentProps.inputAlign === 'center' ? 'justify-center' : item.componentProps.inputAlign === 'right' ? 'justify-end' : 'justify-start']"
               >
                 <text
                   v-if="!getShownValue(item)"
-                  :class="[item.componentProps.placeholderClass || 'input-placeholder']"
-                  :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+                  :class="[item.componentProps.placeholderClass]"
+                  :style="'color: #c0c4cc; fontSize: 15px;' + $u.addStyle(item.componentProps.placeholderStyle)"
                 >
-                  {{item.componentProps.placeholder}}
+                  {{ item.componentProps.placeholder }}
                 </text>
                 <text
                   v-else
                   :style="{
-                          fontSize:item.componentProps.fontSize || '15px',
-                          color: item.componentProps.color || '#303133'
-                        }"
+                    fontSize: item.componentProps.fontSize || '15px',
+                    color: item.componentProps.color || '#303133',
+                  }"
                 >
-                  {{getShownValue(item)}}
+                  {{ getShownValue(item) }}
                 </text>
               </view>
               <!-- #endif -->
@@ -77,128 +73,15 @@
               <u--input
                 :value="getShownValue(item)"
                 :placeholder="item.componentProps.placeholder"
-                :inputAlign="item.componentProps.inputAlign || 'left'"
+                :input-align="item.componentProps.inputAlign || 'left'"
                 border="none"
                 disabled
-                disabledColor="#ffffff"
+                disabled-color="#ffffff"
               />
               <!-- #endif -->
-              <u-icon slot="right" name="arrow-right" />
-            </template>
-
-            <!-- Calendar、Picker、DatetimePicker中： -->
-            <!-- flex:0避免占input的位置， -->
-            <!-- @click.native.stop避免点击背景隐藏时冒泡到form-item的点击事件 -->
-            <!-- Calendar、Picker没有v-model -->
-            <!-- 微信小程序不支持v-bind语法,只能逐个绑定 -->
-
-            <!-- Calendar -->
-            <template v-if="item.component === 'Calendar'">
-              <u-calendar
-                :ref="`${getName(item)}Ref`"
-                @click.native.stop
-                @click.native="e => e.stopPropagation()"
-                style="flex: 0"
-                :title="item.componentProps.title"
-                :showTitle="item.componentProps.showTitle"
-                :showSubtitle="item.componentProps.showSubtitle"
-                :mode="item.componentProps.mode"
-                :startText="item.componentProps.startText"
-                :endText="item.componentProps.endText"
-                :customList="item.componentProps.customList"
-                :color="item.componentProps.color"
-                :minDate="item.componentProps.minDate"
-                :maxDate="item.componentProps.maxDate"
-                :defaultDate="item.componentProps.defaultDate"
-                :maxCount="item.componentProps.maxCount"
-                :rowHeight="item.componentProps.rowHeight"
-                :formatter="item.componentProps.formatter"
-                :showLunar="item.componentProps.showLunar"
-                :showMark="item.componentProps.showMark"
-                :confirmText="item.componentProps.confirmText"
-                :confirmDisabledText="item.componentProps.confirmDisabledText"
-                :show="item.show"
-                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-                :readonly="item.componentProps.readonly"
-                :maxRange="item.componentProps.maxRange"
-                :rangePrompt="item.componentProps.rangePrompt"
-                :showRangePrompt="item.componentProps.showRangePrompt"
-                :allowSameDay="item.componentProps.allowSameDay"
-                :round="item.componentProps.round"
-                :monthNum="item.componentProps.monthNum"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
-                @confirm="onCalendarConfirm(item, $event)"
-                @close="closeItem(item, item.componentProps.onClose, $event)"
-              />
-            </template>
-
-            <!-- Picker -->
-            <template v-else-if="item.component === 'Picker'">
-              <u-picker
-                :ref="`${getName(item)}Ref`"
-                @click.native.stop
-                @click.native="e => e.stopPropagation()"
-                style="flex: 0"
-                :show="item.show"
-                :showToolbar="item.componentProps.showToolbar"
-                :title="item.componentProps.title"
-                :loading="item.componentProps.loading"
-                :itemHeight="item.componentProps.itemHeight"
-                :cancelText="item.componentProps.cancelText"
-                :confirmText="item.componentProps.confirmText"
-                :cancelColor="item.componentProps.cancelColor"
-                :confirmColor="item.componentProps.confirmColor"
-                :visibleItemCount="item.componentProps.visibleItemCount"
-                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-                :defaultIndex="item.componentProps.defaultIndex"
-                :immediateChange="item.componentProps.immediateChange"
-                :keyName="item.componentProps.labelField"
-                :columns="item.componentProps.options"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
-                @close="closeItem(item, item.componentProps.onClose, $event)"
-                @confirm="onPickerConfirm(item, $event)"
-                @change="onPickerChange($event, `${getName(item)}Ref`, item.componentProps.onChange)"
-                @cancel="closeItem(item, item.componentProps.onCancel, $event)"
-              />
-            </template>
-
-            <!-- DatetimePicker -->
-            <template v-else-if="item.component === 'DatetimePicker'">
-              <u-datetime-picker
-                :ref="`${getName(item)}Ref`"
-                @click.native.stop
-                @click.native="e => e.stopPropagation()"
-                style="flex: 0"
-                :showToolbar="item.componentProps.showToolbar"
-                :title="item.componentProps.title"
-                :mode="item.componentProps.mode"
-                :maxDate="item.componentProps.maxDate"
-                :minDate="item.componentProps.minDate"
-                :minHour="item.componentProps.minHour"
-                :maxHour="item.componentProps.maxHour"
-                :minMinute="item.componentProps.minMinute"
-                :maxMinute="item.componentProps.maxMinute"
-                :filter="item.componentProps.filter"
-                :formatter="item.componentProps.formatter"
-                :loading="item.componentProps.loading"
-                :itemHeight="item.componentProps.itemHeight"
-                :cancelText="item.componentProps.cancelText"
-                :confirmText="item.componentProps.confirmText"
-                :cancelColor="item.componentProps.cancelColor"
-                :confirmColor="item.componentProps.confirmColor"
-                :visibleItemCount="item.componentProps.visibleItemCount"
-                :closeOnClickOverlay="item.componentProps.closeOnClickOverlay"
-                :defaultIndex="item.componentProps.defaultIndex"
-                :value="get(model, item.prop)"
-                :show="item.show"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
-                @confirm="onDatetimeConfirm(item, $event)"
-                @close="closeItem(item, item.componentProps.onClose, $event)"
-                @cancel="closeItem(item, item.componentProps.onCancel, $event)"
-                @change="onMethod($event, item.componentProps.onChange)"
+              <u-icon
+                slot="right"
+                name="arrow-right"
               />
             </template>
 
@@ -208,18 +91,18 @@
                 :ref="`${getName(item)}Ref`"
                 :count="item.componentProps.count"
                 :size="item.componentProps.size"
-                :inactiveColor="item.componentProps.inactiveColor"
-                :activeColor="item.componentProps.activeColor"
+                :inactive-color="item.componentProps.inactiveColor"
+                :active-color="item.componentProps.activeColor"
                 :gutter="item.componentProps.gutter"
-                :minCount="item.componentProps.minCount"
-                :allowHalf="item.componentProps.allowHalf"
-                :activeIcon="item.componentProps.activeIcon"
-                :inactiveIcon="item.componentProps.inactiveIcon"
+                :min-count="item.componentProps.minCount"
+                :allow-half="item.componentProps.allowHalf"
+                :active-icon="item.componentProps.activeIcon"
+                :inactive-icon="item.componentProps.inactiveIcon"
                 :touchable="item.componentProps.touchable"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @change="onMethod($event, item.componentProps.onChange, item.prop)"
               />
             </template>
@@ -233,37 +116,46 @@
                 :max="item.componentProps.max"
                 :step="item.componentProps.step"
                 :integer="item.componentProps.integer"
-                :disabledInput="item.componentProps.disabledInput"
-                :asyncChange="item.componentProps.asyncChange"
-                :inputWidth="item.componentProps.inputWidth"
-                :showMinus="item.componentProps.showMinus"
-                :showPlus="item.componentProps.showPlus"
-                :decimalLength="item.componentProps.decimalLength"
-                :longPress="item.componentProps.longPress"
+                :disabled-input="item.componentProps.disabledInput"
+                :async-change="item.componentProps.asyncChange"
+                :input-width="item.componentProps.inputWidth"
+                :show-minus="item.componentProps.showMinus"
+                :show-plus="item.componentProps.showPlus"
+                :decimal-length="item.componentProps.decimalLength"
+                :long-press="item.componentProps.longPress"
                 :color="item.componentProps.color"
-                :buttonSize="item.componentProps.buttonSize"
-                :bgColor="item.componentProps.bgColor"
-                :cursorSpacing="item.componentProps.cursorSpacing"
-                :disableMinus="item.componentProps.disableMinus"
-                :disablePlus="item.componentProps.disablePlus"
-                :iconStyle="item.componentProps.iconStyle"
+                :button-size="item.componentProps.buttonSize"
+                :bg-color="item.componentProps.bgColor"
+                :cursor-spacing="item.componentProps.cursorSpacing"
+                :disable-minus="item.componentProps.disableMinus"
+                :disable-plus="item.componentProps.disablePlus"
+                :icon-style="item.componentProps.iconStyle"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @focus="onMethod($event, item.componentProps.onFocus)"
                 @blur="onMethod($event, item.componentProps.onBlur)"
-                @change="e => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
+                @change="(e) => onMethod(e, item.componentProps.onChange, item.prop, e.value)"
                 @overlimit="onMethod($event, item.componentProps.onOverlimit)"
               >
-                <view slot="minus" v-if="$slots[`${getName(item)}Minus`]">
-                  <slot :name="`${getName(item)}Minus`"></slot>
+                <view
+                  v-if="$slots[`${getName(item)}Minus`]"
+                  slot="minus"
+                >
+                  <slot :name="`${getName(item)}Minus`" />
                 </view>
-                <view slot="input" v-if="$slots[`${getName(item)}Input`]">
-                  <slot :name="`${getName(item)}Input`"></slot>
+                <view
+                  v-if="$slots[`${getName(item)}Input`]"
+                  slot="input"
+                >
+                  <slot :name="`${getName(item)}Input`" />
                 </view>
-                <view slot="plus" v-if="$slots[`${getName(item)}Plus`]">
-                  <slot :name="`${getName(item)}Plus`"></slot>
+                <view
+                  v-if="$slots[`${getName(item)}Plus`]"
+                  slot="plus"
+                >
+                  <slot :name="`${getName(item)}Plus`" />
                 </view>
               </u-number-box>
             </template>
@@ -276,65 +168,62 @@
                 :capture="item.componentProps.capture"
                 :compressed="item.componentProps.compressed"
                 :camera="item.componentProps.camera"
-                :maxDuration="item.componentProps.maxDuration"
-                :uploadIcon="item.componentProps.uploadIcon"
-                :uploadIconColor="item.componentProps.uploadIconColor"
-                :useBeforeRead="item.componentProps.useBeforeRead"
-                :previewFullImage="item.componentProps.previewFullImage"
-                :maxCount="item.componentProps.maxCount"
-                :imageMode="item.componentProps.imageMode"
-                :sizeType="item.componentProps.sizeType"
+                :max-duration="item.componentProps.maxDuration"
+                :upload-icon="item.componentProps.uploadIcon"
+                :upload-icon-color="item.componentProps.uploadIconColor"
+                :use-before-read="item.componentProps.useBeforeRead"
+                :preview-full-image="item.componentProps.previewFullImage"
+                :max-count="item.componentProps.maxCount"
+                :image-mode="item.componentProps.imageMode"
+                :size-type="item.componentProps.sizeType"
                 :multiple="item.componentProps.multiple"
                 :deletable="item.componentProps.deletable"
-                :maxSize="item.componentProps.maxSize"
-                :uploadText="item.componentProps.uploadText"
+                :max-size="item.componentProps.maxSize"
+                :upload-text="item.componentProps.uploadText"
                 :width="item.componentProps.width"
                 :height="item.componentProps.height"
-                :previewImage="item.componentProps.previewImage"
-                :fileList="item.componentProps.fileList"
+                :preview-image="item.componentProps.previewImage"
+                :file-list="item.componentProps.fileList"
                 :name="item.componentProps.name || getName(item)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @afterRead="afterRead(item, $event)"
                 @delete="deleteFile(item, $event)"
                 @beforeRead="onMethod($event, item.componentProps.beforeRead)"
                 @oversize="onMethod($event, item.componentProps.oversize)"
                 @clickPreview="onMethod($event, item.componentProps.clickPreview)"
               >
-                <slot :name="`${getName(item)}Default`"></slot>
+                <slot :name="`${getName(item)}Default`" />
               </u-upload>
             </template>
 
             <!-- Code -->
             <template v-else-if="item.component === 'Code'">
-              <view style="flex: 1;display: flex;flex-direction: row;">
+              <view style="flex: 1; display: flex; flex-direction: row">
                 <u--input
                   :value="get(model, item.prop)"
-                  @change="onMethod($event, null, item.prop)"
                   border="none"
                   :type="item.componentProps.inputType"
                   :maxlength="item.componentProps.maxlength"
                   :placeholder="item.componentProps.placeholder"
                   :disabled="isDisabled(item)"
-                ></u--input>
+                  @change="onMethod($event, null, item.prop)"
+                />
 
                 <u-button
                   v-if="item.componentProps.type === 'button'"
-                  customStyle="width: auto;"
-                  @click="getCode(item)"
+                  custom-style="width: auto;"
                   :text="item.componentProps.tips"
                   :type="item.componentProps.buttonType"
                   :size="item.componentProps.buttonSize"
                   :disabled="isDisabled(item) || item.componentProps.buttonDisabled"
+                  @click="getCode(item)"
                 />
 
                 <text
                   v-else
-                  :class="[
-                            isDisabled(item) || item.componentProps.buttonDisabled ? 'text-info-disabled' : 'text-link',
-                            'pl-6',
-                          ]"
+                  :class="[isDisabled(item) || item.componentProps.buttonDisabled ? 'text-info-disabled' : 'text-link', 'pl-6']"
                   :style="item.componentProps.textStyle"
                   @click="getCode(item, isDisabled(item) || item.componentProps.buttonDisabled)"
                 >
@@ -345,13 +234,13 @@
               <u-code
                 :ref="`${getName(item)}Ref`"
                 :seconds="item.componentProps.seconds"
-                :startText="item.componentProps.startText"
-                :changeText="item.componentProps.changeText"
-                :endText="item.componentProps.endText"
-                :keepRunning="item.componentProps.keepRunning"
-                :uniqueKey="item.componentProps.uniqueKey || getName(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :start-text="item.componentProps.startText"
+                :change-text="item.componentProps.changeText"
+                :end-text="item.componentProps.endText"
+                :keep-running="item.componentProps.keepRunning"
+                :unique-key="item.componentProps.uniqueKey || getName(item)"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @change="onCodeChange(item, $event)"
                 @start="onCodeStart(item)"
                 @end="onCodeEnd(item)"
@@ -359,199 +248,71 @@
             </template>
 
             <!-- Input 插槽需要区分NVUE页面 -->
-            <!-- #ifndef APP-NVUE -->
-            <template v-else-if="item.component === 'Input'">
-              <u-input
-                :ref="`${getName(item)}Ref`"
-                :type="item.componentProps.type"
-                :fixed="item.componentProps.fixed"
-                :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
-                :clearable="item.componentProps.clearable"
-                :password="item.componentProps.password"
-                :maxlength="item.componentProps.maxlength"
-                :placeholder="item.componentProps.placeholder"
-                :placeholderClass="item.componentProps.placeholderClass"
-                :placeholderStyle="item.componentProps.placeholderStyle"
-                :showWordLimit="item.componentProps.showWordLimit"
-                :confirmType="item.componentProps.confirmType"
-                :confirmHold="item.componentProps.confirmHold"
-                :holdKeyboard="item.componentProps.holdKeyboard"
-                :focus="item.componentProps.focus"
-                :autoBlur="item.componentProps.autoBlur"
-                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-                :cursor="item.componentProps.cursor"
-                :cursorSpacing="item.componentProps.cursorSpacing"
-                :selectionStart="item.componentProps.selectionStart"
-                :selectionEnd="item.componentProps.selectionEnd"
-                :adjustPosition="item.componentProps.adjustPosition"
-                :inputAlign="item.componentProps.inputAlign"
-                :fontSize="item.componentProps.fontSize"
-                :color="item.componentProps.color"
-                :prefixIcon="item.componentProps.prefixIcon"
-                :prefixIconStyle="item.componentProps.prefixIconStyle"
-                :suffixIcon="item.componentProps.suffixIcon"
-                :suffixIconStyle="item.componentProps.suffixIconStyle"
-                :border="item.componentProps.border"
-                :readonly="item.componentProps.readonly"
-                :shape="item.componentProps.shape"
-                :formatter="item.componentProps.formatter"
-                :value="get(model, item.prop)"
-                :disabled="isDisabled(item) || !!item.componentProps.keyboard"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
-                @blur="onMethod($event, item.componentProps.onBlur)"
-                @focus="onMethod($event, item.componentProps.onFocus)"
-                @confirm="onMethod($event, item.componentProps.onConfirm)"
-                @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
-                @input="onMethod($event, item.componentProps.onInput)"
-                @change="onMethod($event, item.componentProps.onChange, item.prop)"
-                @clear="onMethod($event, item.componentProps.onClear)"
-              >
-                <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
-                  <slot :name="`${getName(item)}Prefix`"></slot>
-                </view>
-                <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
-                  <slot :name="`${getName(item)}suffix`"></slot>
-                </view>
-              </u-input>
-
-              <template v-if="item.componentProps.keyboard">
-                <u-keyboard
-                  :ref="`${getName(item)}Keyboard`"
-                  @click.native.stop
-                  @click.native="e => e.stopPropagation()"
-                  style="flex: 0"
-                  :show="item.show"
-                  :mode="item.componentProps.keyboard.mode"
-                  :dotDisabled="item.componentProps.keyboard.dotDisabled"
-                  :tooltip="item.componentProps.keyboard.tooltip"
-                  :showTips="item.componentProps.keyboard.showTips"
-                  :tips="item.componentProps.keyboard.tips"
-                  :showCancel="item.componentProps.keyboard.showCancel"
-                  :showConfirm="item.componentProps.keyboard.showConfirm"
-                  :random="item.componentProps.keyboard.random"
-                  :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
-                  :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
-                  :overlay="item.componentProps.keyboard.overlay"
-                  :zIndex="item.componentProps.keyboard.zIndex"
-                  :confirmText="item.componentProps.keyboard.confirmText"
-                  :cancelText="item.componentProps.keyboard.cancelText"
-                  :customStyle="item.componentProps.keyboard.customStyle"
-                  :autoChange="item.componentProps.keyboard.autoChange"
-                  @change="onInputKeyboardChange(item, $event)"
-                  @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
-                  @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
-                  @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
-                  @backspace="onInputKeyboardBackspace(item, $event)"
-                >
-                  <slot :name="`${getName(item)}KeyboardDefault`"></slot>
-                </u-keyboard>
-              </template>
-            </template>
-            <!-- #endif -->
 
             <!-- #ifdef APP-NVUE -->
             <!-- NVUE Input Keyboard -->
             <!-- 兼容在安卓nvue上，事件无法冒泡，u-input内部处理测试无效-->
             <template v-else-if="item.component === 'Input' && item.componentProps.keyboard">
               <view
-                :class="[
-                          'flex',
-                          'items-center',
-                          item.componentProps.inputAlign==='center' ?
-                          'justify-center' :
-                          item.componentProps.inputAlign === 'right' ?
-                          'justify-end' :
-                          'justify-start'
-                        ]"
+                :class="['flex', 'items-center', item.componentProps.inputAlign === 'center' ? 'justify-center' : item.componentProps.inputAlign === 'right' ? 'justify-end' : 'justify-start']"
               >
                 <text
                   v-if="!getShownValue(item)"
-                  :class="[item.componentProps.placeholderClass || 'input-placeholder']"
-                  :style="item.componentProps.placeholderStyle || 'color: #c0c4cc'"
+                  :class="[item.componentProps.placeholderClass]"
+                  :style="'color: #c0c4cc; fontSize: 15px;' + $u.addStyle(item.componentProps.placeholderStyle)"
                 >
-                  {{item.componentProps.placeholder}}
+                  {{ item.componentProps.placeholder }}
                 </text>
                 <text
                   v-else
                   :style="{
-                                      fontSize:item.componentProps.fontSize || '15px',
-                                      color: item.componentProps.color || '#303133'
-                                    }"
+                    fontSize: item.componentProps.fontSize || '15px',
+                    color: item.componentProps.color || '#303133',
+                  }"
                 >
-                  {{getShownValue(item)}}
+                  {{ getShownValue(item) }}
                 </text>
               </view>
-              <u-keyboard
-                :ref="`${getName(item)}Keyboard`"
-                @click.native.stop
-                @click.native="e => e.stopPropagation()"
-                style="flex: 0"
-                :show="item.show"
-                :mode="item.componentProps.keyboard.mode"
-                :dotDisabled="item.componentProps.keyboard.dotDisabled"
-                :tooltip="item.componentProps.keyboard.tooltip"
-                :showTips="item.componentProps.keyboard.showTips"
-                :tips="item.componentProps.keyboard.tips"
-                :showCancel="item.componentProps.keyboard.showCancel"
-                :showConfirm="item.componentProps.keyboard.showConfirm"
-                :random="item.componentProps.keyboard.random"
-                :safeAreaInsetBottom="item.componentProps.keyboard.safeAreaInsetBottom"
-                :closeOnClickOverlay="item.componentProps.keyboard.closeOnClickOverlay"
-                :overlay="item.componentProps.keyboard.overlay"
-                :zIndex="item.componentProps.keyboard.zIndex"
-                :confirmText="item.componentProps.keyboard.confirmText"
-                :cancelText="item.componentProps.keyboard.cancelText"
-                :customStyle="item.componentProps.keyboard.customStyle"
-                :autoChange="item.componentProps.keyboard.autoChange"
-                @change="onInputKeyboardChange(item, $event)"
-                @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
-                @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
-                @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
-                @backspace="onInputKeyboardBackspace(item, $event)"
-              >
-                <slot :name="`${getName(item)}KeyboardDefault`"></slot>
-              </u-keyboard>
             </template>
             <template v-else-if="item.component === 'Input'">
               <u--input
                 :ref="`${getName(item)}Ref`"
                 :type="item.componentProps.type"
                 :fixed="item.componentProps.fixed"
-                :disabledColor="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
+                :disabled-color="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
                 :clearable="item.componentProps.clearable"
                 :password="item.componentProps.password"
                 :maxlength="item.componentProps.maxlength"
                 :placeholder="item.componentProps.placeholder"
-                :placeholderClass="item.componentProps.placeholderClass"
-                :placeholderStyle="item.componentProps.placeholderStyle"
-                :showWordLimit="item.componentProps.showWordLimit"
-                :confirmType="item.componentProps.confirmType"
-                :confirmHold="item.componentProps.confirmHold"
-                :holdKeyboard="item.componentProps.holdKeyboard"
+                :placeholder-class="item.componentProps.placeholderClass"
+                :placeholder-style="item.componentProps.placeholderStyle"
+                :show-word-limit="item.componentProps.showWordLimit"
+                :confirm-type="item.componentProps.confirmType"
+                :confirm-hold="item.componentProps.confirmHold"
+                :hold-keyboard="item.componentProps.holdKeyboard"
                 :focus="item.componentProps.focus"
-                :autoBlur="item.componentProps.autoBlur"
-                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
+                :auto-blur="item.componentProps.autoBlur"
+                :disable-default-padding="item.componentProps.disableDefaultPadding"
                 :cursor="item.componentProps.cursor"
-                :cursorSpacing="item.componentProps.cursorSpacing"
-                :selectionStart="item.componentProps.selectionStart"
-                :selectionEnd="item.componentProps.selectionEnd"
-                :adjustPosition="item.componentProps.adjustPosition"
-                :inputAlign="item.componentProps.inputAlign"
-                :fontSize="item.componentProps.fontSize"
+                :cursor-spacing="item.componentProps.cursorSpacing"
+                :selection-start="item.componentProps.selectionStart"
+                :selection-end="item.componentProps.selectionEnd"
+                :adjust-position="item.componentProps.adjustPosition"
+                :input-align="item.componentProps.inputAlign"
+                :font-size="item.componentProps.fontSize"
                 :color="item.componentProps.color"
-                :prefixIcon="item.componentProps.prefixIcon"
-                :prefixIconStyle="item.componentProps.prefixIconStyle"
-                :suffixIcon="item.componentProps.suffixIcon"
-                :suffixIconStyle="item.componentProps.suffixIconStyle"
+                :prefix-icon="item.componentProps.prefixIcon"
+                :prefix-icon-style="item.componentProps.prefixIconStyle"
+                :suffix-icon="item.componentProps.suffixIcon"
+                :suffix-icon-style="item.componentProps.suffixIconStyle"
                 :border="item.componentProps.border"
                 :readonly="item.componentProps.readonly"
                 :shape="item.componentProps.shape"
                 :formatter="item.componentProps.formatter"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item) || !!item.componentProps.keyboard"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @blur="onMethod($event, item.componentProps.onBlur)"
                 @focus="onMethod($event, item.componentProps.onFocus)"
                 @confirm="onMethod($event, item.componentProps.onConfirm)"
@@ -560,13 +321,83 @@
                 @change="onMethod($event, item.componentProps.onChange, item.prop)"
                 @clear="onMethod($event, item.componentProps.onClear)"
               >
-                <view slot="prefix" v-if="$slots[`${getName(item)}Prefix`]">
-                  <slot :name="`${getName(item)}Prefix`"></slot>
+                <view
+                  v-if="$slots[`${getName(item)}Prefix`]"
+                  slot="prefix"
+                >
+                  <slot :name="`${getName(item)}Prefix`" />
                 </view>
-                <view slot="suffix" v-if="$slots[`${getName(item)}suffix`]">
-                  <slot :name="`${getName(item)}suffix`"></slot>
+                <view
+                  v-if="$slots[`${getName(item)}suffix`]"
+                  slot="suffix"
+                >
+                  <slot :name="`${getName(item)}suffix`" />
                 </view>
               </u--input>
+            </template>
+            <!-- #endif -->
+            <!-- #ifndef APP-NVUE -->
+            <!-- eslint-disable-next-line vue/no-dupe-v-else-if -->
+            <template v-else-if="item.component === 'Input'">
+              <u-input
+                :ref="`${getName(item)}Ref`"
+                :type="item.componentProps.type"
+                :fixed="item.componentProps.fixed"
+                :disabled-color="item.componentProps.keyboard ? '#ffffff' : item.componentProps.disabledColor"
+                :clearable="item.componentProps.clearable"
+                :password="item.componentProps.password"
+                :maxlength="item.componentProps.maxlength"
+                :placeholder="item.componentProps.placeholder"
+                :placeholder-class="item.componentProps.placeholderClass"
+                :placeholder-style="item.componentProps.placeholderStyle"
+                :show-word-limit="item.componentProps.showWordLimit"
+                :confirm-type="item.componentProps.confirmType"
+                :confirm-hold="item.componentProps.confirmHold"
+                :hold-keyboard="item.componentProps.holdKeyboard"
+                :focus="item.componentProps.focus"
+                :auto-blur="item.componentProps.autoBlur"
+                :disable-default-padding="item.componentProps.disableDefaultPadding"
+                :cursor="item.componentProps.cursor"
+                :cursor-spacing="item.componentProps.cursorSpacing"
+                :selection-start="item.componentProps.selectionStart"
+                :selection-end="item.componentProps.selectionEnd"
+                :adjust-position="item.componentProps.adjustPosition"
+                :input-align="item.componentProps.inputAlign"
+                :font-size="item.componentProps.fontSize"
+                :color="item.componentProps.color"
+                :prefix-icon="item.componentProps.prefixIcon"
+                :prefix-icon-style="item.componentProps.prefixIconStyle"
+                :suffix-icon="item.componentProps.suffixIcon"
+                :suffix-icon-style="item.componentProps.suffixIconStyle"
+                :border="item.componentProps.border"
+                :readonly="item.componentProps.readonly"
+                :shape="item.componentProps.shape"
+                :formatter="item.componentProps.formatter"
+                :value="get(model, item.prop)"
+                :disabled="isDisabled(item) || !!item.componentProps.keyboard"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
+                @blur="onMethod($event, item.componentProps.onBlur)"
+                @focus="onMethod($event, item.componentProps.onFocus)"
+                @confirm="onMethod($event, item.componentProps.onConfirm)"
+                @keyboardheightchange="onMethod($event, item.componentProps.onKeyboardheightchange)"
+                @input="onMethod($event, item.componentProps.onInput)"
+                @change="onMethod($event, item.componentProps.onChange, item.prop)"
+                @clear="onMethod($event, item.componentProps.onClear)"
+              >
+                <view
+                  v-if="$slots[`${getName(item)}Prefix`]"
+                  slot="prefix"
+                >
+                  <slot :name="`${getName(item)}Prefix`" />
+                </view>
+                <view
+                  v-if="$slots[`${getName(item)}suffix`]"
+                  slot="suffix"
+                >
+                  <slot :name="`${getName(item)}suffix`" />
+                </view>
+              </u-input>
             </template>
             <!-- #endif -->
 
@@ -575,29 +406,29 @@
               <u--textarea
                 :ref="`${getName(item)}Ref`"
                 :placeholder="item.componentProps.placeholder"
-                :placeholderClass="item.componentProps.placeholderClass"
-                :placeholderStyle="item.componentProps.placeholderStyle"
+                :placeholder-class="item.componentProps.placeholderClass"
+                :placeholder-style="item.componentProps.placeholderStyle"
                 :height="item.componentProps.height"
-                :confirmType="item.componentProps.confirmType"
+                :confirm-type="item.componentProps.confirmType"
                 :count="item.componentProps.count"
                 :focus="item.componentProps.focus"
-                :autoHeight="item.componentProps.autoHeight"
+                :auto-height="item.componentProps.autoHeight"
                 :fixed="item.componentProps.fixed"
-                :cursorSpacing="item.componentProps.cursorSpacing"
+                :cursor-spacing="item.componentProps.cursorSpacing"
                 :cursor="item.componentProps.cursor"
-                :showConfirmBar="item.componentProps.showConfirmBar"
-                :selectionStart="item.componentProps.selectionStart"
-                :selectionEnd="item.componentProps.selectionEnd"
-                :adjustPosition="item.componentProps.adjustPosition"
-                :disableDefaultPadding="item.componentProps.disableDefaultPadding"
-                :holdKeyboard="item.componentProps.holdKeyboard"
+                :show-confirm-bar="item.componentProps.showConfirmBar"
+                :selection-start="item.componentProps.selectionStart"
+                :selection-end="item.componentProps.selectionEnd"
+                :adjust-position="item.componentProps.adjustPosition"
+                :disable-default-padding="item.componentProps.disableDefaultPadding"
+                :hold-keyboard="item.componentProps.holdKeyboard"
                 :maxlength="item.componentProps.maxlength"
                 :border="item.componentProps.border"
                 :formatter="item.componentProps.formatter"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @blur="onMethod($event, item.componentProps.onBlur)"
                 @focus="onMethod($event, item.componentProps.onFocus)"
                 @confirm="onMethod($event, item.componentProps.onConfirm)"
@@ -613,21 +444,21 @@
                 :ref="`${getName(item)}Ref`"
                 :name="item.componentProps.name"
                 :shape="item.componentProps.shape"
-                :activeColor="item.componentProps.activeColor"
-                :inactiveColor="item.componentProps.inactiveColor"
+                :active-color="item.componentProps.activeColor"
+                :inactive-color="item.componentProps.inactiveColor"
                 :size="item.componentProps.size"
                 :placement="item.componentProps.placement"
-                :labelSize="item.componentProps.labelSize"
-                :labelColor="item.componentProps.labelColor"
-                :labelDisabled="item.componentProps.labelDisabled"
-                :iconColor="item.componentProps.iconColor"
-                :iconSize="item.componentProps.iconSize"
-                :iconPlacement="item.componentProps.iconPlacement"
-                :borderBottom="item.componentProps.borderBottom"
+                :label-size="item.componentProps.labelSize"
+                :label-color="item.componentProps.labelColor"
+                :label-disabled="item.componentProps.labelDisabled"
+                :icon-color="item.componentProps.iconColor"
+                :icon-size="item.componentProps.iconSize"
+                :icon-placement="item.componentProps.iconPlacement"
+                :border-bottom="item.componentProps.borderBottom"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @change="onMethod($event, item.componentProps.onChange, item.prop)"
               >
                 <u-checkbox
@@ -637,17 +468,17 @@
                   :size="option.size"
                   :checkbox="option.checkbox"
                   :disabled="option.disabled"
-                  :activeColor="option.activeColor"
-                  :inactiveColor="option.inactiveColor"
-                  :iconSize="option.iconSize"
-                  :iconColor="option.iconColor"
-                  :labelSize="option.labelSize"
-                  :labelColor="option.labelColor"
-                  :labelDisabled="option.labelDisabled"
+                  :active-color="option.activeColor"
+                  :inactive-color="option.inactiveColor"
+                  :icon-size="option.iconSize"
+                  :icon-color="option.iconColor"
+                  :label-size="option.labelSize"
+                  :label-color="option.labelColor"
+                  :label-disabled="option.labelDisabled"
                   :label="option[item.componentProps.labelField]"
                   :name="option[item.componentProps.valueField]"
-                  :customClass="option.customClass"
-                  :customStyle="option.customStyle"
+                  :custom-class="option.customClass"
+                  :custom-style="option.customStyle"
                 />
               </u-checkbox-group>
             </template>
@@ -657,22 +488,22 @@
               <u-radio-group
                 :ref="`${getName(item)}Ref`"
                 :shape="item.componentProps.shape"
-                :activeColor="item.componentProps.activeColor"
-                :inactiveColor="item.componentProps.inactiveColor"
+                :active-color="item.componentProps.activeColor"
+                :inactive-color="item.componentProps.inactiveColor"
                 :name="item.componentProps.name"
                 :size="item.componentProps.size"
                 :placement="item.componentProps.placement"
                 :label="item.componentProps.label"
-                :labelColor="item.componentProps.labelColor"
-                :labelSize="item.componentProps.labelSize"
-                :labelDisabled="item.componentProps.labelDisabled"
-                :iconColor="item.componentProps.iconColor"
-                :iconSize="item.componentProps.iconSize"
-                :borderBottom="item.componentProps.borderBottom"
-                :iconPlacement="item.componentProps.iconPlacement"
+                :label-color="item.componentProps.labelColor"
+                :label-size="item.componentProps.labelSize"
+                :label-disabled="item.componentProps.labelDisabled"
+                :icon-color="item.componentProps.iconColor"
+                :icon-size="item.componentProps.iconSize"
+                :border-bottom="item.componentProps.borderBottom"
+                :icon-placement="item.componentProps.iconPlacement"
                 :value="get(model, item.prop)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 :disabled="isDisabled(item)"
                 @change="onMethod($event, item.componentProps.onChange, item.prop)"
               >
@@ -681,22 +512,21 @@
                   :key="index"
                   :shape="option.shape"
                   :disabled="option.disabled"
-                  :labelDisabled="option.labelDisabled"
-                  :activeColor="option.activeColor"
-                  :inactiveColor="option.inactiveColor"
-                  :iconSize="option.iconSize"
-                  :labelSize="option.labelSize"
-                  :labelColor="option.labelColor"
+                  :label-disabled="option.labelDisabled"
+                  :active-color="option.activeColor"
+                  :inactive-color="option.inactiveColor"
+                  :icon-size="option.iconSize"
+                  :label-size="option.labelSize"
+                  :label-color="option.labelColor"
                   :size="option.size"
-                  :iconColor="option.iconColor"
+                  :icon-color="option.iconColor"
                   :placement="option.placement"
                   :label="option[item.componentProps.labelField]"
                   :name="option[item.componentProps.valueField]"
-                  :customClass="option.customClass"
-                  :customStyle="option.customStyle"
+                  :custom-class="option.customClass"
+                  :custom-style="option.customStyle"
                   @change="onMethod($event, option.onChange)"
-                >
-                </u-radio>
+                />
               </u-radio-group>
             </template>
 
@@ -706,16 +536,16 @@
                 :ref="`${getName(item)}Ref`"
                 :loading="item.componentProps.loading"
                 :size="item.componentProps.size"
-                :activeColor="item.componentProps.activeColor"
-                :inactiveColor="item.componentProps.inactiveColor"
-                :activeValue="item.componentProps.activeValue"
-                :inactiveValue="item.componentProps.inactiveValue"
-                :asyncChange="item.componentProps.asyncChange"
+                :active-color="item.componentProps.activeColor"
+                :inactive-color="item.componentProps.inactiveColor"
+                :active-value="item.componentProps.activeValue"
+                :inactive-value="item.componentProps.inactiveValue"
+                :async-change="item.componentProps.asyncChange"
                 :space="item.componentProps.space"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="item.componentProps.customStyle"
                 @change="onMethod($event, item.componentProps.onChange, item.prop)"
                 @input="onMethod($event, item.componentProps.onInput)"
               />
@@ -725,20 +555,19 @@
             <template v-else-if="item.component === 'Slider'">
               <u-slider
                 :ref="`${getName(item)}Ref`"
-                style="flex: 1"
-                :blockSize="item.componentProps.blockSize"
+                :block-size="item.componentProps.blockSize"
                 :min="item.componentProps.min"
                 :max="item.componentProps.max"
                 :step="item.componentProps.step"
-                :activeColor="item.componentProps.activeColor"
-                :inactiveColor="item.componentProps.inactiveColor"
-                :blockColor="item.componentProps.blockColor"
-                :showValue="item.componentProps.showValue"
-                :blockStyle="item.componentProps.blockStyle"
+                :active-color="item.componentProps.activeColor"
+                :inactive-color="item.componentProps.inactiveColor"
+                :block-color="item.componentProps.blockColor"
+                :show-value="item.componentProps.showValue"
+                :block-style="item.componentProps.blockStyle"
                 :value="get(model, item.prop)"
                 :disabled="isDisabled(item)"
-                :customClass="item.componentProps.customClass"
-                :customStyle="item.componentProps.customStyle"
+                :custom-class="item.componentProps.customClass"
+                :custom-style="'flex: 1;' + $u.addStyle(item.componentProps.customStyle)"
                 @change="onMethod($event, item.componentProps.onChange)"
                 @input="onMethod($event, item.componentProps.onInput, item.prop)"
                 @changing="onMethod($event, item.componentProps.onChanging)"
@@ -749,180 +578,315 @@
       </u-form-item>
     </u--form>
 
+    <!-- 弹出组件相关 -->
+    <!-- Calendar、Picker没有v-model -->
+    <template v-for="(item, fi) of items">
+      <!-- Calendar -->
+      <template v-if="item.component === 'Calendar'">
+        <u-calendar
+          :key="fi"
+          :ref="`${getName(item)}Ref`"
+          :title="item.componentProps.title"
+          :show-title="item.componentProps.showTitle"
+          :show-subtitle="item.componentProps.showSubtitle"
+          :mode="item.componentProps.mode"
+          :start-text="item.componentProps.startText"
+          :end-text="item.componentProps.endText"
+          :custom-list="item.componentProps.customList"
+          :color="item.componentProps.color"
+          :min-date="item.componentProps.minDate"
+          :max-date="item.componentProps.maxDate"
+          :default-date="item.componentProps.defaultDate"
+          :max-count="item.componentProps.maxCount"
+          :row-height="item.componentProps.rowHeight"
+          :formatter="item.componentProps.formatter"
+          :show-lunar="item.componentProps.showLunar"
+          :show-mark="item.componentProps.showMark"
+          :confirm-text="item.componentProps.confirmText"
+          :confirm-disabled-text="item.componentProps.confirmDisabledText"
+          :show="item.show"
+          :close-on-click-overlay="item.componentProps.closeOnClickOverlay"
+          :readonly="item.componentProps.readonly"
+          :max-range="item.componentProps.maxRange"
+          :range-prompt="item.componentProps.rangePrompt"
+          :show-range-prompt="item.componentProps.showRangePrompt"
+          :allow-same-day="item.componentProps.allowSameDay"
+          :round="item.componentProps.round"
+          :month-num="item.componentProps.monthNum"
+          :custom-class="item.componentProps.customClass"
+          :custom-style="item.componentProps.customStyle"
+          @confirm="onCalendarConfirm(item, $event)"
+          @close="closeItem(item, item.componentProps.onClose, $event)"
+        />
+      </template>
+
+      <!-- Picker -->
+      <template v-else-if="item.component === 'Picker'">
+        <u-picker
+          :key="fi"
+          :ref="`${getName(item)}Ref`"
+          :show="item.show"
+          :show-toolbar="item.componentProps.showToolbar"
+          :title="item.componentProps.title"
+          :loading="item.componentProps.loading"
+          :item-height="item.componentProps.itemHeight"
+          :cancel-text="item.componentProps.cancelText"
+          :confirm-text="item.componentProps.confirmText"
+          :cancel-color="item.componentProps.cancelColor"
+          :confirm-color="item.componentProps.confirmColor"
+          :visible-item-count="item.componentProps.visibleItemCount"
+          :close-on-click-overlay="item.componentProps.closeOnClickOverlay"
+          :default-index="item.componentProps.defaultIndex"
+          :immediate-change="item.componentProps.immediateChange"
+          :key-name="item.componentProps.labelField"
+          :columns="item.componentProps.options"
+          :custom-class="item.componentProps.customClass"
+          :custom-style="item.componentProps.customStyle"
+          @close="closeItem(item, item.componentProps.onClose, $event)"
+          @confirm="onPickerConfirm(item, $event)"
+          @change="onPickerChange($event, `${getName(item)}Ref`, item.componentProps.onChange)"
+          @cancel="closeItem(item, item.componentProps.onCancel, $event)"
+        />
+      </template>
+
+      <!-- DatetimePicker -->
+      <template v-else-if="item.component === 'DatetimePicker'">
+        <u-datetime-picker
+          :key="fi"
+          :ref="`${getName(item)}Ref`"
+          :show-toolbar="item.componentProps.showToolbar"
+          :title="item.componentProps.title"
+          :mode="item.componentProps.mode"
+          :max-date="item.componentProps.maxDate"
+          :min-date="item.componentProps.minDate"
+          :min-hour="item.componentProps.minHour"
+          :max-hour="item.componentProps.maxHour"
+          :min-minute="item.componentProps.minMinute"
+          :max-minute="item.componentProps.maxMinute"
+          :filter="item.componentProps.filter"
+          :formatter="item.componentProps.formatter"
+          :loading="item.componentProps.loading"
+          :item-height="item.componentProps.itemHeight"
+          :cancel-text="item.componentProps.cancelText"
+          :confirm-text="item.componentProps.confirmText"
+          :cancel-color="item.componentProps.cancelColor"
+          :confirm-color="item.componentProps.confirmColor"
+          :visible-item-count="item.componentProps.visibleItemCount"
+          :close-on-click-overlay="item.componentProps.closeOnClickOverlay"
+          :default-index="item.componentProps.defaultIndex"
+          :value="get(model, item.prop)"
+          :show="item.show"
+          :custom-class="item.componentProps.customClass"
+          :custom-style="item.componentProps.customStyle"
+          @confirm="onDatetimeConfirm(item, $event)"
+          @close="closeItem(item, item.componentProps.onClose, $event)"
+          @cancel="closeItem(item, item.componentProps.onCancel, $event)"
+          @change="onMethod($event, item.componentProps.onChange)"
+        />
+      </template>
+
+      <!-- Input -->
+      <template v-if="item.component === 'Input' && item.componentProps.keyboard">
+        <!-- #ifndef APP-NVUE -->
+        <u-keyboard
+          :key="fi"
+          :ref="`${getName(item)}Keyboard`"
+          :show="item.show"
+          :mode="item.componentProps.keyboard.mode"
+          :dot-disabled="item.componentProps.keyboard.dotDisabled"
+          :tooltip="item.componentProps.keyboard.tooltip"
+          :show-tips="item.componentProps.keyboard.showTips"
+          :tips="item.componentProps.keyboard.tips"
+          :show-cancel="item.componentProps.keyboard.showCancel"
+          :show-confirm="item.componentProps.keyboard.showConfirm"
+          :random="item.componentProps.keyboard.random"
+          :safe-area-inset-bottom="item.componentProps.keyboard.safeAreaInsetBottom"
+          :close-on-click-overlay="item.componentProps.keyboard.closeOnClickOverlay"
+          :overlay="item.componentProps.keyboard.overlay"
+          :z-index="item.componentProps.keyboard.zIndex"
+          :confirm-text="item.componentProps.keyboard.confirmText"
+          :cancel-text="item.componentProps.keyboard.cancelText"
+          :custom-style="item.componentProps.keyboard.customStyle"
+          :auto-change="item.componentProps.keyboard.autoChange"
+          @change="onInputKeyboardChange(item, $event)"
+          @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
+          @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
+          @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
+          @backspace="onInputKeyboardBackspace(item, $event)"
+        >
+          <slot :name="`${getName(item)}KeyboardDefault`" />
+        </u-keyboard>
+        <!-- #endif -->
+        <!-- #ifdef APP-NVUE -->
+        <u-keyboard
+          :key="fi"
+          :ref="`${getName(item)}Keyboard`"
+          :show="item.show"
+          :mode="item.componentProps.keyboard.mode"
+          :dot-disabled="item.componentProps.keyboard.dotDisabled"
+          :tooltip="item.componentProps.keyboard.tooltip"
+          :show-tips="item.componentProps.keyboard.showTips"
+          :tips="item.componentProps.keyboard.tips"
+          :show-cancel="item.componentProps.keyboard.showCancel"
+          :show-confirm="item.componentProps.keyboard.showConfirm"
+          :random="item.componentProps.keyboard.random"
+          :safe-area-inset-bottom="item.componentProps.keyboard.safeAreaInsetBottom"
+          :close-on-click-overlay="item.componentProps.keyboard.closeOnClickOverlay"
+          :overlay="item.componentProps.keyboard.overlay"
+          :z-index="item.componentProps.keyboard.zIndex"
+          :confirm-text="item.componentProps.keyboard.confirmText"
+          :cancel-text="item.componentProps.keyboard.cancelText"
+          :custom-style="item.componentProps.keyboard.customStyle"
+          :auto-change="item.componentProps.keyboard.autoChange"
+          @change="onInputKeyboardChange(item, $event)"
+          @close="closeItem(item, item.componentProps.keyboard.onClose, $event)"
+          @confirm="closeItem(item, item.componentProps.keyboard.onConfirm, $event)"
+          @cancel="closeItem(item, item.componentProps.keyboard.onCancel, $event)"
+          @backspace="onInputKeyboardBackspace(item, $event)"
+        >
+          <slot :name="`${getName(item)}KeyboardDefault`" />
+        </u-keyboard>
+        <!-- #endif -->
+      </template>
+    </template>
+
+    <!-- 图片压缩组件 -->
     <ImageCompress ref="imageCompressRef" />
   </view>
 </template>
 
 <script>
-import { cloneDeep, set, get, isPlainObject } from "lodash-es";
-import dayjs from "@/uni_modules/uview-ui/libs/util/dayjs.js";
-import props from "./props.js";
+import { cloneDeep, get, isPlainObject, set } from 'lodash-es'
+import dayjs from 'uview-ui/libs/util/dayjs.js'
+import props from './props.js'
 
 // HACK: uview中的deepMerge有问题，无法在setUViewConfig中直接配置空数组
-uni.$u.props.CustomForm.Upload.fileList = [];
+uni.$u.props.CustomForm.Upload.fileList = []
 
 export default {
-  name: "CustomForm",
-	mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
-  created() {
-    // HACK:源码中只有Object.keys(this.model).length判断通过才会注入rules
-    // 且必须在form组件创建完成前，因为源码中clone首次接收到的值进行判断
-    if (this.rules && !Object.keys(this.model).length) {
-      const firstProp = this.schemas[0].prop;
-      firstProp && set(this.model, firstProp, null);
-    }
-  },
-  mounted() {
-    // 兼容微信小程序通过setRules注入rules
-    // 自动填充trigger与message
-    if (this.$refs.formRef && this.rules) {
-      const ruleMap = cloneDeep(this.rules);
-      if (typeof ruleMap == "object") {
-        for (let prop in ruleMap) {
-          const rules = ruleMap[prop];
-          const { label, component } = this.items.find(
-            (item) => item.prop === prop
-          ) || {};
-          let prefix = "请输入";
-          if (
-            [
-              "Calender",
-              "Picker",
-              "DatetimePicker",
-              "Rate",
-              "Checkbox",
-              "Radio",
-              "Switch",
-              "Slider",
-            ].includes(component)
-          ) {
-            prefix = "请选择";
-          } else if (component === "Upload") {
-            prefix = "请上传";
-          }
-          this.fillRuleMessage(rules, label, prefix);
-        }
-      }
-      this.$refs.formRef.setRules(ruleMap);
-    }
-  },
+  name: 'CustomForm',
+  mixins: [uni.$u.mpMixin, uni.$u.mixin, props],
   data() {
     return {
       model: {},
-    };
+    }
   },
   computed: {
     // 处理schemas
     items() {
-      const data = cloneDeep(this.schemas);
-      return data.map((item) => {
+      const data = cloneDeep(this.schemas)
+      return data.map((item, index) => {
         // HACK:form-item labelWidth设置为0时会使用form labelWidth
-        if (item.labelWidth === 0) {
-          item.labelWidth = 0.1;
-        }
-        if (!item.componentProps) item.componentProps = {};
+        if (item.labelWidth === 0)
+          item.labelWidth = 0.1
+
+        if (!item.componentProps)
+          item.componentProps = {}
         // 合并默认值，在setUViewConfig.js-props-CustomForm中设置
-        const customProps = uni.$u.props.CustomForm[item.component] || {};
-        const lowerCompName =
-          item.component[0].toLowerCase() + item.component.slice(1);
+        const customProps = uni.$u.props.CustomForm[item.component] || {}
+        const lowerCompName
+          = item.component[0].toLowerCase() + item.component.slice(1)
         // Checkbox,Radio还需要合并group属性
-        let groupName;
-        if (["Checkbox", "Radio"].includes(item.component)) {
-          groupName =
-            item.component[0].toLowerCase() + item.component.slice(1) + "Group";
+        let groupName
+        if (['Checkbox', 'Radio'].includes(item.component)) {
+          groupName = `${item.component[0].toLowerCase()
+            + item.component.slice(1)}Group`
         }
+
         // Input可能需要合并Keyboard属性
-        if(item.component === 'Input' && item.componentProps.keyboard) {
+        if (item.component === 'Input' && item.componentProps.keyboard) {
           item.componentProps.keyboard = Object.assign(
             cloneDeep(uni.$u.props.keyboard),
             cloneDeep(uni.$u.props.CustomForm.Keyboard || {}),
-            item.componentProps.keyboard
+            item.componentProps.keyboard,
           )
         }
+
         // 非小程序能够正常处理undefined prop值，直接合并即可
         // #ifndef MP
         item.componentProps = Object.assign(
           cloneDeep(customProps),
-          item.componentProps
-        );
+          item.componentProps,
+        )
         // #endif
         // 小程序中使用undefined prop值后组件不会使用默认值，需要单独映射默认值
         // #ifdef MP
         if (groupName) {
-          const optionProps = uni.$u.props[lowerCompName];
+          const optionProps = uni.$u.props[lowerCompName]
           for (let i = 0; i < item.componentProps.options.length; i++) {
             item.componentProps.options[i] = Object.assign(
               cloneDeep(optionProps),
-              item.componentProps.options[i]
-            );
+              item.componentProps.options[i],
+            )
           }
         }
         const defaultProps = groupName
           ? uni.$u.props[groupName]
-          : uni.$u.props[lowerCompName];
+          : uni.$u.props[lowerCompName]
         item.componentProps = Object.assign(
           cloneDeep(defaultProps),
           cloneDeep(customProps),
-          item.componentProps
-        );
+          item.componentProps,
+        )
         const defaultItemProps = uni.$u.props.formItem
-        item = data[index] = Object.assign(cloneDeep(defaultItemProps), cloneDeep(item))
+        item = data[index] = Object.assign(
+          cloneDeep(defaultItemProps),
+          cloneDeep(item),
+        )
         // #endif
         // 自动填充placeholder
         if (!item.componentProps.placeholder && this.autoSetPlaceholder) {
-          if (
-            ["Calendar", "Picker", "DatetimePicker"].includes(item.component)
-          ) {
-            item.componentProps.placeholder = `请选择${item.label || ""}`;
-          } else if (["Code", "Input", "Textarea"].includes(item.component)) {
-            item.componentProps.placeholder = `请输入${item.label || ""}`;
-          }
+          if (['Calendar', 'Picker', 'DatetimePicker'].includes(item.component))
+            item.componentProps.placeholder = `请选择${item.label || ''}`
+          else if (['Code', 'Input', 'Textarea'].includes(item.component))
+            item.componentProps.placeholder = `请输入${item.label || ''}`
         }
         // 设置Picker使用columns或options属性均可
-        if (item.component === "Picker" && !item.componentProps.options) {
-          item.componentProps.options = item.componentProps.columns;
-        }
+        if (item.component === 'Picker' && !item.componentProps.options)
+          item.componentProps.options = item.componentProps.columns
+
         // 兼容Picker-options为单层数组
         if (
-          item.component === "Picker" &&
-          !Array.isArray(item.componentProps.options[0])
-        ) {
-          item.componentProps.options = [item.componentProps.options];
-        }
+          item.component === 'Picker'
+          && !Array.isArray(item.componentProps.options[0])
+        )
+          item.componentProps.options = [item.componentProps.options]
+
         // 兼容微信小程序使用setFormatter设置formatter
         if (
-          ["Calendar", "Textarea", "DatetimePicker"].includes(item.component) &&
-          typeof item.componentProps.formatter === "function"
+          ['Calendar', 'Textarea', 'DatetimePicker'].includes(item.component)
+          && typeof item.componentProps.formatter === 'function'
         ) {
           if (!this.$refs[`${this.getName(item)}Ref`]?.[0]) {
             this.$nextTick(() => {
               this.$refs[`${this.getName(item)}Ref`][0].setFormatter(
-                item.componentProps.formatter
-              );
-            });
+                item.componentProps.formatter,
+              )
+            })
           }
         }
         // 初始化Upload model值
-        if (item.component === "Upload" && item.componentProps.maxCount !== 1) {
-          const urls = item.componentProps.fileList.map((item) => item.url);
-          set(this.model, item.prop, urls);
-        } else if (
-          item.component === "Upload" &&
-          item.componentProps.fileList.length
+        if (item.component === 'Upload' && item.componentProps.maxCount !== 1) {
+          const urls = item.componentProps.fileList.map(item => item.url)
+          set(this.model, item.prop, urls)
+        }
+        else if (
+          item.component === 'Upload'
+          && item.componentProps.fileList.length
         ) {
-          set(this.model, item.prop, item.componentProps.fileList[0].url);
+          set(this.model, item.prop, item.componentProps.fileList[0].url)
         }
         // 小程序中Switch必须设置初始值才能setRules
-        if(item.component === 'Switch' && !get(this.model, item.prop)) {
+        if (item.component === 'Switch' && !get(this.model, item.prop))
           set(this.model, item.prop, false)
-        }
+
         return {
           ...item,
           // v-show控制表单项
-          ifShow: item.ifShow === false ? false : true,
+          ifShow: item.ifShow !== false,
           // 弹出类型组件,独立控制显示隐藏
-          show: ["Calendar", "Picker", "DatetimePicker", "Input"].includes(
-            item.component
+          show: ['Calendar', 'Picker', 'DatetimePicker', 'Input'].includes(
+            item.component,
           )
             ? false
             : undefined,
@@ -930,12 +894,53 @@ export default {
           disabled: !!item.disabled,
           // 表单项动态禁用
           dynamicDisabled:
-            typeof item.dynamicDisabled === "function"
+            typeof item.dynamicDisabled === 'function'
               ? item.dynamicDisabled
               : !!item.dynamicDisabled,
-        };
-      });
+        }
+      })
     },
+  },
+  created() {
+    // HACK:源码中只有Object.keys(this.model).length判断通过才会注入rules
+    // 且必须在form组件创建完成前，因为源码中clone首次接收到的值进行判断
+    if (this.rules && !Object.keys(this.model).length) {
+      const firstProp = this.schemas[0].prop
+      firstProp && set(this.model, firstProp, null)
+    }
+  },
+  mounted() {
+    // 兼容微信小程序通过setRules注入rules
+    // 自动填充trigger与message
+    if (this.$refs.formRef && this.rules) {
+      const ruleMap = cloneDeep(this.rules)
+      if (typeof ruleMap == 'object') {
+        for (const prop in ruleMap) {
+          const rules = ruleMap[prop]
+          const { label, component }
+            = this.items.find(item => item.prop === prop) || {}
+          let prefix = '请输入'
+          if (
+            [
+              'Calender',
+              'Picker',
+              'DatetimePicker',
+              'Rate',
+              'Checkbox',
+              'Radio',
+              'Switch',
+              'Slider',
+            ].includes(component)
+          )
+            prefix = '请选择'
+          else if (component === 'Upload')
+            prefix = '请上传'
+
+          this.fillRuleMessage(rules, label, prefix)
+        }
+      }
+      this.$refs.formRef.setRules(ruleMap)
+    }
   },
   methods: {
     // HACK:解决HbuilderX编译报错
@@ -944,279 +949,300 @@ export default {
     get,
     // 兼容小程序template中直接set可能无效问题
     // 提供组件ref设置、获取model方法
-    setModel(map){
-      if(!isPlainObject(map)) {
-        throw Error('setModel只能接收对象')
-      }
-      for(let key in map) {
-        set(this.model, key, map[key])
-      }
+    setModel(map) {
+      if (!isPlainObject(map))
+        throw new Error('setModel只能接收对象')
+
+      for (const key in map) set(this.model, key, map[key])
     },
-    getModelClone(){
+    getModelClone() {
       return cloneDeep(this.model)
     },
     // 实现Form方法,方便直接通过组件ref调用
     async validate() {
-      await this.$refs.formRef.validate();
+      await this.$refs.formRef.validate()
     },
     setRules() {
-      this.$refs.formRef.setRules();
+      this.$refs.formRef.setRules()
     },
     async validateField() {
-      await this.$refs.formRef.validateField();
+      await this.$refs.formRef.validateField()
     },
     resetFields() {
-      this.$refs.formRef.resetFields();
+      this.$refs.formRef.resetFields()
     },
     clearValidate() {
-      this.$refs.formRef.clearValidate();
+      this.$refs.formRef.clearValidate()
     },
     // 补充rule message
     fillRuleMessage(rules, label, prefix) {
       if (Array.isArray(rules)) {
-        for (let rule of rules) {
-          this.fillRuleMessage(rule, label, prefix);
-        }
-      } else if (typeof rules === "object") {
-        if (!rules.trigger?.length) rules.trigger = ["blur", "change"];
-        if(rules.message) return
-        if (rules.required) {
-          rules.message = prefix + label;
-        } else if (rules.type) {
-          rules.message = "输入类型错误";
-        } else if (rules.len) {
-          rules.message = `输入长度要求${rules.len}位`;
-        } else {
-          rules.message = "校验不通过";
-        }
+        for (const rule of rules) this.fillRuleMessage(rule, label, prefix)
       }
-
+      else if (typeof rules === 'object') {
+        if (!rules.trigger?.length)
+          rules.trigger = ['blur', 'change']
+        if (rules.message)
+          return
+        if (rules.required)
+          rules.message = prefix + label
+        else if (rules.type)
+          rules.message = '输入类型错误'
+        else if (rules.len)
+          rules.message = `输入长度要求${rules.len}位`
+        else rules.message = '校验不通过'
+      }
     },
     // 处理表单项prop可能带"."的情况,返回处理后的小驼峰prop名
     getName(item) {
-      if (item.prop.includes(".")) {
-        const names = item.prop.split(".").map((name, index) => {
-          if (index == 0) return name.toLowerCase();
-          return name[0].toUpperCase() + name.slice(1).toLowerCase();
-        });
-        return names.join("");
+      if (item.prop.includes('.')) {
+        const names = item.prop.split('.').map((name, index) => {
+          if (index === 0)
+            return name.toLowerCase()
+          return name[0].toUpperCase() + name.slice(1).toLowerCase()
+        })
+        return names.join('')
       }
-      return item.prop;
+      return item.prop
     },
     // 多级条件判断是否应该禁用
     isDisabled(item) {
-      const commonDisabled = !!this.disabled;
-      const itemDisabled = !!item.disabled;
-      let dynamicDisabled = false;
-      if (typeof item.dynamicDisabled == "boolean") {
-        dynamicDisabled = item.dynamicDisabled;
-      } else if (typeof item.dynamicDisabled == "function") {
+      const commonDisabled = !!this.disabled
+      const itemDisabled = !!item.disabled
+      let dynamicDisabled = false
+      if (typeof item.dynamicDisabled == 'boolean') {
+        dynamicDisabled = item.dynamicDisabled
+      }
+      else if (typeof item.dynamicDisabled == 'function') {
         dynamicDisabled = item.dynamicDisabled({
           schema: item,
           schemas: this.items,
           model: this.model,
           prop: item.prop,
-        });
+        })
       }
-      return commonDisabled || itemDisabled || dynamicDisabled;
+      return commonDisabled || itemDisabled || dynamicDisabled
     },
     // 绑定事件
     onMethod(event, func, modelKey, value) {
-      if(modelKey) {
-        this.setModel({[modelKey]: value === undefined ? event : value})
-      }
-      func?.(event);
+      if (modelKey)
+        this.setModel({ [modelKey]: value === undefined ? event : value })
+
+      func?.(event)
       this.$forceUpdate()
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的打开操作
     showItem(item, func, event) {
-      if (this.isDisabled(item)) return;
-      func?.(event);
-      if(['Calendar','Picker','DatetimePicker'].includes(item.component) || (item.component === 'Input' && item.componentProps.keyboard)) {
-        item.show = true;
-        uni.hideKeyboard();
-        this.$forceUpdate();
+      if (this.isDisabled(item))
+        return
+      func?.(event)
+      if (
+        ['Calendar', 'Picker', 'DatetimePicker'].includes(item.component)
+        || (item.component === 'Input' && item.componentProps.keyboard)
+      ) {
+        item.show = true
+        uni.hideKeyboard()
+        this.$forceUpdate()
       }
     },
     // 'Calendar', 'Picker', 'DatetimePicker'的关闭操作
     closeItem(item, func, event) {
-      item.show = false;
-      func?.(event);
-      this.$forceUpdate();
+      item.show = false
+      func?.(event)
+      this.$forceUpdate()
     },
     // 获取Calendar|Picker|DatetimePicker值,优先取model[`${item.prop}Text`],其次model[item.prop]
     getShownValue(item) {
-      const value = get(this.model, `${item.prop}Text`) || get(this.model, item.prop);
-      if (typeof value === "string") return value;
-      if (value === undefined || value === null) return "";
-      return value?.toString();
+      const value
+        = get(this.model, `${item.prop}Text`) || get(this.model, item.prop)
+      if (typeof value === 'string')
+        return value
+      if (value === undefined || value === null)
+        return ''
+      return value?.toString()
     },
     // 日历确认
     onCalendarConfirm(item, e) {
-      if (!item.componentProps.mode || item.componentProps.mode === "single") {
-        set(this.model, item.prop, e[0]);
-      } else {
-        set(this.model, item.prop, e);
-      }
+      if (!item.componentProps.mode || item.componentProps.mode === 'single')
+        set(this.model, item.prop, e[0])
+      else set(this.model, item.prop, e)
+
       this.closeItem(item, item.componentProps.onConfirm, e)
     },
     // 微信小程序无法将picker实例传出来，只能通过ref操作
     onPickerChange(e, refName, func) {
-      e.picker = this.$refs[refName]?.[0];
-      func?.(e);
-      this.$forceUpdate();
+      e.picker = this.$refs[refName]?.[0]
+      func?.(e)
+      this.$forceUpdate()
     },
     // Picker组件需要手动保存数据
     // 传递后e为{indexs: number[], value: any[], values: object[][], actualValue: any[], labels: string[]}
     onPickerConfirm(item, e) {
-      const valueField = item.componentProps.valueField;
-      const labelField = item.componentProps.labelField;
-      const actualValue = e.value.map((value) => value[valueField]);
-      const labels = e.value.map((value) => value[labelField]);
-      set(this.model, item.prop, e.value.length === 1 ? actualValue[0] : actualValue)
-      set(this.model, `${item.prop}Text`, e.value.length === 1 ? labels[0] : labels)
+      const valueField = item.componentProps.valueField
+      const labelField = item.componentProps.labelField
+      const actualValue = e.value.map(value => value[valueField])
+      const labels = e.value.map(value => value[labelField])
+      set(
+        this.model,
+        item.prop,
+        e.value.length === 1 ? actualValue[0] : actualValue,
+      )
+      set(
+        this.model,
+        `${item.prop}Text`,
+        e.value.length === 1 ? labels[0] : labels,
+      )
       this.closeItem(item, item.componentProps.onConfirm, {
         ...e,
         actualValue,
         labels,
-      });
+      })
     },
     // DatetimePicker组需要手动保存数据,这里判断是否格式化保存
     onDatetimeConfirm(item, e) {
-      let value = dayjs(e.value).format("YYYY-MM-DD HH:mm");
-      if (e.mode === "date") {
-        value = dayjs(e.value).format("YYYY-MM-DD");
-      } else if (e.mode === "time") {
-        value = dayjs(e.value).format("HH:mm");
-      } else if (e.mode === "year-month") {
-        value = dayjs(e.value).format("YYYY-MM");
-      }
-      if (item.componentProps.format) {
-        set(this.model, item.prop, value);
-      } else {
-        set(this.model, item.prop, e.value);
-      }
-      this.closeItem(item, item.componentProps.onConfirm, e);
+      let value = dayjs(e.value).format('YYYY-MM-DD HH:mm')
+      if (e.mode === 'date')
+        value = dayjs(e.value).format('YYYY-MM-DD')
+      else if (e.mode === 'time')
+        value = dayjs(e.value).format('HH:mm')
+      else if (e.mode === 'year-month')
+        value = dayjs(e.value).format('YYYY-MM')
+
+      if (item.componentProps.format)
+        set(this.model, item.prop, value)
+      else set(this.model, item.prop, e.value)
+
+      this.closeItem(item, item.componentProps.onConfirm, e)
     },
     // Upload删除文件
     deleteFile(item, e) {
-      const origin = cloneDeep(item.componentProps.fileList);
-      origin.splice(e.index, 1);
-      item.componentProps.fileList = origin;
+      const origin = cloneDeep(item.componentProps.fileList)
+      origin.splice(e.index, 1)
+      item.componentProps.fileList = origin
       if (item.componentProps.maxCount === 1) {
-        set(this.model, item.prop, null);
-      } else {
-        const data = get(this.model, item.prop);
-        data.splice(e.index, 1);
+        set(this.model, item.prop, null)
       }
-      this.$forceUpdate();
+      else {
+        const data = get(this.model, item.prop)
+        data.splice(e.index, 1)
+      }
+      this.$forceUpdate()
     },
     // Upload新增文件
     async afterRead(item, e) {
       // 当设置 multiple 为 true 时, file 为数组格式，否则为对象格式,统一为数组处理
-      const originList = cloneDeep(item.componentProps.fileList);
-      const lists = [].concat(e.file);
-      let fileListLen = originList.length;
-      lists.map((list) => {
+      const originList = cloneDeep(item.componentProps.fileList)
+      const lists = [].concat(e.file)
+      let fileListLen = originList.length
+      lists.forEach((list) => {
         originList.push({
           ...list,
-          status: "uploading",
-          message: "上传中",
-        });
-      });
+          status: 'uploading',
+          message: '上传中',
+        })
+      })
       for (let i = 0; i < lists.length; i++) {
-        let url = lists[i].url;
-        if (item.componentProps.compress && lists[i].type.startsWith("image")) {
+        let url = lists[i].url
+        if (item.componentProps.compress && lists[i].type.startsWith('image')) {
           try {
             url = await this.$refs.imageCompressRef.compress({
               src: url,
               ...item.componentProps.compress,
-            });
-          } catch (err) {
-            console.log("压缩失败", err);
+            })
+          }
+          catch (err) {
+            console.log('压缩失败', err)
           }
         }
-        const result = await item.componentProps.api(url);
+        const result = await item.componentProps.api(url)
         if (item.componentProps.maxCount === 1) {
-          set(this.model, item.prop, result);
-        } else {
-          const data = get(this.model, item.prop);
-          data.push(result);
+          set(this.model, item.prop, result)
         }
-        const file = originList[fileListLen];
+        else {
+          const data = get(this.model, item.prop)
+          data.push(result)
+        }
+        const file = originList[fileListLen]
         originList.splice(
           fileListLen,
           1,
           Object.assign(file, {
-            status: "success",
-            message: "",
+            status: 'success',
+            message: '',
             url: result,
-          })
-        );
-        fileListLen++;
+          }),
+        )
+        fileListLen++
       }
-      item.componentProps.fileList = originList;
-      this.$forceUpdate();
+      item.componentProps.fileList = originList
+      this.$forceUpdate()
     },
     getCode(item, disabled) {
-      if (disabled) return;
+      if (disabled)
+        return
       if (this.$refs[`${this.getName(item)}Ref`]?.[0]?.canGetCode) {
         uni.showLoading({
-          title: "正在获取验证码",
-        });
+          title: '正在获取验证码',
+        })
         item.componentProps
           .api(this.model)
           .then(() => {
             // 这里此提示会被this.start()方法中的提示覆盖
-            uni.$u.toast("验证码已发送");
+            uni.$u.toast('验证码已发送')
             // 通知验证码组件内部开始倒计时
-            this.$refs[`${this.getName(item)}Ref`]?.[0].start();
+            this.$refs[`${this.getName(item)}Ref`]?.[0].start()
           })
           .finally(() => {
-            uni.hideLoading();
-          });
-      } else {
-        uni.$u.toast("请倒计时结束后再发送");
+            uni.hideLoading()
+          })
+      }
+      else {
+        uni.$u.toast('请倒计时结束后再发送')
       }
     },
     // 验证码组件改变显示文本
     onCodeChange(item, e) {
-      item.componentProps.tips = e;
+      item.componentProps.tips = e
       item.componentProps.onChange?.(e)
-      this.$forceUpdate();
+      this.$forceUpdate()
     },
     // 验证码开始倒计时回调
     onCodeStart(item) {
-      item.componentProps.buttonDisabled = true;
-      item.componentProps.onStart?.();
+      item.componentProps.buttonDisabled = true
+      item.componentProps.onStart?.()
     },
     // 验证码结束倒计时回调
     onCodeEnd(item) {
-      item.componentProps.buttonDisabled = false;
-      item.componentProps.onEnd?.();
+      item.componentProps.buttonDisabled = false
+      item.componentProps.onEnd?.()
     },
     // 自定义键盘change事件
     onInputKeyboardChange(item, e) {
       const oldValue = get(this.model, item.prop) || ''
       // 处理Input最大长度设置
-      const maxlength = (typeof item.componentProps.maxlength !== 'number' || item.componentProps.maxlength < 1) ? Infinity : item.componentProps.maxlength
-      if(oldValue.length < maxlength) {
+      const maxlength
+        = typeof item.componentProps.maxlength !== 'number'
+        || item.componentProps.maxlength < 1
+          ? Number.POSITIVE_INFINITY
+          : item.componentProps.maxlength
+      if (oldValue.length < maxlength)
         set(this.model, item.prop, oldValue + e)
-      }
+
       item.componentProps.keyboard.onChange?.(e)
       this.$forceUpdate()
     },
     // 自定义键盘删除事件
     onInputKeyboardBackspace(item, e) {
       const oldValue = get(this.model, item.prop)
-      if(oldValue?.length) {
-        set(this.model, item.prop, oldValue.slice(0, oldValue.length-1))
-      }
+      if (oldValue?.length)
+        set(this.model, item.prop, oldValue.slice(0, oldValue.length - 1))
+
       item.componentProps.keyboard.onBackspace?.(e)
       this.$forceUpdate()
-    }
+    },
   },
-};
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

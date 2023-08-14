@@ -42,7 +42,7 @@
 
 <script>
 export default {
-	mixins: [uni.$u.mpMixin, uni.$u.mixin],
+  mixins: [uni.$u.mpMixin, uni.$u.mixin],
   name: 'SliderVerify',
   emits: ['success'],
   props: {
@@ -51,57 +51,57 @@ export default {
     /* 高度 */
     height: {
       type: [String, Number],
-      default: '80rpx'
+      default: '80rpx',
     },
     /* 滑块宽度，默认同高度 */
     sliderWidth: String,
     /* 背景颜色 */
     color: {
       type: String,
-      default: uni.$u.color.bgColor
+      default: uni.$u.color.bgColor,
     },
     /* 滑动遮罩层颜色 */
     successColor: {
       type: String,
-      default: uni.$u.color.primary
+      default: uni.$u.color.primary,
     },
     /* 滑块颜色 */
     sliderColor: {
       type: String,
-      default: uni.$u.color.contentColor
+      default: uni.$u.color.contentColor,
     },
     /* 显示文字 */
     text: { type: String, default: '' },
     /* 文字颜色 */
     textColor: {
       type: String,
-      default: uni.$u.color.contentColor
+      default: uni.$u.color.contentColor,
     },
     /* 文本大小 */
     fontSize: {
       type: [Number, String],
-      default: '16px'
+      default: '16px',
     },
     /* 滑动完成时文字颜色 */
     successTextColor: {
       type: String,
-      default: '#ffffff'
+      default: '#ffffff',
     },
     /* 图标颜色 */
     iconColor: {
       type: String,
-      default: '#ffffff'
+      default: '#ffffff',
     },
     /* 图标大小 */
     iconSize: {
       type: [Number, String],
-      default: 24
+      default: 24,
     },
     /* 整体圆角大小 */
     borderRadius: {
       type: [Number, String],
-      default: '16rpx'
-    }
+      default: '16rpx',
+    },
   },
   data() {
     return {
@@ -112,30 +112,34 @@ export default {
   },
   computed: {
     getIcon() {
-      if (this.isSuccess) return 'checkmark-circle'
-      if (this.disabled) return 'close-circle'
+      if (this.isSuccess)
+        return 'checkmark-circle'
+      if (this.disabled)
+        return 'close-circle'
       return 'arrow-right-double'
     },
-    halfSliderWidth(){
+    halfSliderWidth() {
       const value = this.sliderWidth || this.height
-      const width = (parseFloat(value) / 2) || 100
+      const width = (Number.parseFloat(value) / 2) || 100
       return Math.min(width, 40)
-    }
+    },
   },
   methods: {
     onChange(e) {
       this.maskWidth = e.detail.x
     },
     async onEnd(e) {
-      if (this.isSuccess) return
+      if (this.isSuccess)
+        return
       const area = await this.getSize('area')
       const slider = await this.getSize('slider')
-      let end = Math.floor(area.left + area.width)
-      let pos = Math.floor(slider.left + slider.width)
+      const end = Math.floor(area.left + area.width)
+      const pos = Math.floor(slider.left + slider.width)
       if (pos >= end) {
         this.isSuccess = true
         this.$emit('success')
-      } else {
+      }
+      else {
         this.reset()
       }
     },
@@ -143,7 +147,7 @@ export default {
       return new Promise((resolve, reject) => {
         // #ifdef APP-NVUE
         const dom = weex.requireModule('dom')
-        dom.getComponentRect(this.$refs[name], option => {
+        dom.getComponentRect(this.$refs[name], (option) => {
           resolve(option.size)
         })
         // #endif
@@ -153,7 +157,7 @@ export default {
           .createSelectorQuery()
           .in(this)
           .select(`#${name}`)
-          .boundingClientRect(data => {
+          .boundingClientRect((data) => {
             resolve(data)
           })
           .exec()
